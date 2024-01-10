@@ -7,7 +7,11 @@
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
+<<<<<<< HEAD
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
+=======
+    "format": "prettier --write \\\"**/*.{js,ts,vue,scss,html,md,json}\\\" --ignore-path .gitignore.a-suppr",
+>>>>>>> master
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build"
@@ -36,4 +40,8 @@
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> master

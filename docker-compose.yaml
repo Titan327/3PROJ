@@ -6,7 +6,7 @@ services:
     container_name: API-EXPRESS
     working_dir: /Express
     ports:
-      - "9000:9000"
+      - "9002:9002"
     #pour run en dev avec nodemon
     command: sh -c "npm install && npm run dev"
     #pour run en classique avec node
@@ -15,7 +15,17 @@ services:
       - SQL
       #- Storage-minio
     volumes:
-      - ./Express:/Node
+      - ./BackEnd/Express:/Express
+
+  Quasar-app:
+    image: node:14
+    container_name: API-QUASAR
+    working_dir: /Quasar
+    volumes:
+      - ./FrontEnd:/Quasar
+    ports:
+      - "9000:9000"
+    command: sh -c "npm install && npm run dev"
 
   SQL:
     image: mysql:8.2.0
@@ -26,5 +36,5 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./SQL_data:/var/lib/mysql
+      - ./BackEnd/SQL_data:/var/lib/mysql
 
