@@ -29,9 +29,9 @@ services:
 
   SQL:
     image: mysql:8.2.0
-    container_name: APP-SQL
+    container_name: API-SQL
     environment:
-      MYSQL_DATABASE: Ticketing_app
+      MYSQL_DATABASE: API-BDD
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
