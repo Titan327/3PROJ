@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import {ref} from "vue";
-import {DefaultUser} from "src/interfaces/user.interface";
-import {api} from "boot/axios";
+<script setup lang='ts'>
+import {ref} from 'vue';
+import {DefaultUser} from 'src/interfaces/user.interface';
+import {api} from 'boot/axios';
 
 let newUser = ref(DefaultUser());
 let pass = ref();
