@@ -6,7 +6,6 @@ async function CreateUser(req, res){
 
     try {
 
-
         const testRyan = {
             "l1":"on est la",
             "l2":"on est la",
