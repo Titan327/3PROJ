@@ -30,7 +30,11 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> f990649bc0b1dd3ce3dabeb87e64706e5fb0fe89
       'axios',
     ],
 
@@ -79,7 +83,11 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> f990649bc0b1dd3ce3dabeb87e64706e5fb0fe89
       // vitePlugins: [
       //   [ 'package-name', { ..options.. } ]
       // ]
@@ -87,7 +95,10 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
+<<<<<<< HEAD
       port: 9000,
+=======
+>>>>>>> f990649bc0b1dd3ce3dabeb87e64706e5fb0fe89
       // https: true
       open: true // opens browser window automatically
     },
