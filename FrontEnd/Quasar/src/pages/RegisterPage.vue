@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {DefaultUser} from "src/interfaces/user.interface";
+import {api} from "boot/axios";
 
 let newUser = ref(DefaultUser());
 let pass = ref();
 let passConfirmation = ref()
+
+async function register(){
+  console.log(newUser)
+  const response = await api.post("/auth/register")
+  console.log(response)
+}
 
 </script>
 
 <template>
   <div class="q-pa-md form">
     <div class="q-gutter-md" style="max-width: 300px">
-      <q-form>
+      <q-form
+        @submit="register"
+      >
         <q-input
           outlined
           v-model="newUser.firstName"
@@ -35,6 +44,12 @@ let passConfirmation = ref()
         />
         <q-input
           outlined
+          v-model="newUser.birthdate"
+          label="Date de naissance"
+          type="date"
+        />
+        <q-input
+          outlined
           v-model="pass"
           label="Mot de passe"
           type="password"
@@ -51,13 +66,14 @@ let passConfirmation = ref()
           outline
           label="Connexion avec Google"
         />
+        <q-btn
+          color="primary"
+          text-color="white"
+          unelevated
+          label="Je créé mon compte"
+          type="submit"
+        />
       </q-form>
-      <q-btn
-        color="primary"
-        text-color="white"
-        unelevated
-        label="Je créé mon compte"
-      />
       <br>
     </div>
   </div>
