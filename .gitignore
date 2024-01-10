@@ -1,5 +1,5 @@
 # Dependency directories
-*/node_modules/
+*/*/node_modules/
 
 # Data SQL
 BackEnd/SQL_data/*
@@ -28,20 +28,20 @@ BackEnd/SQL_data/*
 # Quasar
 
     # Quasar core related directories
-    FrontEnd/.quasar
-    FrontEnd/dist
-    FrontEnd/quasar.config.*.temporary.compiled*
+    FrontEnd/Quasar/.quasar
+    FrontEnd/Quasar/dist
+    FrontEnd/Quasar/quasar.config.*.temporary.compiled*
 
     # Cordova related directories and files
-    FrontEnd/src-cordova/node_modules
-    FrontEnd/src-cordova/platforms
-    FrontEnd/src-cordova/plugins
-    FrontEnd/src-cordova/www
+    FrontEnd/Quasar/src-cordova/node_modules
+    FrontEnd/Quasar/src-cordova/platforms
+    FrontEnd/Quasar/src-cordova/plugins
+    FrontEnd/Quasar/src-cordova/www
 
     # Capacitor related directories and files
-    FrontEnd/src-capacitor/www
-    FrontEnd/src-capacitor/node_modules
+    FrontEnd/Quasar/src-capacitor/www
+    FrontEnd/Quasar/src-capacitor/node_modules
 
     # BEX related directories and files
-    FrontEnd/src-bex/www
-    FrontEnd/src-bex/js/core
+    FrontEnd/Quasar/src-bex/www
+    FrontEnd/Quasar/src-bex/js/core

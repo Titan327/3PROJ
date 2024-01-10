@@ -22,7 +22,7 @@ services:
     container_name: API-QUASAR
     working_dir: /Quasar
     volumes:
-      - ./FrontEnd:/Quasar
+      - ./FrontEnd/Quasar:/Quasar
     ports:
       - "9000:9000"
     command: sh -c "npm install && npm run dev"
