@@ -1,7 +1,4 @@
 # Dependency directories
-<<<<<<< Updated upstream
-BackEnd/Express/node_modules/
-=======
 */node_modules/
 
 # Data SQL
@@ -11,7 +8,6 @@ BackEnd/SQL_data/*
 # .env
 *.env
 *.env.local*
->>>>>>> Stashed changes
 
 # Mac file
 *.DS_Store
