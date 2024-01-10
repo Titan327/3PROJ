@@ -2,4 +2,4 @@
 BackEnd/Express/node_modules/
 
 # Mac file
-*.txt
+*.DS_Store
