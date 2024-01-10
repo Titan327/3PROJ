@@ -1,2 +1,5 @@
 # Dependency directories
-Express/node_modules/
+BackEnd/Express/node_modules/
+
+# Mac file
+*.txt
