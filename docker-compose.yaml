@@ -12,7 +12,7 @@ services:
     #pour run en classique avec node
     #command: sh -c "npm install && npm run start"
     depends_on:
-      - SQL
+      - Postgres
       #- Storage-minio
     volumes:
       - ./BackEnd/Express:/Express
@@ -27,14 +27,15 @@ services:
       - "9000:9000"
     command: sh -c "npm install && npm run dev"
 
-  SQL:
-    image: mysql:8.2.0
-    container_name: API-SQL
+  Postgres:
+    image: postgres:16
+    container_name: API-POSTGRES
     environment:
-      MYSQL_DATABASE: API-BDD
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: API-BDD
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - ./BackEnd/SQL_data:/var/lib/mysql
+      - ./BackEnd/Postgres_data:/var/lib/postgresql/data
 
