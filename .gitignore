@@ -2,12 +2,11 @@
 */*/node_modules/
 
 # Data SQL
-BackEnd/SQL_data/*
-!BackEnd/Sql_data/.gitkeep
+BackEnd/Postgres_data*
 
-# .env
-*.env
-*.env.local*
+# fichier .env
+#*.env
+#*.env.local*
 
 # Mac file
 *.DS_Store
