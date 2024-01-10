@@ -2,7 +2,7 @@
 */*/node_modules/
 
 # Data SQL
-#BackEnd/Postgres_data*
+BackEnd/Postgres_data*
 
 # fichier .env
 #*.env
