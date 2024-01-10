@@ -1,0 +1,11 @@
+const router = require('express').Router();
+const AuthController = require('../controllers/auth.controller');
+
+//PUBLIC
+//POST http://localhost:9000/api/auth/register
+router.post("/register",AuthController.CreateUser);
+//GET http://localhost:9000/api/auth/login
+router.post("/login",AuthController.LoginUser);
+
+
+module.exports = router;
