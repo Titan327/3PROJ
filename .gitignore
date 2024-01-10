@@ -1,5 +1,43 @@
 # Dependency directories
-BackEnd/Express/node_modules/
+*/node_modules/
+
+# .env
+*.env
+*.env.local*
 
 # Mac file
 *.DS_Store
+*.thumbs.db
+
+# IDE files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# logs
+*/npm-debug.log*
+*/yarn-debug.log*
+*/yarn-error.log*
+
+# Quasar
+
+    # Quasar core related directories
+    FrontEnd/.quasar
+    FrontEnd/dist
+    FrontEnd/quasar.config.*.temporary.compiled*
+
+    # Cordova related directories and files
+    FrontEnd/src-cordova/node_modules
+    FrontEnd/src-cordova/platforms
+    FrontEnd/src-cordova/plugins
+    FrontEnd/src-cordova/www
+
+    # Capacitor related directories and files
+    FrontEnd/src-capacitor/www
+    FrontEnd/src-capacitor/node_modules
+
+    # BEX related directories and files
+    FrontEnd/src-bex/www
+    FrontEnd/src-bex/js/core
