@@ -40,8 +40,8 @@ let password = ref();
         </template>
       </q-input>
       <div class="links">
-        <a href="/register">S'inscrire</a>
-        <a href="/register"><b>Mot de passe oublié</b></a>
+        <a href="#/register">S'inscrire</a>
+        <a href="#/reset-pwd"><b>Mot de passe oublié</b></a>
       </div>
       <q-btn
         class="btn "
