@@ -26,11 +26,11 @@ BackEnd/Postgres_data*
 */npm-debug.log*
 */yarn-debug.log*
 */yarn-error.log*
-
 # Quasar
 
     # Quasar core related directories
     FrontEnd/Quasar/.quasar
+    FrontEnd/Quasar/.vscode
     FrontEnd/Quasar/dist
     FrontEnd/Quasar/quasar.config.*.temporary.compiled*
 
