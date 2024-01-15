@@ -35,8 +35,6 @@ import 'quasar/dist/quasar.sass'
 
 import 'src/css/app.scss'
 
-import 'src/css/https://fonts.googleapis.com/css?family=Lato:400,700&display=swap'
-
 
 import createQuasarApp from './app.js'
 import quasarUserOptions from './quasar-user-options.js'
