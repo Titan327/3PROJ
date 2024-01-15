@@ -8,8 +8,8 @@ BackEnd/Postgres_data*
 #*.env
 #*.env.local*
 # ..env
-*.env
-*.env.local*
+#*.env
+#*.env.local*
 
 # Mac file
 *.DS_Store
