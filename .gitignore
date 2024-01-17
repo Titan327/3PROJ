@@ -1,5 +1,7 @@
 # Dependency directories
 */*/node_modules/
+*/node_modules/
+node_modules/
 
 # Data SQL
 BackEnd/Postgres_data*
