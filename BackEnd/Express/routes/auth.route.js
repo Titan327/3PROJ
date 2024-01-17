@@ -3,9 +3,9 @@ const AuthController = require('../controllers/auth.controller');
 
 //PUBLIC
 //POST http://localhost:9000/api/auth/register
-router.post("/register",AuthController.CreateUser);
+router.post("/register", AuthController.register);
 //GET http://localhost:9000/api/auth/login
-router.post("/login",AuthController.LoginUser);
+//router.post("/login",AuthController.LoginUser);
 
 
 module.exports = router;

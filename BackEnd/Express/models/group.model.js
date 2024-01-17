@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configurations/db.config');
 
-const GroupModel = sequelize.define("Groups", {
+const GroupModel = sequelize.define("Group", {
     id : {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -21,8 +21,6 @@ const GroupModel = sequelize.define("Groups", {
         allowNull: true
     }
 });
-
-// Relation Many-to-Many avec l'entitÃ© User
 
 sequelize.sync().then(() => {
     console.log('GroupModel table created successfully!');

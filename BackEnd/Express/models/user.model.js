@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configurations/db.config');
 
-const UserModel = sequelize.define("Users", {
+const UserModel = sequelize.define("User", {
     id : {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -16,17 +16,23 @@ const UserModel = sequelize.define("Users", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
     email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     verified_email: {
         type: DataTypes.BOOLEAN,
-        allowNull: false
+        allowNull: true
     },
     birth_date: {
         type: DataTypes.DATE,
-        allowNull: true
+        allowNull: false
     },
     password: {
         type: DataTypes.STRING,
