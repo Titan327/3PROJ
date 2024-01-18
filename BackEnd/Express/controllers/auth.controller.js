@@ -32,7 +32,6 @@ const register = async (req, res) => {
         return res.status(409).send({ message: "Email already taken"});
     } else {
         try {
-            //hasher le password
             const salt = await genSalt(12);
             const passwordHash = await hash(password, salt);
             console.error(firstname, lastname, username, email, birth_date, passwordHash)
@@ -53,25 +52,62 @@ const register = async (req, res) => {
 }
 
 const authentication = async (req, res) => {
-    const { pseudo, password } = req.body;
-    console.log(`REST authentication user: ${pseudo}`);
-    try {
-        const userDB = await User.findOne({ pseudo });
-        if (!userDB) {
-            res.status(400).send("Credentials incorrect");
-        } else {
-            const isPasswordValid = await compare(password, userDB.password);
-            if (!isPasswordValid) {
-                res.status(400).send("Credentials incorrect");
-            } else {
-                const token = Token.createToken(userDB);
-                res.status(200).send(token);
-            }
-        }
-    } catch (e) {
-        console.error(e)
-        res.status(500).send(e);
+    console.log(`REST login`);
+    let credentialsAreValid = false;
+    let user = null;
+    if (req.body.email) {
+        credentialsAreValid = await loginWithEmail(req.body.email, req.body.password);
+        user = await User.findOne({where: { email: req.body.email }});
     }
+    else if (req.body.username) {
+        credentialsAreValid = await loginWithUsername(req.body.username, req.body.password);
+        user = await User.findOne({where: { username: req.body.username }});
+    }
+    console.log("credentialsAreValid: ", credentialsAreValid);
+    if (credentialsAreValid){
+        const token = Token.createToken(user);
+        console.log("token: ", token);
+        return res.status(200).send(token);
+    }
+    return res.status(400).send("Credentials incorrect");
+}
+
+function loginWithEmail(email, password) {
+    console.log("login with email");
+    return new Promise((resolve, reject) => {
+        User.findOne({ where: { email: email } })
+            .then(async user => {
+                if (!user) {
+                    resolve(false); // Utilisateur non trouvé, informations d'identification invalides
+                } else {
+                    const isPasswordValid = await compare(password, user.password)
+                        .then(isPasswordValid => {
+                            resolve(isPasswordValid); // Résoudre avec la validité du mot de passe
+                        })
+                        .catch(e => reject(e));
+                }
+            })
+            .catch(e => reject(e));
+    });
+}
+
+function loginWithUsername(username, password) {
+    console.log("login with username");
+    return new Promise((resolve, reject) => {
+        User.findOne({ where: { username: username } })
+            .then(async user => {
+                if (!user) {
+                    resolve(false); // Utilisateur non trouvé, informations d'identification invalides
+                } else {
+                    const isPasswordValid = await compare(password, user.password)
+                        .then(isPasswordValid => {
+                            resolve(isPasswordValid); // Résoudre avec la validité du mot de passe
+                        })
+                        .catch(e => reject(e));
+                }
+            })
+            .catch(e => reject(e));
+    });
 }
 
 module.exports = {
