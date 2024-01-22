@@ -6,6 +6,7 @@ const verifyIsAuth = (req, res, next) => {
 
     // header: authorization: Bearer token
     const header = req.headers.authorization;
+    console.log("header: ", header);
     if (!header?.startsWith("Bearer ")) {
         return res.status(401).send({ message: "Unauthorized"});
     }
