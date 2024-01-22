@@ -8,17 +8,17 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/login',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/EmptyLayout.vue'),
     children: [{ path: '', component: () => import('pages/LoginPage.vue') }],
   },
   {
     path: '/register',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/EmptyLayout.vue'),
     children: [{ path: '', component: () => import('pages/RegisterPage.vue') }],
   },
   {
     path: '/reset-pwd',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/EmptyLayout.vue'),
     children: [{ path: '', component: () => import('pages/ResetPwdPage.vue') }],
   },
 
