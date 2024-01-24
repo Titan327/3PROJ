@@ -1,16 +1,104 @@
 <script setup lang='ts'>
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import {DefaultUser} from 'src/interfaces/user.interface';
 import {api} from 'boot/axios';
+import {useQuasar} from 'quasar';
+import {useRouter} from 'vue-router';
+
+const $q = useQuasar();
+let loading = ref(false)
+const router = useRouter();
 
 let newUser = ref(DefaultUser());
 let pass = ref();
 let passConfirmation = ref()
 
-async function register(){
-  console.log(newUser)
-  const response = await api.post("/auth/register")
-  console.log(response)
+const checkBasicEmailSyntax = (value) => {
+  const basicEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return basicEmailRegex.test(value) || 'Adresse e-mail invalide';
+};
+const checkPasswordComplexity = (value) => {
+  //regex mot de passe
+  const hasLowerCase = /[a-z]/.test(value);
+  const hasUpperCase = /[A-Z]/.test(value);
+  const hasDigit = /\d/.test(value);
+  const hasSpecialChar = /[@$!%*?&]/.test(value);
+
+  let errorMessage = "Le mot de passe doit contenir au moins";
+  if (!hasLowerCase) errorMessage += " des minuscules,";
+  if (!hasUpperCase) errorMessage += " des majuscules,";
+  if (!hasDigit) errorMessage += " des chiffres,";
+  if (!hasSpecialChar) errorMessage += " un caractère spécial,";
+
+  if (!hasLowerCase || !hasUpperCase || !hasDigit || !hasSpecialChar) {
+    errorMessage = errorMessage.slice(0, -1);
+  }
+  errorMessage += " et au moins 8 caractères.";
+
+  return (hasLowerCase && hasUpperCase && hasDigit && hasSpecialChar && value.length >= 8) || errorMessage;
+};
+const checkAge = (value) => {
+  if (!value) {
+    return "Veuillez fournir votre date de naissance.";
+  }
+
+  const birthdateTimestamp = new Date(value).getTime();
+  const eighteenYearsAgo = new Date();
+  eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18);
+  const eighteenYearsAgoTimestamp = eighteenYearsAgo.getTime();
+
+  return birthdateTimestamp <= eighteenYearsAgoTimestamp || "Vous devez avoir plus de 18 ans.";
+};
+const checkPasswordMatch = (value) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Votre logique de validation asynchrone ici
+      resolve((value === pass.value) || "Les mots de passe ne correspondent pas");
+    }, 1000
+    );
+  });
+};
+
+const checkNotNull = (value) => {
+  return !!value || "Champ Obligatoire";
+};
+
+async function register() {
+
+  loading.value = true;
+  if(1==1){
+    try {
+
+      const response = await api.post("auth/register", {
+        firstname : newUser.value.firstName,
+      });
+      if (response.data) {
+        localStorage.setItem('authToken', response.data);
+        router.push('/#');
+      }
+    }
+    catch (error) {
+      if (error.response.status === 400) {
+        $q.notify({
+          type: 'negative',
+          message: 'Nom d\'utilisateur ou mot de passe incorrect'
+        })
+      }
+      else {
+        $q.notify({
+          type: 'negative',
+          message: 'Une erreur s\'est produite lors de la connexion'
+        })
+      }
+    }
+  }
+  else {
+    $q.notify({
+      type: 'negative',
+      message: 'Tout les champs ne sont pas remplis'
+    })
+  }
+  loading.value = false;
 }
 
 </script>
@@ -23,16 +111,19 @@ async function register(){
       >
         <span class="text-primary text-h5">Créer un compte</span>
         <q-input
+          style="margin-top: 20px;"
           outlined
           class="input"
           v-model="newUser.firstName"
           label="Nom"
+          :rules="[checkNotNull]"
         />
         <q-input
           outlined
           class="input"
           v-model="newUser.lastName"
           label="Prénom"
+          :rules="[checkNotNull]"
         />
         <q-input
           outlined
@@ -40,12 +131,14 @@ async function register(){
           v-model="newUser.email"
           label="Adresse email"
           type="email"
+          :rules="[checkNotNull, checkBasicEmailSyntax]"
         />
         <q-input
           outlined
           class="input"
           v-model="newUser.username"
           label="Nom d'utilisateur"
+          :rules="[checkNotNull]"
         />
         <q-input
           outlined
@@ -53,6 +146,7 @@ async function register(){
           v-model="newUser.birthdate"
           label="Date de naissance"
           type="date"
+          :rules="[checkNotNull, checkAge]"
         />
         <q-input
           class="input"
@@ -60,6 +154,7 @@ async function register(){
           v-model="pass"
           label="Mot de passe"
           type="password"
+          :rules="[checkNotNull, checkPasswordComplexity]"
         />
         <q-input
           class="input"
@@ -67,6 +162,8 @@ async function register(){
           v-model="passConfirmation"
           label="Confirmer"
           type="password"
+          :rules="[checkNotNull, checkPasswordMatch]"
+
         />
         <div class="links">
           <a href="#/login"><b>Déja un compte ?</b></a>
@@ -121,8 +218,11 @@ async function register(){
   flex-direction: column;
 }
 
-.form .input, .form .external-services {
-  margin-top: 20px;
+ .form .external-services {
+  margin-top: 10px;
+}
+.input{
+  margin-bottom: 5px;
 }
 
 .links {

@@ -62,7 +62,7 @@ async function login() {
     <div class="logo">
       <q-img
         width="100%"
-        src="../assets/logo.png"
+        src="../assets/logo-web.webp"
         :ratio="1"
       />
     </div>
