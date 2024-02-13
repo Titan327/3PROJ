@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configurations/db.config');
+const User = require('./user.model');
 
 const GroupModel = sequelize.define("Group", {
     id : {
@@ -19,6 +20,14 @@ const GroupModel = sequelize.define("Group", {
     picture: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    owner_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        references: {
+            model: User,
+            key: 'id'
+        }
     }
 });
 

@@ -28,7 +28,8 @@ const UserModel = sequelize.define("User", {
     },
     verified_email: {
         type: DataTypes.BOOLEAN,
-        allowNull: true
+        allowNull: true,
+        defaultValue: false
     },
     birth_date: {
         type: DataTypes.DATE,
@@ -41,11 +42,8 @@ const UserModel = sequelize.define("User", {
     profile_picture: {
         type: DataTypes.STRING,
         allowNull: true
-    },
+    }
 });
-
-
-
 
 sequelize.sync().then(() => {
     console.log('UserModel table created successfully!');

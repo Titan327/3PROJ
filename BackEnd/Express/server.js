@@ -29,12 +29,9 @@ app.listen(PORT, () => console.log(`Server up and running on http://localhost:${
 
 require('./configurations/db.config');
 
-const Groups = require('./models/group.model');
-const Users = require('./models/user.model');
-const UsersGroups = require('./models/userGroup.model');
+const Group = require('./models/group.model');
+const User = require('./models/user.model');
+const UserGroup = require('./models/userGroup.model');
 
-const AuthRoute = require("./routes/auth.route");
-const Group = require("./models/group.model");
-const User = require("./models/user.model");
-app.use("/api/auth", AuthRoute);
-
+app.use("/api/auth", require("./routes/auth.route"));
+app.use("/api/group", require("./routes/group.route"));
