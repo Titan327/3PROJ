@@ -1,0 +1,16 @@
+FROM node:16-alpine
+
+# Install Cordova
+RUN npm install -g cordova
+
+# Create a new Cordova project
+RUN cordova create my-app
+
+# Change to the Cordova project directory
+WORKDIR my-app
+
+# Build the Cordova app
+RUN cordova build android --release
+
+# Export the built app
+RUN ls -lh platforms/android/build/outputs/apk/release/app-release.apk

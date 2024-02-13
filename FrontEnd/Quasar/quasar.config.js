@@ -163,6 +163,8 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
     cordova: {
+
+        appId: 'org.cordova.quasar.app',
       // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
     },
 

@@ -28,12 +28,14 @@ services:
     command: sh -c "npm install && npm run dev"
 
   cordova-builder:
-    image: node:14
-    container_name: CORDOVA-BUILDER
-    working_dir: /Quasar/src-cordova
+    build:
+      context: ./FrontEnd/Quasar/src-cordova
+      dockerfile: FrontEnd/Dockerfile
+    container_name: API-CORDOVA
+    working_dir: /app
     volumes:
-      - ./FrontEnd/Quasar:/Quasar
-    command: sh -c "npm install -g cordova && echo ici on create && cordova create app com.androidtest.ryan && cd app && npm install && cordova platform add android && cordova build android"
+      - ./FrontEnd/Quasar/src-cordova/app:/app
+    #command: sh -c "cordova build android"
 
   Postgres:
     image: postgres:16
