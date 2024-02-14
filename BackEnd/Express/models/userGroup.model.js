@@ -3,7 +3,6 @@ const sequelize = require('../configurations/db.config');
 const Group = require('./group.model');
 const User = require('./user.model');
 
-
 const UserGroupModel = sequelize.define("UserGroup", {
     id : {
         type: DataTypes.BIGINT,
@@ -26,12 +25,17 @@ const UserGroupModel = sequelize.define("UserGroup", {
             model: Group,
             key: 'id'
         }
+    },
+    balance: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0
     }
 });
 
 // Relation Many-to-Many avec l'entité User et Group
 User.belongsToMany(Group, { through: UserGroupModel, foreignKey: 'user_id' });
-Group.belongsToMany(User, { through: UserGroupModel, foreignKey: 'user_id' });
+Group.belongsToMany(User, { through: UserGroupModel, foreignKey: 'group_id' });
 
 sequelize.sync().then(() => {
     console.log('UserGroupModel table created successfully!');
