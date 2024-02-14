@@ -34,4 +34,16 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - ./BackEnd/Postgres_data:/var/lib/postgresql/data
+      - ./Data/Postgres_data:/var/lib/postgresql/data
+
+  Minio-storage:
+    image: minio/minio
+    container_name: API-MINIO
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    ports:
+      - "${MINIO_PORT}:9001"
+    volumes:
+      - ./Data/Minio_data:/data
+    command: server --address :9001 /data
