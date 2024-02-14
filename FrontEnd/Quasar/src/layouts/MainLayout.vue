@@ -1,14 +1,9 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
+  <q-layout view="lHh LpR lFf">
 
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
+    <left-pannel>
+
+    </left-pannel>
 
     <q-page-container>
       <router-view />
@@ -20,6 +15,7 @@
 
 import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
+import LeftPannel from "components/Common/LeftPannel.vue";
 const router = useRouter();
 
 let authToken = ref(localStorage.getItem('authToken'));
