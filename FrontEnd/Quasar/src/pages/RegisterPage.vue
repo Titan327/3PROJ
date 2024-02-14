@@ -33,7 +33,6 @@ const checkPasswordComplexity = (value) => {
   if (!hasLowerCase || !hasUpperCase || !hasDigit || !hasSpecialChar) {
     errorMessage = errorMessage.slice(0, -1);
   }
-  errorMessage += " et au moins 8 caractères.";
 
   return (hasLowerCase && hasUpperCase && hasDigit && hasSpecialChar && value.length >= 8) || errorMessage;
 };
@@ -54,7 +53,7 @@ const checkPasswordMatch = (value) => {
     setTimeout(() => {
       // Votre logique de validation asynchrone ici
       resolve((value === pass.value) || "Les mots de passe ne correspondent pas");
-    }, 1000
+    },
     );
   });
 };
@@ -63,33 +62,42 @@ const checkNotNull = (value) => {
   return !!value || "Champ Obligatoire";
 };
 
+const computeIsMatchingPassword = computed(() => {
+  if(passConfirmation.value === pass.value){
+    return true;
+  }
+  return false;
+
+});
 async function register() {
 
   loading.value = true;
-  if(1==1){
+  if(computeIsMatchingPassword.value){
     try {
 
       const response = await api.post("auth/register", {
         firstname : newUser.value.firstName,
+        lastname : newUser.value.lastName,
+        username : newUser.value.username,
+        email : newUser.value.email,
+        birth_date : newUser.value.birthdate,
+        password : pass.value
+
       });
       if (response.data) {
-        localStorage.setItem('authToken', response.data);
-        router.push('/#');
+        $q.notify({
+          type: 'positive',
+          message: 'Utilisateur créé'
+        })
+        router.push('/#/login');
       }
     }
     catch (error) {
-      if (error.response.status === 400) {
         $q.notify({
           type: 'negative',
-          message: 'Nom d\'utilisateur ou mot de passe incorrect'
+          message: 'Une erreur s\'est produite lors de l\'inscription'
         })
-      }
-      else {
-        $q.notify({
-          type: 'negative',
-          message: 'Une erreur s\'est produite lors de la connexion'
-        })
-      }
+
     }
   }
   else {
@@ -169,12 +177,13 @@ async function register() {
           <a href="#/login"><b>Déja un compte ?</b></a>
         </div>
         <q-btn
-          class="btn "
+          class="btn"
           color="primary"
           text-color="white"
           unelevated
           label="Créer mon compte"
           type="submit"
+          :loading="loading"
         />
         <div class="external-services">
           <q-item-label class="text-secondary">Inscription avec:</q-item-label>
