@@ -1,9 +1,60 @@
 <script setup lang="ts">
 import {ref} from 'vue';
+import {api} from "boot/axios";
+import { useQuasar } from 'quasar'
+import {useRouter} from "vue-router";
 
-let userName = ref();
-let password = ref();
+const $q = useQuasar();
+let loading = ref(false)
+const router = useRouter();
 
+let userName = ref(null);
+let password = ref(null);
+let email = ref(null);
+
+async function login() {
+  loading.value = true;
+  if((userName.value !=null && userName.value!='') && (password.value != null && password.value!='')){
+    try {
+      let sendUserLogin = null;
+      if (userName.value.includes('@')) {
+        email.value = userName.value;
+      } else {
+        sendUserLogin = userName.value;
+      }
+      const response = await api.post("auth/login", {
+        username: sendUserLogin,
+        password: password.value,
+        email: email.value,
+      });
+      if (response.data) {
+        localStorage.setItem('authToken', response.data);
+        router.push('/#');
+      }
+    }
+    catch (error) {
+      if (error.response.status === 400) {
+        $q.notify({
+          type: 'negative',
+          message: 'Nom d\'utilisateur ou mot de passe incorrect'
+        })
+      }
+      else {
+        $q.notify({
+          type: 'negative',
+          message: 'Une erreur s\'est produite lors de la connexion'
+        })
+      }
+    }
+  }
+  else {
+    $q.notify({
+      type: 'negative',
+      message: 'Tout les champs ne sont pas remplis'
+    })
+  }
+  loading.value = false;
+}
 </script>
 
 <template>
@@ -11,7 +62,7 @@ let password = ref();
     <div class="logo">
       <q-img
         width="100%"
-        src="../assets/logo.png"
+        src="../assets/logo-web.webp"
         :ratio="1"
       />
     </div>
@@ -49,6 +100,8 @@ let password = ref();
         text-color="white"
         unelevated
         label="Se connecter"
+        @click="login"
+        :loading="loading"
       />
       <div class="external-services">
         <q-item-label class="text-secondary">Connexion avec:</q-item-label>

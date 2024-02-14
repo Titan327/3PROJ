@@ -17,5 +17,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+
+import {onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+const router = useRouter();
+
+let authToken = ref(localStorage.getItem('authToken'));
+
+onMounted(() => {
+  if (authToken.value) {
+    console.log("Token OK");
+  } else {
+    router.push('/login')
+  }
+});
 </script>
