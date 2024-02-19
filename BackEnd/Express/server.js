@@ -1,12 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-//const Sequelize = require('sequelize');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 YAML = require('yamljs');
 swaggerDoc = YAML.load('./swagger.yaml');
 const app = express();
+const {createTransport} = require("nodemailer");
 
 
 
@@ -32,6 +32,7 @@ require('./configurations/db.config');
 const Group = require('./models/group.model');
 const User = require('./models/user.model');
 const UserGroup = require('./models/userGroup.model');
+
 
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));

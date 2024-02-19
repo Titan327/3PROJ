@@ -6,6 +6,8 @@ const AuthController = require('../controllers/auth.controller');
 router.post("/register", AuthController.register);
 //POST http://localhost:9000/api/auth/login
 router.post("/login",AuthController.authentication);
+//POST http://localhost:9000/api/auth/forgottenPassword
+router.post("/forgottenPassword",AuthController.forgottenPassword);
 
 
 module.exports = router;
