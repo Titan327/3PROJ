@@ -29,7 +29,17 @@ const UserGroupModel = sequelize.define("UserGroup", {
     balance: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        defaultValue: 0
+        defaultValue: 0.00
+    },
+    favorite: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
     }
 });
 
