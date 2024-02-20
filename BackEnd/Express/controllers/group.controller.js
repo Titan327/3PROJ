@@ -57,27 +57,49 @@ const createGroup = async (req, res) => {
 
 const modifyGroup = async (req, res) => {
     console.log(`REST modifyGroup`);
-    const { group_id, group_name_modified, new_name, group_description_modified, new_description } = req.params;
-    const user_id = req.authorization.user_id;
-    let group = await Group.findOne({where: {id: group_id}});
-    if (group === null) {
-        return res.status(404).send({ error: "Group not found" });
-    } else if (group.owner_id !== user_id) {
-        return res.status(403).send({ error: "You are not the owner of this group" });
-    } else {
-        if (group_name_modified === "true") {
-            group.name = new_name;
+    const { groupId } = req.params;
+    const { name, description } = req.body;
+    try {
+        const user_id = req.authorization.user_id;
+        let group = await Group.findOne({where: {id: groupId}});
+        if (group === null) {
+            return res.status(404).send({ error: "Group not found" });
+        } else if (group.owner_id !== user_id) {
+            return res.status(403).send({ error: "You are not the owner of this group" });
+        } else {
+            await Group.update({ name, description }, { where: { id: groupId } });
+            return res.status(200).send({ message: "Group modified successfully" });
         }
-        if (group_description_modified === "true") {
-            group.description = new_description;
+    } catch (e) {
+        console.error(e);
+        res.status(500).send(e);
+    }
+}
+
+const modifyGroupPicture = async (req, res) => {
+    console.log(`REST modifyGroup`);
+    const { groupId } = req.params;
+    const { url } = req.body;
+    try {
+        const user_id = req.authorization.user_id;
+        let group = await Group.findOne({where: {id: groupId}});
+        if (group === null) {
+            return res.status(404).send({ error: "Group not found" });
+        } else if (group.owner_id !== user_id) {
+            return res.status(403).send({ error: "You are not the owner of this group" });
+        } else {
+            await Group.update({ picture: url }, { where: { id: groupId } });
+            return res.status(200).send({ message: "Group picture modified successfully" });
         }
-        await group.save();
-        return res.status(200).send({ message: "Group modified successfully" });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send(e);
     }
 }
 
 module.exports = {
     createGroup,
     modifyGroup,
-    getGroups
+    getGroups,
+    modifyGroupPicture
 }
