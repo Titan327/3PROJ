@@ -1,0 +1,53 @@
+const { DataTypes, Transaction} = require('sequelize');
+const sequelize = require('../configurations/db.config');
+const TransactionCategoryModel = require('./transactionCategory.model');
+const GroupModel = require('./group.model');
+
+const TransactionModel = sequelize.define("Transaction", {
+    id : {
+        type: DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+    },
+    group_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false
+    },
+    label: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    total_amount: {
+        type: DataTypes.FLOAT,
+        allowNull: false
+    },
+    date: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    receipt: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    sender_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false
+    },
+    category_id: {
+        type: DataTypes.BIGINT,
+        allowNull: false
+    }
+});
+
+// Relation entre les transactions et les groupes / catégories
+TransactionModel.belongsTo(GroupModel, { foreignKey: 'group_id' });
+TransactionModel.belongsTo(TransactionCategoryModel, { foreignKey: 'category_id' });
+
+sequelize.sync().then(() => {
+    console.log('TransactionModel table created successfully!');
+}).catch((error) => {
+    console.error('Unable to create table UserModel : TransactionModel', error);
+});
+
+module.exports = TransactionModel;

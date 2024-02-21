@@ -32,7 +32,11 @@ require('./configurations/db.config');
 const Group = require('./models/group.model');
 const User = require('./models/user.model');
 const UserGroup = require('./models/userGroup.model');
+const Transaction = require('./models/transaction.model');
+const TransactionCategory = require('./models/transactionCategory.model');
+const TransactionUser = require('./models/transactionUser.model');
 
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));
 app.use("/api/user", require("./routes/user.route"));
+app.use("/api/transaction", require("./routes/transaction.route"));
