@@ -1,5 +1,19 @@
 const Transaction = require('../models/transaction.model');
 const TransactionUser = require('../models/transactionUser.model');
+const UserGroup = require('../models/userGroup.model'); // Assurez-vous d'importer votre modèle GroupUser
+
+const deleteTransactionAndTransactionUsers = async (transactionId, transactionUserIds) => {
+    await Transaction.destroy({
+        where: {
+            id: transactionId
+        }
+    });
+    await TransactionUser.destroy({
+        where: {
+            id: transactionUserIds
+        }
+    });
+}
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
@@ -21,6 +35,18 @@ const createTransaction = async (req, res) => {
         let totalDetailAmount = 0;
 
         for (const detail of detailsArray) {
+            const userInGroup = await UserGroup.findOne({
+                where: {
+                    group_id: group_id,
+                    user_id: detail.user_id
+                }
+            });
+
+            if (!userInGroup) {
+                await deleteTransactionAndTransactionUsers(transaction.id, transactionUserIds);
+                return res.status(400).send('User is not part of the group');
+            }
+
             const transactionUser = await TransactionUser.create({
                 transaction_id: transaction.id,
                 user_id: detail.user_id,
@@ -30,16 +56,7 @@ const createTransaction = async (req, res) => {
             totalDetailAmount += detail.amount;
         }
         if (totalDetailAmount !== total_amount) {
-            await Transaction.destroy({
-                where: {
-                    id: transaction.id
-                }
-            });
-            await TransactionUser.destroy({
-                where: {
-                    id: transactionUserIds
-                }
-            });
+            await deleteTransactionAndTransactionUsers(transaction.id, transactionUserIds);
             return res.status(400).send('The sum of the details amount must be equal to the total amount');
         }
         return res.status(201).send(transaction);
