@@ -1,6 +1,6 @@
 const Transaction = require('../models/transaction.model');
 const TransactionUser = require('../models/transactionUser.model');
-const UserGroup = require('../models/userGroup.model'); // Assurez-vous d'importer votre modèle GroupUser
+const UserGroup = require('../models/userGroup.model');
 
 const deleteTransactionAndTransactionUsers = async (transactionId, transactionUserIds) => {
     await Transaction.destroy({

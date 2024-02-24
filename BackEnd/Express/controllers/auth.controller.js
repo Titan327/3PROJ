@@ -34,7 +34,6 @@ const register = async (req, res) => {
         try {
             const salt = await genSalt(12);
             const passwordHash = await hash(password, salt);
-            console.error(firstname, lastname, username, email, birth_date, passwordHash)
             await User.create({
                 firstname,
                 lastname,
@@ -63,10 +62,8 @@ const authentication = async (req, res) => {
         credentialsAreValid = await loginWithUsername(req.body.username, req.body.password);
         user = await User.findOne({where: { username: req.body.username }});
     }
-    console.log("credentialsAreValid: ", credentialsAreValid);
     if (credentialsAreValid){
         const token = Token.createToken(user);
-        console.log("token: ", token);
         return res.status(200).send(token);
     }
     return res.status(400).send("Credentials incorrect");
