@@ -1,12 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-//const Sequelize = require('sequelize');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 YAML = require('yamljs');
 swaggerDoc = YAML.load('./swagger.yaml');
 const app = express();
+const {createTransport} = require("nodemailer");
 
 
 
@@ -35,6 +35,7 @@ const UserGroup = require('./models/userGroup.model');
 const Transaction = require('./models/transaction.model');
 const TransactionCategory = require('./models/transactionCategory.model');
 const TransactionUser = require('./models/transactionUser.model');
+
 
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));

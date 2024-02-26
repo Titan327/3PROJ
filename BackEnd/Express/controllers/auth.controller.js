@@ -2,6 +2,7 @@ const Joi = require("joi");
 const Token = require('../security/token.security')
 const User = require("../models/user.model");
 const {genSalt, hash, compare} = require("bcrypt");
+const transporter = require("../configurations/email.config");
 
 
 const register = async (req, res) => {
@@ -69,6 +70,28 @@ const authentication = async (req, res) => {
     return res.status(400).send("Credentials incorrect");
 }
 
+const forgottenPassword = async (req, res) => {
+
+    let mailOptions = {
+        from: 'contact@tristan-tourbier.com',
+        to: 'ryan.dordain@supinfo.com',
+        subject: 'Wsh la street ca dit quoi ?',
+        text: 'ecoute mon khey ca dit feur hein'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error)
+            return res.status(500).send(error);
+        } else {
+            console.log(info.response)
+            return res.status(200).send(info.response);
+        }
+    });
+
+}
+
+
 function loginWithEmail(email, password) {
     console.log("login with email");
     return new Promise((resolve, reject) => {
@@ -109,5 +132,6 @@ function loginWithUsername(username, password) {
 
 module.exports = {
     register,
-    authentication
+    authentication,
+    forgottenPassword
 }
