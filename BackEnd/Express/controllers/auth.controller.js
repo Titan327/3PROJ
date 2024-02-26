@@ -3,6 +3,12 @@ const Token = require('../security/token.security')
 const User = require("../models/user.model");
 const {genSalt, hash, compare} = require("bcrypt");
 const transporter = require("../configurations/email.config");
+const path = require('path');
+
+const fs = require('fs');
+const {isTokenValid} = require("../security/token.security");
+
+const ForgottenPasswordTemplate = path.join(__dirname, '../Email_template/ForgottenPassword.html');
 
 
 const register = async (req, res) => {
@@ -75,23 +81,83 @@ const authentication = async (req, res) => {
 
 const forgottenPassword = async (req, res) => {
 
-    let mailOptions = {
-        from: 'contact@tristan-tourbier.com',
-        to: 'ryan.dordain@supinfo.com',
-        subject: 'Wsh la street ca dit quoi ?',
-        text: 'ecoute mon khey ca dit feur hein'
-    };
+    const schema = Joi.object({
+        email: Joi.string().email().required(),
+    });
+    const { error, value } = schema.validate(req.body, { abortEarly: false });
+    const { email } = value;
 
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            console.log(error)
-            return res.status(500).send(error);
-        } else {
-            console.log(info.response)
-            return res.status(200).send(info.response);
-        }
+    if (error) {
+        const errorMessage = error.details.map(detail => detail.message.replace(/"/g, ''));
+        return res.status(400).json({ error: errorMessage });
+    }
+
+    const user = await User.findOne({
+        where: {
+            email: email,
+        },
     });
 
+    if (!user){
+        return res.status(449).send({error:"Mail not found"});
+    }
+
+    const token = Token.createToken(user,'1h');
+    console.log(token);
+
+    let htmlContent = fs.readFileSync(ForgottenPasswordTemplate,'utf8');
+    htmlContent = htmlContent.replace('{{link}}', "https://youtube.com"); //rediriger ver le form du front
+
+    let mailOptions = {
+        from: 'contact@tristan-tourbier.com',
+        //to: email,
+        to:"tristan.tourbier@gmail.com",
+        subject: 'Email oublié',
+        html: htmlContent
+    };
+
+    await transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            return res.status(500).send({error:"Internal Server Error"});
+        } else {
+            return res.status(200).send({message:"Mail send"});
+        }
+    });
+}
+
+const resetPassword = async (req, res) => {
+    try {
+
+        console.log(req);
+
+        const schema = Joi.object({
+            password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required(),
+            passwordConfirm: Joi.ref('password')
+        });
+        const { error, value } = schema.validate(req.body, { abortEarly: false });
+        const { password } = value;
+
+        if (error) {
+            const errorMessage = error.details.map(detail => detail.message.replace(/"/g, ''));
+            return res.status(400).json({ error: errorMessage });
+        }
+
+        const salt = await genSalt(12);
+        const passwordHash = await hash(password, salt);
+
+        await User.update({
+                password : passwordHash
+            },
+            {where: {id : tokenValue.user_id}}
+        ).then(() => {
+            return res.status(200).json({ success: "Mot de passe modifié" });
+        }).catch(() => {
+            return res.status(500).json({ error: "Une erreur interne au serveur est surenue, veuiller contacter les administrateurs" });
+        });
+
+    }catch (err){
+        return res.status(500).json({ error: "Une erreur interne au serveur est surenue, veuiller contacter les administrateurs" });
+    }
 }
 
 
@@ -136,5 +202,6 @@ function loginWithUsername(username, password) {
 module.exports = {
     register,
     authentication,
-    forgottenPassword
+    forgottenPassword,
+    resetPassword
 }

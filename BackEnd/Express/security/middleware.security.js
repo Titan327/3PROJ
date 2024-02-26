@@ -18,6 +18,8 @@ const verifyIsAuth = (req, res, next) => {
         return res.status(403).send({ message: "Unauthorized"});
     }
 
+    console.log(verifyToken);
+
     //Si il est bon
     req.currentUser = verifyToken.username;
     next();
