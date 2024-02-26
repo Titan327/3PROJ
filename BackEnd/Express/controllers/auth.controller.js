@@ -78,47 +78,51 @@ const authentication = async (req, res) => {
 
 const forgottenPassword = async (req, res) => {
 
-    const schema = Joi.object({
-        email: Joi.string().email().required(),
-    });
-    const { error, value } = schema.validate(req.body, { abortEarly: false });
-    const { email } = value;
+    try {
+        const schema = Joi.object({
+            email: Joi.string().email().required(),
+        });
+        const { error, value } = schema.validate(req.body, { abortEarly: false });
+        const { email } = value;
 
-    if (error) {
-        const errorMessage = error.details.map(detail => detail.message.replace(/"/g, ''));
-        return res.status(400).json({ error: errorMessage });
-    }
-
-    const user = await User.findOne({
-        where: {
-            email: email,
-        },
-    });
-
-    if (!user){
-        return res.status(449).send({error:"Mail not found"});
-    }
-
-    const token = Token.createToken(user,'1h');
-    console.log(token);
-
-    let htmlContent = fs.readFileSync(ForgottenPasswordTemplate,'utf8');
-    htmlContent = htmlContent.replace('{{link}}', "https://youtube.com"); //rediriger ver le form du front
-
-    let mailOptions = {
-        from: 'contact@tristan-tourbier.com',
-        to: email,
-        subject: 'Email oublié',
-        html: htmlContent
-    };
-
-    await transporter.sendMail(mailOptions, function(error, info){
         if (error) {
-            return res.status(500).send({error:"Internal Server Error"});
-        } else {
-            return res.status(200).send({message:"Mail send"});
+            const errorMessage = error.details.map(detail => detail.message.replace(/"/g, ''));
+            return res.status(400).json({ error: errorMessage });
         }
-    });
+
+        const user = await User.findOne({
+            where: {
+                email: email,
+            },
+        });
+
+        if (!user){
+            return res.status(449).send({error:"Mail not found"});
+        }
+
+        const token = Token.createToken(user,'1h');
+        console.log(token);
+
+        let htmlContent = fs.readFileSync(ForgottenPasswordTemplate,'utf8');
+        htmlContent = htmlContent.replace('{{link}}', "https://youtube.com"); //rediriger ver le form du front
+
+        let mailOptions = {
+            from: 'contact@tristan-tourbier.com',
+            to: email,
+            subject: 'Email oublié',
+            html: htmlContent
+        };
+
+        await transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                return res.status(500).send({error:"Internal Server Error"});
+            } else {
+                return res.status(200).send({message:"Mail send"});
+            }
+        });
+    }catch (err){
+        return res.status(500).json({ error: "Une erreur interne au serveur est surenue, veuiller contacter les administrateurs" });
+    }
 }
 
 const resetPassword = async (req, res) => {
