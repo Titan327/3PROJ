@@ -107,8 +107,7 @@ const forgottenPassword = async (req, res) => {
 
     let mailOptions = {
         from: 'contact@tristan-tourbier.com',
-        //to: email,
-        to:"tristan.tourbier@gmail.com",
+        to: email,
         subject: 'Email oublié',
         html: htmlContent
     };
