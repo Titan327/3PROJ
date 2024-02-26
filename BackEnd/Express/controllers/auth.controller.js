@@ -125,7 +125,7 @@ const forgottenPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     try {
 
-        console.log(req);
+        const tokenValue = req.authorization
 
         const schema = Joi.object({
             password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required(),
@@ -148,9 +148,7 @@ const resetPassword = async (req, res) => {
             {where: {id : tokenValue.user_id}}
         ).then(() => {
             return res.status(200).json({ success: "Mot de passe modifié" });
-        }).catch(() => {
-            return res.status(500).json({ error: "Une erreur interne au serveur est surenue, veuiller contacter les administrateurs" });
-        });
+        })
 
     }catch (err){
         return res.status(500).json({ error: "Une erreur interne au serveur est surenue, veuiller contacter les administrateurs" });
