@@ -39,7 +39,7 @@ const createGroup = async (req, res) => {
         return res.status(400).json({ error: errorMessage });
     }
     try {
-        let user_id = req.authorization.user_id;
+        const user_id = req.authorization.user_id;
         console.log(`user_id: ${user_id}`);
         // Stocker le groupe créé dans une variable
         let newGroup = await Group.create({
