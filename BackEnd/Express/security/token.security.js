@@ -21,6 +21,7 @@ const isTokenValid = (token) => {
     }
 }
 
+
 module.exports = {
     createToken,
     isTokenValid
