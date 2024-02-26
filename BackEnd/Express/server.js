@@ -35,7 +35,9 @@ const UserGroup = require('./models/userGroup.model');
 const Transaction = require('./models/transaction.model');
 const TransactionCategory = require('./models/transactionCategory.model');
 const TransactionUser = require('./models/transactionUser.model');
+const Invitation = require('./models/invitation.model');
 
+app.use("", require("./routes/invitation.route"));
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));
 app.use("/api/user", require("./routes/user.route"));

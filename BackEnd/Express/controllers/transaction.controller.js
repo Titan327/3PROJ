@@ -83,7 +83,6 @@ const getTransaction = async (req, res) => {
 const getUserTransactions = async (req, res) => {
     console.log(`REST getTransaction`);
     try {
-        console.log(req.params.userId);
         const transaction = await Transaction.findAll({
             where: {
                 sender_id: req.params.userId
