@@ -10,7 +10,7 @@ const TransactionUserModel = sequelize.define("TransactionUser", {
         autoIncrement: true,
         allowNull: false
     },
-    user_id: {
+    userId: {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
@@ -33,7 +33,7 @@ const TransactionUserModel = sequelize.define("TransactionUser", {
 });
 
 // Relation Many-to-Many avec l'entité User et Group
-User.belongsToMany(Transaction, { through: TransactionUserModel, foreignKey: 'user_id' });
+User.belongsToMany(Transaction, { through: TransactionUserModel, foreignKey: 'userId' });
 Transaction.belongsToMany(User, { through: TransactionUserModel, foreignKey: 'transaction_id' });
 
 sequelize.sync().then(() => {

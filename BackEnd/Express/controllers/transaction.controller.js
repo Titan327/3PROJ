@@ -38,7 +38,7 @@ const createTransaction = async (req, res) => {
             const userInGroup = await UserGroup.findOne({
                 where: {
                     group_id: group_id,
-                    user_id: detail.user_id
+                    userId: detail.userId
                 }
             });
 
@@ -49,7 +49,7 @@ const createTransaction = async (req, res) => {
 
             const transactionUser = await TransactionUser.create({
                 transaction_id: transaction.id,
-                user_id: detail.user_id,
+                userId: detail.userId,
                 amount: detail.amount
             });
             transactionUserIds.push(transactionUser.id);
