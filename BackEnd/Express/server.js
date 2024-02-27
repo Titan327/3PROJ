@@ -7,6 +7,7 @@ YAML = require('yamljs');
 swaggerDoc = YAML.load('./swagger.yaml');
 const app = express();
 const {createTransport} = require("nodemailer");
+const {initializeBucket} = require("./configurations/minio.config");
 
 
 
@@ -43,3 +44,6 @@ app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));
 app.use("/api/user", require("./routes/user.route"));
 app.use("/api/transaction", require("./routes/transaction.route"));
+
+initializeBucket("pp-user");
+initializeBucket("pp-group");
