@@ -44,6 +44,8 @@ app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));
 app.use("/api/user", require("./routes/user.route"));
 app.use("/api/transaction", require("./routes/transaction.route"));
+app.use("/api/img", require("./routes/image.route"));
+
 
 initializeBucket("pp-user");
 initializeBucket("pp-group");
