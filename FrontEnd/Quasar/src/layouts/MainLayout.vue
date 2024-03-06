@@ -28,3 +28,9 @@ onMounted(() => {
   }
 });
 </script>
+<style>
+body{
+  background: #141332;
+  color: #ffff
+}
+</style>

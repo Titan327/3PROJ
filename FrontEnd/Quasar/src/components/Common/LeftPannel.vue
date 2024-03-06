@@ -10,46 +10,46 @@ const drawer = ref(true)
   <q-drawer
     v-model="drawer"
     :width="350"
+    mini-width="250"
     elevated
-  >
+    class="bg-primary text-white border-radius">
       <q-list>
         <q-img
           class="logo-drawer"
           src="src/assets/logo-500.png"
-          spinner-color="red"
           style="height: 140px; max-width: 150px"
         />
         <q-item clickable v-ripple>
           <q-item-section avatar>
-            <q-icon color="primary" name="bluetooth" />
+            <q-icon color="secondary" name="dashboard" />
           </q-item-section>
 
           <q-item-section>Accueil</q-item-section>
         </q-item>
         <q-item clickable v-ripple>
           <q-item-section avatar>
-            <q-icon color="primary" name="bluetooth" />
+            <q-icon color="secondary" name="notifications" />
           </q-item-section>
 
           <q-item-section>Notifications</q-item-section>
         </q-item>
         <q-item clickable v-ripple>
           <q-item-section avatar>
-            <q-icon color="primary" name="bluetooth" />
+            <q-icon color="secondary" name="send" />
           </q-item-section>
 
           <q-item-section>Messagerie</q-item-section>
         </q-item>
         <q-item clickable v-ripple>
           <q-item-section avatar>
-            <q-icon color="primary" name="bluetooth" />
+            <q-icon color="secondary" name="person" />
           </q-item-section>
 
           <q-item-section>Compte</q-item-section>
         </q-item>
         <q-item clickable v-ripple>
           <q-item-section avatar>
-            <q-icon color="primary" name="bluetooth" />
+            <q-icon color="secondary" name="settings" />
           </q-item-section>
 
           <q-item-section>Paramètres</q-item-section>
