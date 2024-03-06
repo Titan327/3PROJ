@@ -1,6 +1,7 @@
 const Transaction = require('../models/transaction.model');
 const TransactionUser = require('../models/transactionUser.model');
 const UserGroup = require('../models/userGroup.model');
+const Group = require('../models/group.model');
 
 const deleteTransactionAndTransactionUsers = async (transactionId, transactionUserIds) => {
     await Transaction.destroy({
@@ -101,20 +102,26 @@ const getUserTransactions = async (req, res) => {
 const getXLastsUserTransactions = async (req, res) => {
     console.log(`REST getTransaction`);
     try {
-        const limit = parseInt(req.params.limit);
-        const transaction = await Transaction.findAll({
+        const limit = parseInt(req.query.limit);
+        const transactions = await TransactionUser.findAll({
             where: {
-                sender_id: req.params.userId
+                userId: req.params.userId
             },
             order: [
-                ['date', 'DESC']
+                ['createdAt', 'DESC']
             ],
-            limit: limit
+            limit: limit,
+            include: [{
+                model: Transaction,
+                include: [{
+                    model: Group
+                }]
+            }]
         });
-        if(transaction === null) {
+        if(transactions === null) {
             return res.status(404).send('No transaction found for this user');
         }
-        return res.status(200).send(transaction);
+        return res.status(200).send(transactions);
     } catch (e) {
         console.error(e);
         return res.status(500).send(e);
