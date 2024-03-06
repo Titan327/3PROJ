@@ -8,4 +8,6 @@ router.get("/:id", securityMiddleware.verifyIsAuth, TransactionController.getTra
 //POST http://localhost:9002/api/transaction/{id}
 router.post("/", securityMiddleware.verifyIsAuth, TransactionController.createTransaction);
 
+
+
 module.exports = router;

@@ -17,11 +17,11 @@ const deleteTransactionAndTransactionUsers = async (transactionId, transactionUs
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
-    const {group_id, label, total_amount, date, receipt, sender_id, category_id, details} = req.body;
-    console.log(group_id, label, total_amount, date, receipt, sender_id, category_id);
+    const {groupId, label, total_amount, date, receipt, sender_id, category_id, details} = req.body;
+    console.log(groupId, label, total_amount, date, receipt, sender_id, category_id);
     try {
         let transaction = await Transaction.create({
-            group_id,
+            groupId,
             label,
             total_amount,
             date,
@@ -37,7 +37,7 @@ const createTransaction = async (req, res) => {
         for (const detail of detailsArray) {
             const userInGroup = await UserGroup.findOne({
                 where: {
-                    group_id: group_id,
+                    groupId: groupId,
                     userId: detail.userId
                 }
             });
@@ -98,9 +98,33 @@ const getUserTransactions = async (req, res) => {
     }
 }
 
+const getXLastsUserTransactions = async (req, res) => {
+    console.log(`REST getTransaction`);
+    try {
+        const limit = parseInt(req.params.limit);
+        const transaction = await Transaction.findAll({
+            where: {
+                sender_id: req.params.userId
+            },
+            order: [
+                ['date', 'DESC']
+            ],
+            limit: limit
+        });
+        if(transaction === null) {
+            return res.status(404).send('No transaction found for this user');
+        }
+        return res.status(200).send(transaction);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send(e);
+    }
+}
+
 
 module.exports = {
     createTransaction,
     getTransaction,
-    getUserTransactions
+    getUserTransactions,
+    getXLastsUserTransactions
 }

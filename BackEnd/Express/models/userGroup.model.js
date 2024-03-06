@@ -45,7 +45,7 @@ const UserGroupModel = sequelize.define("UserGroup", {
 
 // Relation Many-to-Many avec l'entité User et Group
 User.belongsToMany(Group, { through: UserGroupModel, foreignKey: 'userId' });
-Group.belongsToMany(User, { through: UserGroupModel, foreignKey: 'group_id' });
+Group.belongsToMany(User, { through: UserGroupModel, foreignKey: 'groupId' });
 
 sequelize.sync().then(() => {
     console.log('UserGroupModel table created successfully!');

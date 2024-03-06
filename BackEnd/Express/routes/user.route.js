@@ -10,6 +10,8 @@ const userMiddleware = require('../middlewares/user.middleware');
 router.get("/:userId/groups", securityMiddleware.verifyIsAuthAndActivUser, GroupController.getGroups);
 //GET http://localhost:9002/api/user/{id}/transactions
 router.get("/:userId/transactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getUserTransactions);
+//GET http://localhost:9002/api/user/{id}/lastTransactions/{limit}
+router.get("/:userId/lastTransactions?limit=:limit", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getXLastsUserTransactions);
 
 //PUT http://localhost:9002/api/user/{id}
 router.put("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyUserInfos, userMiddleware.verifyPasswordForSensibleInfos, UserController.modifyUser);

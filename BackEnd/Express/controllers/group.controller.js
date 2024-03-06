@@ -13,7 +13,7 @@ const getGroups = async (req, res) => {
         const userId = req.params.userId;
         const groupsID = await UserGroup.findAll({where: {userId: userId}});
         if (groupsID.length > 0) {
-            let groupIds = groupsID.map(group => group.group_id);
+            let groupIds = groupsID.map(group => group.groupId);
             console.log(`groupIds: ${groupIds}`);
             let groups = [];
             groups = await Group.findAll({where: {id: groupIds}});
@@ -47,7 +47,8 @@ const createGroup = async (req, res) => {
             description,
             owner_id: userId,
         });
-        createUserGroupRelation(userId, newGroup.id);
+        console.log(`newGroup: ${newGroup.id}`);
+        await createUserGroupRelation(userId, newGroup.id);
         res.status(201).send({ message: "Group created successfully", group: newGroup });
     } catch (e) {
         console.error(e);
@@ -105,7 +106,7 @@ const switchGroupOwnerWhenDeletingUser = async (userId) => {
             for (let group of groups) {
                 let newOwner = await UserGroup.findOne({
                     where: {
-                        group_id: group.id,
+                        groupId: group.id,
                         userId: {
                             [Op.ne]: userId
                         },
