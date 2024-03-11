@@ -10,7 +10,7 @@ const UserGroupModel = sequelize.define("UserGroup", {
         autoIncrement: true,
         allowNull: false
     },
-    user_id: {
+    userId: {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
@@ -18,7 +18,7 @@ const UserGroupModel = sequelize.define("UserGroup", {
             key: 'id'
         }
     },
-    group_id: {
+    groupId: {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
@@ -29,13 +29,23 @@ const UserGroupModel = sequelize.define("UserGroup", {
     balance: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        defaultValue: 0
+        defaultValue: 0.00
+    },
+    favorite: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
     }
 });
 
 // Relation Many-to-Many avec l'entité User et Group
-User.belongsToMany(Group, { through: UserGroupModel, foreignKey: 'user_id' });
-Group.belongsToMany(User, { through: UserGroupModel, foreignKey: 'group_id' });
+User.belongsToMany(Group, { through: UserGroupModel, foreignKey: 'userId' });
+Group.belongsToMany(User, { through: UserGroupModel, foreignKey: 'groupId' });
 
 sequelize.sync().then(() => {
     console.log('UserGroupModel table created successfully!');
