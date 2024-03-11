@@ -18,8 +18,8 @@ const deleteTransactionAndTransactionUsers = async (transactionId, transactionUs
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
-    const {groupId, label, total_amount, date, receipt, sender_id, category_id, details} = req.body;
-    console.log(groupId, label, total_amount, date, receipt, sender_id, category_id);
+    const {groupId, label, total_amount, date, receipt, senderId, categoryId, details} = req.body;
+    console.log(groupId, label, total_amount, date, receipt, senderId, categoryId);
     try {
         let transaction = await Transaction.create({
             groupId,
@@ -27,8 +27,8 @@ const createTransaction = async (req, res) => {
             total_amount,
             date,
             receipt,
-            sender_id,
-            category_id
+            senderId,
+            categoryId
         });
 
         const detailsArray = Object.values(details);
@@ -49,7 +49,7 @@ const createTransaction = async (req, res) => {
             }
 
             const transactionUser = await TransactionUser.create({
-                transaction_id: transaction.id,
+                transactionId: transaction.id,
                 userId: detail.userId,
                 amount: detail.amount
             });
@@ -86,7 +86,7 @@ const getUserTransactions = async (req, res) => {
     try {
         const transaction = await Transaction.findAll({
             where: {
-                sender_id: req.params.userId
+                senderId: req.params.userId
             }
         });
         if(transaction === null) {

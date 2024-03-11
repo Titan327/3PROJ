@@ -18,7 +18,7 @@ const TransactionUserModel = sequelize.define("TransactionUser", {
             key: 'id'
         }
     },
-    transaction_id: {
+    transactionId: {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
@@ -34,8 +34,8 @@ const TransactionUserModel = sequelize.define("TransactionUser", {
 
 // Relation Many-to-Many avec l'entité User et Group
 User.belongsToMany(Transaction, { through: TransactionUserModel, foreignKey: 'userId' });
-Transaction.belongsToMany(User, { through: TransactionUserModel, foreignKey: 'transaction_id' });
-TransactionUserModel.belongsTo(Transaction, { foreignKey: 'transaction_id' });
+Transaction.belongsToMany(User, { through: TransactionUserModel, foreignKey: 'transactionId' });
+TransactionUserModel.belongsTo(Transaction, { foreignKey: 'transactionId' });
 
 sequelize.sync().then(() => {
     console.log('TransactionUser table created successfully!');

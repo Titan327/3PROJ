@@ -45,7 +45,7 @@ const createGroup = async (req, res) => {
         let newGroup = await Group.create({
             name,
             description,
-            owner_id: userId,
+            ownerId: userId,
         });
         console.log(`newGroup: ${newGroup.id}`);
         await createUserGroupRelation(userId, newGroup.id);

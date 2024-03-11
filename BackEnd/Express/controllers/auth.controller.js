@@ -118,7 +118,7 @@ const resetPassword = async (req, res) => {
         await User.update({
                 password : passwordHash
             },
-            {where: {id : tokenValue.user_id}}
+            {where: {id : tokenValue.userId}}
         ).then(() => {
             return res.status(200).json({ success: "Mot de passe modifié" });
         })
