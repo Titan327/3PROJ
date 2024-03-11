@@ -8,6 +8,11 @@ swaggerDoc = YAML.load('./swagger.yaml');
 const app = express();
 const {createTransport} = require("nodemailer");
 
+const server = http.createServer(app);
+const path = require('path');
+const socketIo = require('socket.io');
+const io = socketIo(server);
+
 
 
 app.use(express.json());
@@ -22,6 +27,22 @@ app.use(cors({
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 
+app.get("/chat", function(req, res){
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+// Gestion des connexions WebSocket pour le chat
+io.on('connection', function(socket){
+    console.log('A user is connected');
+
+    socket.on('disconnect', function (){
+        console.log('A user is disconnected');
+    });
+
+    socket.on('chat message', function (msg){
+        console.log('Message received: ' + msg);
+        io.emit('chat message', msg);
+    });
+});
 
 const PORT = process.env.PORT;
 
