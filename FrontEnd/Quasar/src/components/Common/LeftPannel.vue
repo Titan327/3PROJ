@@ -1,17 +1,24 @@
 <script setup lang="ts">
 
 import {ref} from "vue";
-import {getUser} from "stores/userStore";
+import {disconnectUser, getUser} from "stores/userStore";
+import {useRouter} from "vue-router";
 
 const drawer = ref(true)
-
+const router = useRouter();
 const userString = ref('');
 
 (async () => {
   const userData = await getUser();
   if (userData.firstName != null) {
-    userString.value = userData.firstName;
-  }})
+    userString.value = `${userData.firstName} ${userData.lastName}`;
+  }
+})();
+
+function disconnect(){
+  disconnectUser()
+  router.push('/login');
+}
 
 </script>
 
@@ -79,8 +86,10 @@ const userString = ref('');
       </template>
 
       <q-card>
-        <q-card-section class="bg-primary">
+        <q-card-section class="disconnect-user">
+          <q-chip clickable :onclick="disconnect" color="red" class="text-white">
             Se déconnecter
+          </q-chip>
         </q-card-section>
       </q-card>
     </q-expansion-item>
@@ -95,6 +104,10 @@ const userString = ref('');
 
 .user-drawer{
   margin-top: 40vh;
+}
+
+.disconnect-user{
+background-color: #171733;
 }
 
 </style>

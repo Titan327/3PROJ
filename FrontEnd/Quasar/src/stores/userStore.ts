@@ -3,7 +3,6 @@ import { api } from "boot/axios";
 import {DefaultUser, IUser} from "src/interfaces/user.interface";
 
 const user: Ref<IUser> = ref(DefaultUser());
-
 function updateUser(token: string): void {
   user.value.token = token;
   localStorage.setItem('userToken', token);
@@ -13,7 +12,7 @@ async function getUserData(): Promise<void> {
   const token = localStorage.getItem('userToken');
 
   if (!token) {
-    console.error("Token non trouvé dans le localStorage.");
+    console.error("Pas de token");
     return;
   }
 
@@ -34,9 +33,8 @@ async function getUserData(): Promise<void> {
     user.value.username = userData.username;
     user.value.email = userData.email;
     user.value.birthdate = userData.birth_date;
-
-    console.log("Données utilisateur récupérées :", user.value);
   } catch (error) {
+
     console.error("Erreur lors de la récupération des données utilisateur :", error);
   }
 }
@@ -48,4 +46,9 @@ async function getUser(): Promise<IUser> {
   return user.value;
 }
 
-export { updateUser, getUser };
+function disconnectUser(): void {
+  user.value = DefaultUser();
+  localStorage.removeItem('userToken');
+}
+
+export { updateUser, getUser, disconnectUser };
