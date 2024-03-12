@@ -12,6 +12,8 @@ router.get("/:userId/groups", securityMiddleware.verifyIsAuthAndActivUser, Group
 router.get("/:userId/transactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getUserTransactions);
 //GET http://localhost:9002/api/user/{id}/lastTransactions/limit={limit}
 router.get("/:userId/lastTransactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getXLastsUserTransactions);
+//GET http://localhost:9002/api/user/{id}
+router.get("/:userId", securityMiddleware.verifyIsAuthAndActivUser, UserController.getUser);
 //PUT http://localhost:9002/api/user/{id}
 router.put("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyUserInfos, userMiddleware.verifyPasswordForSensibleInfos, UserController.modifyUser);
 //DELETE http://localhost:9002/api/user/{id}
