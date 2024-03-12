@@ -26,6 +26,13 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/EmptyLayout.vue'),
     children: [{ path: '', component: () => import('pages/ChatPage.vue') }],
   },
+  {
+    path: '/chat2',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [{ path: '', component: () => import('pages/index.html') }],
+  },
+
+
 
   // Always leave this as last one,
   // but you can also remove it

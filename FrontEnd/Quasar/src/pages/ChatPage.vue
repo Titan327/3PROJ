@@ -6,7 +6,7 @@
       </div>
       <div class="chat-input">
         <input type="text" v-model="message" @keyup.enter="sendMessage" placeholder="Type your message...">
-        <button @click="sendMessage">Send</button>
+        <button @click="sendMessage">Send Mes</button>
       </div>
     </div>
   </div>
