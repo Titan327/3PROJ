@@ -15,7 +15,20 @@ declare module '@vue/runtime-core' {
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({ baseURL: 'http://localhost:9002/api/' }); //localhost:9002 docker
-
+api.interceptors.request.use(
+  (config) => {
+    // Récupère le token de l'utilisateur depuis le local storage
+    const userToken = localStorage.getItem('userToken');
+    // Vérifie si le token est disponible et ajoute-le aux en-têtes
+    if (userToken) {
+      config.headers.Authorization = `Bearer ${userToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 

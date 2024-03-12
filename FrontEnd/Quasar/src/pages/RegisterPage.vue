@@ -117,7 +117,7 @@ async function register() {
       <q-form
         @submit="register"
       >
-        <span class="text-primary text-h5">Créer un compte</span>
+        <span class="text-grey-2 text-h5">Créer un compte</span>
         <q-input
           style="margin-top: 20px;"
           outlined
@@ -125,6 +125,7 @@ async function register() {
           v-model="newUser.firstName"
           label="Nom"
           :rules="[checkNotNull]"
+          dark
         />
         <q-input
           outlined
@@ -132,6 +133,7 @@ async function register() {
           v-model="newUser.lastName"
           label="Prénom"
           :rules="[checkNotNull]"
+          dark
         />
         <q-input
           outlined
@@ -140,6 +142,7 @@ async function register() {
           label="Adresse email"
           type="email"
           :rules="[checkNotNull, checkBasicEmailSyntax]"
+          dark
         />
         <q-input
           outlined
@@ -147,6 +150,7 @@ async function register() {
           v-model="newUser.username"
           label="Nom d'utilisateur"
           :rules="[checkNotNull]"
+          dark
         />
         <q-input
           outlined
@@ -155,6 +159,7 @@ async function register() {
           label="Date de naissance"
           type="date"
           :rules="[checkNotNull, checkAge]"
+          dark
         />
         <q-input
           class="input"
@@ -163,6 +168,7 @@ async function register() {
           label="Mot de passe"
           type="password"
           :rules="[checkNotNull, checkPasswordComplexity]"
+          dark
         />
         <q-input
           class="input"
@@ -171,14 +177,14 @@ async function register() {
           label="Confirmer"
           type="password"
           :rules="[checkNotNull, checkPasswordMatch]"
-
+          dark
         />
         <div class="links">
           <a href="#/login"><b>Déja un compte ?</b></a>
         </div>
         <q-btn
           class="btn"
-          color="primary"
+          color="secondary"
           text-color="white"
           unelevated
           label="Créer mon compte"
@@ -191,22 +197,22 @@ async function register() {
           <div class="btns">
             <q-btn
               @click="console.log('Google')"
-              class="btn-log shadow-6">
+              class="btn-log shadow-6 bg-white">
               <img src="/../src/assets/icons/googleIcon.svg" alt="Google"/>
             </q-btn>
             <q-btn
               @click="console.log('Apple')"
-              class="btn-log shadow-6">
+              class="btn-log shadow-6 bg-white">
               <img src="/../src/assets/icons/appleIcon.svg" alt="Apple"/>
             </q-btn>
             <q-btn
               @click="console.log('Microsoft')"
-              class="btn-log shadow-6">
+              class="btn-log shadow-6 bg-white">
               <img src="/../src/assets/icons/microsoftIcon.svg" alt="Microsoft"/>
             </q-btn>
             <q-btn
               @click="console.log('Facebook')"
-              class="btn-log shadow-6">
+              class="btn-log shadow-6 bg-white">
               <img src="/../src/assets/icons/facebookIcon.svg" alt="Facebook"/>
             </q-btn>
           </div>

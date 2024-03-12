@@ -17,3 +17,11 @@
 
 <script setup lang="ts">
 </script>
+
+<style>
+body{
+  background: #141332;
+  color: #ffff
+}
+</style>
+

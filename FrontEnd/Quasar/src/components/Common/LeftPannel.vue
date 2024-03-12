@@ -1,8 +1,17 @@
 <script setup lang="ts">
 
 import {ref} from "vue";
+import {getUser} from "stores/userStore";
 
 const drawer = ref(true)
+
+const userString = ref('');
+
+(async () => {
+  const userData = await getUser();
+  if (userData.firstName != null) {
+    userString.value = userData.firstName;
+  }})
 
 </script>
 
@@ -65,12 +74,12 @@ const drawer = ref(true)
         </q-item-section>
 
         <q-item-section>
-         Portic Dubail
+          {{ userString }}
         </q-item-section>
       </template>
 
       <q-card>
-        <q-card-section>
+        <q-card-section class="bg-primary">
             Se déconnecter
         </q-card-section>
       </q-card>
