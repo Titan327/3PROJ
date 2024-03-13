@@ -3,6 +3,7 @@ import {ref} from 'vue';
 import {api} from "boot/axios";
 import { useQuasar } from 'quasar'
 import {useRouter} from "vue-router";
+import {updateUser} from "stores/userStore";
 
 const $q = useQuasar();
 let loading = ref(false)
@@ -11,6 +12,8 @@ const router = useRouter();
 let userName = ref(null);
 let password = ref(null);
 let email = ref(null);
+
+
 
 async function login() {
   loading.value = true;
@@ -28,8 +31,8 @@ async function login() {
         email: email.value,
       });
       if (response.data) {
-        localStorage.setItem('authToken', response.data);
-        router.push('/#');
+        updateUser(response.data);
+        await router.push('/#');
       }
     }
     catch (error) {
@@ -66,7 +69,7 @@ async function login() {
         :ratio="1"
       />
     </div>
-    <span class="text-primary text-h5">Me connecter</span>
+    <span class="text-grey-2 text-h5">Connexion</span>
     <div class="inputs">
       <q-input
         class="input"
@@ -74,12 +77,14 @@ async function login() {
         v-model="userName"
         icon="user"
         label="Nom d'utilisateur"
+        dark
         color="secondary">
         <template v-slot:prepend>
           <q-icon name="person"/>
         </template>
       </q-input>
       <q-input
+        dark
         class="input"
         outlined
         v-model="password"
@@ -96,7 +101,7 @@ async function login() {
       </div>
       <q-btn
         class="btn "
-        color="primary"
+        color="secondary"
         text-color="white"
         unelevated
         label="Se connecter"
@@ -109,22 +114,22 @@ async function login() {
         <div class="btns">
           <q-btn
             @click="console.log('Google')"
-            class="btn-log shadow-6">
+            class="btn-log shadow-6 bg-white">
             <img src="/../src/assets/icons/googleIcon.svg" alt="Google"/>
           </q-btn>
           <q-btn
             @click="console.log('Apple')"
-            class="btn-log shadow-6">
+            class="btn-log shadow-6 bg-white">
             <img src="/../src/assets/icons/appleIcon.svg" alt="Apple"/>
           </q-btn>
           <q-btn
             @click="console.log('Microsoft')"
-            class="btn-log shadow-6">
+            class="btn-log shadow-6 bg-white">
             <img src="/../src/assets/icons/microsoftIcon.svg" alt="Microsoft"/>
           </q-btn>
           <q-btn
             @click="console.log('Facebook')"
-            class="btn-log shadow-6">
+            class="btn-log shadow-6 bg-white">
             <img src="/../src/assets/icons/facebookIcon.svg" alt="Facebook"/>
           </q-btn>
         </div>

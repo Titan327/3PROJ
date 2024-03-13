@@ -4,10 +4,12 @@
 node_modules/
 
 # Data SQL
-BackEnd/Postgres_data*
+Data/Postgres_data*
+Data/Minio_data*
 
 # fichier .env
-#*.env
+*.env
+
 #*.env.local*
 # ..env
 #*.env

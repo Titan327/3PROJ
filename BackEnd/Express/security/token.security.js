@@ -4,7 +4,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const createToken = (user) => {
     return jwt.sign(
-        { user_id: user.id},
+        {
+            userId: user.id
+        },
         JWT_SECRET,
         {expiresIn: '24h'}
     )
@@ -18,6 +20,7 @@ const isTokenValid = (token) => {
         return false;
     }
 }
+
 
 module.exports = {
     createToken,
