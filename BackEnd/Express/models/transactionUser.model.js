@@ -30,6 +30,11 @@ const TransactionUserModel = sequelize.define("TransactionUser", {
         type: DataTypes.FLOAT,
         allowNull: false
     },
+    refunded: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    }
 });
 
 // Relation Many-to-Many avec l'entité User et Group
