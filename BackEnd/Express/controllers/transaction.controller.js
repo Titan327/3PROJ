@@ -6,7 +6,6 @@ const Group = require('../models/group.model');
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
     const {groupId, label, total_amount, date, receipt, senderId, categoryId, details} = req.body;
-    console.log(groupId, label, total_amount, date, receipt, senderId, categoryId);
     try {
         let transaction = await Transaction.create({
             groupId,
@@ -44,12 +43,15 @@ const createTransaction = async (req, res) => {
                     userId: detail.userId,
                     amount: detail.amount
                 });
-                if (transaction.userId === senderId) {
-                    currentUserTransactionAmount = transaction.amount;
+                if (transactionUser.userId === senderId) {
+                    currentUserTransactionAmount = transactionUser.amount;
                 }
             }
             let userGroup = await UserGroup.findOne({groupId, userId: senderId});
             userGroup.balance += total_amount - currentUserTransactionAmount;
+            const group = await Group.findOne({where: {id: groupId}});
+            await Group.update({description: "updated"}, {where: {id: groupId}});
+            await Group.update({description: group.description}, {where: {id: groupId}});
             return res.status(201).send(transaction);
         } else {
             return res.status(400).send('The total amount of the transaction is not equal to the sum of the details');
