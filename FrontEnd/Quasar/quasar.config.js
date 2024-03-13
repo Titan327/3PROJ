@@ -95,10 +95,10 @@ module.exports = configure(function (/* ctx */) {
       https: true,
       strictPort: true,
       hmr: {
-        host: '3proj-front.tristan-tourbier.com',
-        port: 443,
+        host: 'localhost',
         protocol: 'wss',
-      },
+        clientPort: 443
+      }
 
 
     },
