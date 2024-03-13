@@ -90,6 +90,9 @@ module.exports = configure(function (/* ctx */) {
       // https: true
       open: false, // opens browser window automatically
       port:9000,
+      hmr:{
+        port:443
+      },
 
 
     },
