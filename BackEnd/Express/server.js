@@ -55,6 +55,7 @@ const Transaction = require('./models/transaction.model');
 const TransactionCategory = require('./models/transactionCategory.model');
 const TransactionUser = require('./models/transactionUser.model');
 const Invitation = require('./models/invitation.model');
+const Refund = require('./models/refund.model');
 
 app.use("", require("./routes/invitation.route"));
 app.use("/api/auth", require("./routes/auth.route"));
