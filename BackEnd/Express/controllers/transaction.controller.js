@@ -51,7 +51,7 @@ const createTransaction = async (req, res) => {
             userGroup.balance += total_amount - currentUserTransactionAmount;
             const group = await Group.findOne({where: {id: groupId}});
             await Group.update({description: "updated"}, {where: {id: groupId}});
-            await group.save();
+            await Group.update({description: group.description}, {where: {id: groupId}});
             return res.status(201).send(transaction);
         } else {
             return res.status(400).send('The total amount of the transaction is not equal to the sum of the details');

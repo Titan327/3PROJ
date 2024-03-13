@@ -23,7 +23,7 @@ const getGroups = async (req, res) => {
         if (groupsID.length > 0) {
             let groupIds = groupsID.map(group => group.groupId);
             console.log(`groupIds: ${groupIds}`);
-            let groups = await Group.findAll({where: {id: groupIds}});
+            let groups = await Group.findAll({where: {id: groupIds}, order: [['updatedAt', 'ASC']]});
             return res.status(200).send(groups);
         }
         return res.status(404).send({ message: "No groups found" });
