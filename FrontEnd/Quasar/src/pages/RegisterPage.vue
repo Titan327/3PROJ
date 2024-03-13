@@ -76,11 +76,11 @@ async function register() {
     try {
 
       const response = await api.post("auth/register", {
-        firstname : newUser.value.firstName,
-        lastname : newUser.value.lastName,
+        firstname : newUser.value.firstname,
+        lastname : newUser.value.lastname,
         username : newUser.value.username,
         email : newUser.value.email,
-        birth_date : newUser.value.birthdate,
+        birth_date : newUser.value.birth_date,
         password : pass.value
 
       });
@@ -122,7 +122,7 @@ async function register() {
           style="margin-top: 20px;"
           outlined
           class="input"
-          v-model="newUser.firstName"
+          v-model="newUser.firstname"
           label="Nom"
           :rules="[checkNotNull]"
           dark
@@ -130,7 +130,7 @@ async function register() {
         <q-input
           outlined
           class="input"
-          v-model="newUser.lastName"
+          v-model="newUser.lastname"
           label="Prénom"
           :rules="[checkNotNull]"
           dark
@@ -155,7 +155,7 @@ async function register() {
         <q-input
           outlined
           class="input"
-          v-model="newUser.birthdate"
+          v-model="newUser.birth_date"
           label="Date de naissance"
           type="date"
           :rules="[checkNotNull, checkAge]"
