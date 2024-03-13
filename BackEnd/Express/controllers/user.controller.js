@@ -2,6 +2,21 @@ const {genSalt, hash} = require("bcrypt");
 const User = require('../models/user.model');
 const UserController = require('./userGroup.controller');
 
+const getUser = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.userId, {
+            attributes: ['id', 'firstname', 'lastname', 'username', 'email', 'birth_date', 'profile_picture'],
+        });
+        if (user === null) {
+            return res.status(404).send('User not found');
+        }
+        return res.status(200).send(user);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send(e);
+    }
+}
+
 const createUser = async (req, res) => {
     console.log(`REST createUser`);
     console.log(req.value);
@@ -78,6 +93,7 @@ const deleteUser = async (req, res) => {
 }
 
 module.exports = {
+    getUser,
     createUser,
     modifyUser,
     deleteUser
