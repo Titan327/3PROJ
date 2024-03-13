@@ -2,9 +2,9 @@ export interface IUser {
   id?: number
   username?: string;
   email?: string;
-  firstName?: string;
-  lastName?: string;
-  birthdate?: string;
+  firstname?: string;
+  lastname?: string;
+  birth_date?: string;
   token?: string;
 }
 
@@ -13,9 +13,9 @@ export function DefaultUser(): IUser {
     id: 0,
     username: '',
     email: '',
-    birthdate: '',
-    firstName: '',
-    lastName: '',
+    birth_date: '',
+    firstname: '',
+    lastname: '',
     token: ''
   };
 }
