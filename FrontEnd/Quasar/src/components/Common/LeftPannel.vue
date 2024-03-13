@@ -76,7 +76,7 @@ function disconnect(){
       <template v-slot:header="{}">
         <q-item-section avatar>
           <q-avatar>
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            <img src="src/assets/defaults/user-default.webp">
           </q-avatar>
         </q-item-section>
 

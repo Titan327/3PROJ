@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh LpR lFf">
+  <q-layout view="lHh Lpr lFf">
 
     <left-pannel>
 
@@ -8,6 +8,10 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <right-pannel>
+
+    </right-pannel>
   </q-layout>
 </template>
 
@@ -16,6 +20,7 @@
 import {onMounted,ref} from "vue";
 import {useRouter} from "vue-router";
 import LeftPannel from "components/Common/LeftPannel.vue";
+import RightPannel from "components/Index/RightPannel.vue";
 const router = useRouter();
 
 onMounted(() => {

@@ -1,16 +1,13 @@
 <script setup lang="ts">
 
 import {onMounted, ref } from "vue";
-import {Transaction} from "src/interfaces/transactions.interface";
 import {Group} from "src/interfaces/group.interface";
-import axios from "axios";
 import {api} from "boot/axios";
 import {getUser} from "stores/userStore";
 
 let groupList = ref<Group[]>([]);
 
 onMounted(async () => {
-  const user = ref(getUser());
 
   const userData = await getUser();
 
@@ -38,7 +35,7 @@ onMounted(async () => {
           <q-avatar
             size="100px"
           >
-            <img :src="group.picture ? group.picture : 'https://cdn.quasar.dev/img/avatar.png'">
+            <img :src="group.picture ? group.picture : 'src/assets/defaults/group-default.webp'">
             <q-badge color="red" rounded floating >{{group.id}}</q-badge>
 
           </q-avatar>
