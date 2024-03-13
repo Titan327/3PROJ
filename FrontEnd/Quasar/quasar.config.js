@@ -94,11 +94,7 @@ module.exports = configure(function (/* ctx */) {
 
       https: true,
       strictPort: true,
-      hmr: {
-        host: 'localhost',
-        protocol: 'wss',
-        clientPort: 443
-      }
+
 
 
     },
