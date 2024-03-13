@@ -11,12 +11,19 @@ const getGroups = async (req, res) => {
     }
     try {
         const userId = req.params.userId;
-        const groupsID = await UserGroup.findAll({where: {userId: userId}});
+        let whereCondition = {userId: userId};
+
+        if (req.query.favorite === "true") {
+            whereCondition.favorite = true;
+        } else if (req.query.favorite === "false") {
+            whereCondition.favorite = false;
+        }
+
+        const groupsID = await UserGroup.findAll({where: whereCondition});
         if (groupsID.length > 0) {
             let groupIds = groupsID.map(group => group.groupId);
             console.log(`groupIds: ${groupIds}`);
-            let groups = [];
-            groups = await Group.findAll({where: {id: groupIds}});
+            let groups = await Group.findAll({where: {id: groupIds}});
             return res.status(200).send(groups);
         }
         return res.status(404).send({ message: "No groups found" });
