@@ -12,14 +12,14 @@ services:
       - Postgres
       #- Storage-minio
     volumes:
-      - ./BackEnd/Express:/Express
+      - ${EXPRESS_VOLUME}
 
   Quasar-app:
     image: ${QUASAR_IMG}
     container_name: API-QUASAR
     working_dir: /Quasar
     volumes:
-      - ./FrontEnd/Quasar:/Quasar
+      - ${QUASAR_VOLUME}
     ports:
       - "${QUASAR_PORT}:9000"
     command: sh -c "npm install && npm run dev"
@@ -34,7 +34,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - ./Data/Postgres_data:/var/lib/postgresql/data
+      - ${POSTGRES_VOLUME}
 
   Minio-storage:
     image: minio/minio
@@ -45,5 +45,5 @@ services:
     ports:
       - "${MINIO_PORT}:9001"
     volumes:
-      - ./Data/Minio_data:/data
+      - ${MINIO_VOLUME}
     command: server --address :9001 /data

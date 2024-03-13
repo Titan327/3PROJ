@@ -5,7 +5,7 @@ const UserController = require('./userGroup.controller');
 const getUser = async (req, res) => {
     try {
         const user = await User.findByPk(req.params.userId, {
-            attributes: ['id', 'firstname', 'lastname', 'username', 'email', 'birth_date'], // specify the fields you want to retrieve
+            attributes: ['id', 'firstname', 'lastname', 'username', 'email', 'birth_date', 'profile_picture'],
         });
         if (user === null) {
             return res.status(404).send('User not found');
