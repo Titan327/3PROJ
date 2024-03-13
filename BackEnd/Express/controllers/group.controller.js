@@ -11,6 +11,7 @@ const getGroups = async (req, res) => {
     }
     try {
         const userId = req.params.userId;
+        const limit = parseInt(req.query.limit) || 5;
         let whereCondition = {userId: userId};
 
         if (req.query.favorite === "true") {
@@ -23,7 +24,7 @@ const getGroups = async (req, res) => {
         if (groupsID.length > 0) {
             let groupIds = groupsID.map(group => group.groupId);
             console.log(`groupIds: ${groupIds}`);
-            let groups = await Group.findAll({where: {id: groupIds}, order: [['updatedAt', 'ASC']]});
+            let groups = await Group.findAll({where: {id: groupIds}, order: [['updatedAt', 'ASC']], limit: limit});
             return res.status(200).send(groups);
         }
         return res.status(404).send({ message: "No groups found" });
