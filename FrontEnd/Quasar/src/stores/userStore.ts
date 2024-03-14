@@ -28,11 +28,12 @@ async function getUserData(): Promise<void> {
 
     const userData = response.data;
     user.value.id = decodedPayload.userId;
-    user.value.firstName = userData.firstname;
-    user.value.lastName = userData.lastname;
+    user.value.firstname = userData.firstname;
+    user.value.lastname = userData.lastname;
     user.value.username = userData.username;
     user.value.email = userData.email;
-    user.value.birthdate = userData.birth_date;
+    user.value.birth_date = userData.birth_date;
+    user.value.profile_picture = userData.profile_picture;
   } catch (error) {
 
     console.error("Erreur lors de la récupération des données utilisateur :", error);

@@ -6,6 +6,7 @@ export interface IUser {
   lastname?: string;
   birth_date?: string;
   token?: string;
+  profile_picture?: string;
 }
 
 export function DefaultUser(): IUser {
@@ -16,6 +17,7 @@ export function DefaultUser(): IUser {
     birth_date: '',
     firstname: '',
     lastname: '',
-    token: ''
+    token: '',
+    profile_picture: ''
   };
 }

@@ -3,8 +3,17 @@
 
 import {ref} from "vue";
 import PaymentsMethods from "components/Index/PaymentsMethods.vue";
+import {EtatTotalPaidComponent} from "src/interfaces/types";
+import TotalPaid from "components/Index/TotalPaid.vue";
 
-const drawer = ref(true)
+const drawer = ref(false)
+
+const currentUrl = window.location.href;
+const currentPage = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
+
+if (currentPage === ''){
+  drawer.value = true;
+}
 
 </script>
 
@@ -16,13 +25,26 @@ const drawer = ref(true)
     mini-width="300"
     class="right-drawer bg-dark">
 
-    <PaymentsMethods etat="positive"></PaymentsMethods>
+    <div class="content">
+
+    <total-paid :etat="EtatTotalPaidComponent.Positive" />
+
+    <total-paid :etat="EtatTotalPaidComponent.Negative" />
+
+    <PaymentsMethods></PaymentsMethods>
+    </div>
+
   </q-drawer>
 
 </template>
 
 <style scoped>
+
 .right-drawer{
   background: #141332;
+}
+
+.content{
+  margin-top: 41%;
 }
 </style>

@@ -51,3 +51,4 @@ Data/Minio_data*
     # BEX related directories and files
     FrontEnd/Quasar/src-bex/www
     FrontEnd/Quasar/src-bex/js/core
+/FrontEnd/Quasar/dist/
