@@ -22,7 +22,7 @@ services:
       - ${QUASAR_VOLUME}
     ports:
       - "${QUASAR_PORT}"
-    command: sh -c "npm install && npm run dev"
+    command: ${QUASAR_CMD}
 
   Postgres:
     image: ${POSTGRES_IMG}
