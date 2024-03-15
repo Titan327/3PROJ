@@ -33,8 +33,8 @@ Data/Minio_data*
 # Quasar
 
     # Quasar core related directories
-    FrontEnd/Quasar/.quasar/
-    FrontEnd/Quasar/dist/
+    FrontEnd/Quasar/.quasar
+    FrontEnd/Quasar/dist
     FrontEnd/Quasar/.vscode
     FrontEnd/Quasar/quasar.config.*.temporary.compiled*
 
