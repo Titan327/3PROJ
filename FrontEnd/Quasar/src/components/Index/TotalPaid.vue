@@ -63,8 +63,9 @@ onMounted(() => {
 <style scoped>
 
 .bloc-paye{
-  width: 40%;
+  width: 85%;
   height: 120px;
   border-radius: 15px;
+  margin-top: 10%;
 }
 </style>

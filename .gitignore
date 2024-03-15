@@ -32,6 +32,7 @@ Data/Minio_data*
 */yarn-error.log*
 # Quasar
 
+
 # Quasar core related directories
 FrontEnd/Quasar/.quasar/
 FrontEnd/Quasar/dist/

@@ -76,6 +76,7 @@ onMounted(() => {
   border-radius: 15px;
   display: flex;
   flex-direction: column;
+  margin-top: 10%;
 }
 
 .caroussel{
