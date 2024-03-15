@@ -7,11 +7,16 @@ import {useRouter} from "vue-router";
 const drawer = ref(true)
 const router = useRouter();
 const userString = ref('');
+const pictureUrl = ref('');
+
 
 (async () => {
   const userData = await getUser();
-  if (userData.firstName != null) {
-    userString.value = `${userData.firstName} ${userData.lastName}`;
+  if (userData != null) {
+    userString.value = `${userData.firstname} ${userData.lastname}`;
+    if (userData.profile_picture != null) {
+      pictureUrl.value = userData.profile_picture;
+    }
   }
 })();
 
@@ -76,7 +81,7 @@ function disconnect(){
       <template v-slot:header="{}">
         <q-item-section avatar>
           <q-avatar>
-            <img src="src/assets/defaults/user-default.webp">
+            <img :src="pictureUrl ? pictureUrl : 'src/assets/defaults/user-default.webp'">
           </q-avatar>
         </q-item-section>
 

@@ -12,8 +12,8 @@ const userFirstName = ref('');
 
 (async () => {
   const userData = await getUser();
-  if (userData.firstName != null) {
-    userFirstName.value = userData.firstName;
+  if (userData.firstname != null) {
+    userFirstName.value = userData.firstname;
   }
 })();
 </script>
@@ -23,10 +23,6 @@ const userFirstName = ref('');
 
     <h3 class="text-h4">Bienvenue {{ userFirstName }} &#x1F44B;</h3>
 
-    <div class="totalPaid">
-      <total-paid :etat="EtatTotalPaidComponent.Positive" />
-      <total-paid :etat="EtatTotalPaidComponent.Negative" />
-    </div>
 
     <last-groups />
 
@@ -35,10 +31,4 @@ const userFirstName = ref('');
   </q-page>
 </template>
 <style scoped>
-
-.totalPaid{
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-}
 </style>
