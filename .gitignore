@@ -32,22 +32,22 @@ Data/Minio_data*
 */yarn-error.log*
 # Quasar
 
-    # Quasar core related directories
-    FrontEnd/Quasar/.quasar
-    FrontEnd/Quasar/dist
-    FrontEnd/Quasar/.vscode
-    FrontEnd/Quasar/quasar.config.*.temporary.compiled*
+# Quasar core related directories
+FrontEnd/Quasar/.quasar/
+FrontEnd/Quasar/dist/
+FrontEnd/Quasar/.vscode
+FrontEnd/Quasar/quasar.config.*.temporary.compiled*
 
-    # Cordova related directories and files
-    FrontEnd/Quasar/src-cordova/node_modules
-    FrontEnd/Quasar/src-cordova/platforms
-    FrontEnd/Quasar/src-cordova/plugins
-    FrontEnd/Quasar/src-cordova/www
+# Cordova related directories and files
+FrontEnd/Quasar/src-cordova/node_modules
+FrontEnd/Quasar/src-cordova/platforms
+FrontEnd/Quasar/src-cordova/plugins
+FrontEnd/Quasar/src-cordova/www
 
-    # Capacitor related directories and files
-    FrontEnd/Quasar/src-capacitor/www
-    FrontEnd/Quasar/src-capacitor/node_modules
+# Capacitor related directories and files
+FrontEnd/Quasar/src-capacitor/www
+FrontEnd/Quasar/src-capacitor/node_modules
 
-    # BEX related directories and files
-    FrontEnd/Quasar/src-bex/www
-    FrontEnd/Quasar/src-bex/js/core
+# BEX related directories and files
+FrontEnd/Quasar/src-bex/www
+FrontEnd/Quasar/src-bex/js/core
