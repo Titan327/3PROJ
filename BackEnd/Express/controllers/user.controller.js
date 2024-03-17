@@ -1,6 +1,7 @@
 const {genSalt, hash} = require("bcrypt");
 const User = require('../models/user.model');
 const UserController = require('./userGroup.controller');
+const TransactionUserController = require('./transactionUser.controller');
 
 const getUser = async (req, res) => {
     try {
@@ -92,9 +93,42 @@ const deleteUser = async (req, res) => {
     }
 }
 
+const getAmountOfAllUserNotRefoundedTransactions = async (req, res) => {
+    console.log(`REST getAmountOfAllUserNotRefoundedTransactions`);
+    try {
+        const transactions = await TransactionUserController.getAllNotRefoundedTransactionsByUser(req.params.userId);
+        let amount = 0;
+        for (let i = 0; i < transactions.length; i++) {
+            amount += transactions[i].amount;
+        }
+        return res.status(200).send({ amount: amount, transactions: transactions.length });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send(e);
+    }
+}
+
+const getAmountOfAllUserTransactionsThisMonth = async (req, res) => {
+    console.log(`REST getAmountOfAllUserTransactionsThisMonth`);
+    try {
+        const transactions = await TransactionUserController.getAllUserTransactionsThisMonth(req.params.userId);
+        let amount = 0;
+        for (let i = 0; i < transactions.length; i++) {
+            amount += transactions[i].amount;
+        }
+        return res.status(200).send({ amount: amount, transactions: transactions.length });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send(e);
+    }
+
+}
+
 module.exports = {
     getUser,
     createUser,
     modifyUser,
-    deleteUser
+    deleteUser,
+    getAmountOfAllUserNotRefoundedTransactions,
+    getAmountOfAllUserTransactionsThisMonth
 }

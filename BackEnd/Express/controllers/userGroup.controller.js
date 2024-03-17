@@ -2,8 +2,6 @@ const UserGroup = require('../models/userGroup.model');
 
 const createUserGroupRelation = async (userId, groupId) => {
     console.log(`REST createUserGroupRelation`);
-    console.log(`userId: ${userId}`);
-    console.log(`groupId: ${groupId}`);
     try {
     return await UserGroup.create({
         userId,

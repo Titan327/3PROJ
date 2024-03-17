@@ -15,6 +15,11 @@ router.get("/:userId/transactions", securityMiddleware.verifyIsAuthAndActivUser,
 router.get("/:userId/lastTransactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getXLastsUserTransactions);
 //POST http://localhost:9002/api/user/{id}/refund
 router.post("/:userId/refund", securityMiddleware.verifyIsAuthAndActivUser, RefundController.refundTransactions);
+//GET http://localhost:9002/api/user/{id}/trasnactions/notRefunded
+router.get("/:userId/transactions/notRefunded", securityMiddleware.verifyIsAuthAndActivUser, UserController.getAmountOfAllUserNotRefoundedTransactions);
+//GET http://localhost:9002/api/user/{id}/trasnactions/thisMonth
+router.get("/:userId/transactions/thisMonth", securityMiddleware.verifyIsAuthAndActivUser, UserController.getAmountOfAllUserTransactionsThisMonth);
+
 
 
 //GET http://localhost:9002/api/user/{id}
