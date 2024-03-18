@@ -49,7 +49,7 @@ onMounted(() => {
             :name="`slide-${index}`"
           >
             <q-card class="method rounded-borders">
-              <q-img src="src/assets/card/paypal-card.webp" class="rounded-borders">
+              <q-img src="/public/assets/card/paypal-card.webp" class="rounded-borders">
                 <div class="absolute-bottom text-subtitle2 text-center">
                   {{ paiement }}
                 </div>
