@@ -76,12 +76,14 @@ async function register() {
     try {
 
       const response = await api.post("auth/register", {
+      userInfos:{
         firstname : newUser.value.firstname,
         lastname : newUser.value.lastname,
         username : newUser.value.username,
         email : newUser.value.email,
         birth_date : newUser.value.birth_date,
         password : pass.value
+      }
 
       });
       if (response.data) {
