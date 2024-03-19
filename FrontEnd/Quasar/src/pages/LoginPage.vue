@@ -32,7 +32,7 @@ async function login() {
       });
       if (response.data) {
         updateUser(response.data);
-        await router.push('/#');
+        await router.push('../#');
       }
     }
     catch (error) {

@@ -6,14 +6,7 @@ import PaymentsMethods from "components/Index/PaymentsMethods.vue";
 import {EtatTotalPaidComponent} from "src/interfaces/types";
 import TotalPaid from "components/Index/TotalPaid.vue";
 
-const drawer = ref(false)
-
-const currentUrl = window.location.href;
-const currentPage = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
-
-if (currentPage === ''){
-  drawer.value = true;
-}
+const drawer = ref(true)
 
 </script>
 
