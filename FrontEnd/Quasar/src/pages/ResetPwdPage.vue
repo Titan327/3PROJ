@@ -10,11 +10,11 @@ let mail = ref();
     <div class="logo">
       <q-img
         width="100%"
-        src="../assets/logo-web.webp"
+        src="/public/assets/logo-web.webp"
         :ratio="1"
       />
     </div>
-    <span class="text-primary text-h5">Mot de passe oublié</span>
+    <span class="text-primary text-h5 text-grey-3">Mot de passe oublié</span>
     <div class="inputs">
       <q-input
         class="input"
@@ -23,7 +23,9 @@ let mail = ref();
         icon="mail"
         label="Adresse Email"
         type="email"
-        color="secondary">
+        color="secondary"
+        dark
+      >
         <template v-slot:prepend>
           <q-icon name="mail"/>
         </template>

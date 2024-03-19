@@ -8,10 +8,6 @@
     <q-page-container>
       <router-view />
     </q-page-container>
-
-    <right-pannel>
-
-    </right-pannel>
   </q-layout>
 </template>
 

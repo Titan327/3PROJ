@@ -5,6 +5,7 @@ import LastGroups from "components/Index/LastGroups.vue";
 import { getUser } from "stores/userStore";
 import { ref } from "vue";
 import {EtatTotalPaidComponent} from "src/interfaces/types";
+import RightPannel from "components/Index/RightPannel.vue";
 
 const user = ref(getUser());
 
@@ -19,6 +20,7 @@ const userFirstName = ref('');
 </script>
 
 <template>
+  <right-pannel></right-pannel>
   <q-page class="row items-center justify-evenly">
 
     <h3 class="text-h4">Bienvenue {{ userFirstName }} &#x1F44B;</h3>

@@ -40,13 +40,14 @@ function disconnect(){
           src="src/assets/logo-500.png"
           style="height: 140px; max-width: 150px"
         />
-        <q-item clickable v-ripple>
+        <q-item clickable v-ripple  @click="router.push('/#')">
           <q-item-section avatar>
             <q-icon color="secondary" name="dashboard" />
           </q-item-section>
 
           <q-item-section>Accueil</q-item-section>
         </q-item>
+
         <q-item clickable v-ripple>
           <q-item-section avatar>
             <q-icon color="secondary" name="notifications" />
@@ -54,6 +55,7 @@ function disconnect(){
 
           <q-item-section>Notifications</q-item-section>
         </q-item>
+
         <q-item clickable v-ripple>
           <q-item-section avatar>
             <q-icon color="secondary" name="send" />
@@ -61,6 +63,15 @@ function disconnect(){
 
           <q-item-section>Messagerie</q-item-section>
         </q-item>
+
+        <q-item clickable v-ripple @click="router.push('/groups')">
+          <q-item-section avatar>
+            <q-icon color="secondary" name="group" />
+          </q-item-section>
+
+          <q-item-section>Groupes</q-item-section>
+        </q-item>
+
         <q-item clickable v-ripple>
           <q-item-section avatar>
             <q-icon color="secondary" name="person" />
@@ -68,6 +79,7 @@ function disconnect(){
 
           <q-item-section>Compte</q-item-section>
         </q-item>
+
         <q-item clickable v-ripple>
           <q-item-section avatar>
             <q-icon color="secondary" name="settings" />
