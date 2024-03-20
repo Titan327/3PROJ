@@ -11,7 +11,7 @@ onMounted(async () => {
 
   const userData = await getUser();
 
-  const response = await api.get(`/user/${userData.id}/groups`);
+  const response = await api.get(`/user/${userData.id}/groups?limit=5`);
 
   groupList.value = response.data;
   console.log(groupList.value);
