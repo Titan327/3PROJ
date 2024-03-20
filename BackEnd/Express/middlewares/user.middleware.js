@@ -10,8 +10,6 @@ const verifyUserInfos = async (req, res, next) => {
         username: Joi.string().min(3).required(),
         email: Joi.string().email().max(100).required(),
         birth_date: Joi.date().required(),
-        password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required(),
-        passwordConfirm: Joi.ref('password')
     });
     if (req.body.userInfos == null) {
         return res.status(400).send({ message: "User infos are required" });
@@ -38,7 +36,22 @@ const verifyPasswordForSensibleInfos = async (req, res, next) => {
     next();
 }
 
+const verifyPasswordForSensibleInfosWhenModifying = async (req, res, next) => {
+    console.log(`REST verifyPasswordForSensibleInfos`);
+    if (!req.body.password) {
+        return res.status(400).send({ message: "Password is required for this operation" });
+    }
+    const user = await User.findOne({ where: { id: req.params.userId } });
+    if (user.email === req.body.userInfos.email) {
+        if (!await compare(req.body.password, user.password)) {
+            return res.status(401).send({message: "Unauthorized"});
+        }
+    }
+    next();
+}
+
 module.exports = {
     verifyUserInfos,
-    verifyPasswordForSensibleInfos
+    verifyPasswordForSensibleInfos,
+    verifyPasswordForSensibleInfosWhenModifying
 }
