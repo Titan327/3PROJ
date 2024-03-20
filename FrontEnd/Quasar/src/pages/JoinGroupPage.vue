@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { getUser } from "stores/userStore";
 import { ref } from "vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useQuasar} from "quasar";
 import {api} from "boot/axios";
 
 const $q = useQuasar()
 const user = ref(getUser());
+const router = useRouter();
 
 const userFirstName = ref('');
 const route = useRoute();
@@ -27,6 +28,7 @@ async function joinGroup() {
         type: 'positive',
         message: 'Vous avez rejoint le groupe'
       })
+      router.push('/#/groups');
     }
   }
   catch (error) {
