@@ -6,11 +6,13 @@ import {api} from "boot/axios";
 import {getUser} from "stores/userStore";
 import DialogCreateGroup from "components/Groups/DialogCreateGroup.vue";
 import {useQuasar} from "quasar";
+import DialogInvitintoGroup from "components/Groups/DialogInvitintoGroup.vue";
 
 let groupList = ref<Group[]>([]);
 const $q = useQuasar()
 
 let DialogCreate = ref(false);
+let DialogInvite = ref(false);
 
 onMounted(async () => {
 
@@ -22,6 +24,10 @@ async function getGroups() {
   const userData = await getUser();
   const response = await api.get(`/user/${userData.id}/groups?limit=50`);
   groupList.value = response.data;
+
+  groupList.value.sort((a, b) => {
+    return new Date(b.updatedAt) - new Date(a.updatedAt); //ts error
+  });
 }
 
 function openDialogCreate(){
@@ -40,6 +46,50 @@ function openDialogCreate(){
 }).onDismiss(() => {
     getGroups()
 })
+}
+
+async function openDialogInvite(id: number, name: string){
+
+  try {
+    const today = new Date();
+    const expirationDate = new Date(today);
+    expirationDate.setDate(today.getDate() + 7);
+
+    const response = await api.post(`group/${id}/createInvitation`, {
+
+      remaining_uses: 5,
+      expiration_date:expirationDate
+
+    });
+
+    if (response.data) {
+
+      DialogInvite.value = true;
+      $q.dialog({
+        component: DialogInvitintoGroup,
+
+        componentProps: {
+          isOpen: openDialogInvite,
+          link: response.data.invitation.token,
+          name: name
+        }
+      }).onOk(() => {
+        console.log('OK')
+      }).onCancel(() => {
+        console.log('Cancel')
+      }).onDismiss(() => {
+        console.log('Dismiss')
+      })
+    }
+  }
+  catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Une erreur s\'est produite lors de la création du groupe'
+    })
+
+  }
+
 }
 </script>
 
@@ -74,6 +124,7 @@ function openDialogCreate(){
               outline
               class="btn-consulter"
               icon="person_add"
+              @click="openDialogInvite(group.id, group.name)"
             >
             </q-btn>
           </q-item-section>

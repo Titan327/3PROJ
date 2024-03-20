@@ -4,6 +4,7 @@ export interface Group{
   description: string,
   picture?: string,
   owner_id?: number,
+  updatedAt?: Date,
 }
 
 export function DefaultGroup(): Group {
