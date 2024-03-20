@@ -93,7 +93,7 @@ function disconnect(){
       <template v-slot:header="{}">
         <q-item-section avatar>
           <q-avatar>
-            <img :src="pictureUrl ? pictureUrl : 'public/assets/defaults/user-default.webp'">
+            <img :src="pictureUrl ? pictureUrl : 'assets/defaults/user-default.webp' ">
           </q-avatar>
         </q-item-section>
 
