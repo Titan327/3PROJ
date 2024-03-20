@@ -1,15 +1,15 @@
-<script setup lang="ts"> import {EtatTotalPaidComponent} from "src/interfaces/types";
-
+<script setup lang="ts">
+import { EtatTotalPaidComponent } from "src/interfaces/types";
 import { defineProps, onMounted, ref } from "vue";
-import {Group} from "src/interfaces/group.interface";
-import {getUser} from "stores/userStore";
-import {api} from "boot/axios";
+import { Group } from "src/interfaces/group.interface";
+import { getUser } from "stores/userStore";
+import { api } from "boot/axios";
 
 const montantTotal = ref(0);
 const displayColor = ref('red');
 const titleText = ref('');
 const operations = ref(0);
-const icon = ref("south_west");
+const icon = ref();
 
 const props = defineProps<{
   etat: EtatTotalPaidComponent;
@@ -17,27 +17,29 @@ const props = defineProps<{
 
 const userData = ref(getUser());
 
-onMounted(() => {
-
-  if (props.etat !== EtatTotalPaidComponent.Positive) {
-    displayColor.value = 'red';
-    titleText.value = 'Reste à payer';
-    operations.value = 21;
-    montantTotal.value = 12345;
-    icon.value = 'north_east'
-    const response = api.get(`/user/${userData.value.id}/`);
-    //montantTotal.value = response.data;
-  }
-  else {
-    displayColor.value = 'green';
-    titleText.value = 'Total payé ce mois-ci';
-    operations.value = 12;
-    montantTotal.value = 76567;
-    icon.value = 'south_west'
+onMounted(async () => {
+  try {
+    if (props.etat !== EtatTotalPaidComponent.Positive) {
+      displayColor.value = 'red';
+      titleText.value = 'Reste à payer';
+      icon.value = 'north_east';
+      const response = await api.get(`user/${userData.value.id}/transactions/notRefunded`);
+      montantTotal.value = response.data.amount;
+      operations.value = response.data.transactions;
+    } else {
+      displayColor.value = 'green';
+      titleText.value = 'Total payé ce mois-ci';
+      icon.value = 'south_west';
+      const response = await api.get(`user/${userData.value.id}/transactions/thisMonth`);
+      montantTotal.value = response.data.amount;
+      operations.value = response.data.transactions;
+    }
+  } catch (error) {
+    console.error("Une erreur s'est produite lors de la récupération des données :", error);
   }
 });
-
 </script>
+
 
 
 <template>
@@ -50,11 +52,12 @@ onMounted(() => {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="text-grey-5 text-h6">{{titleText}}</q-item-label>
-          <q-item-label class="text-white" caption lines="2">{{montantTotal}}€</q-item-label>
+          <q-item-label class="text-grey-5 text-body1">{{titleText}}</q-item-label>
+          <q-item-label class="text-white text-subtitle1" caption lines="2">{{montantTotal}}€</q-item-label>
         </q-item-section>
 
-        <q-chip class="chip-status" :color="displayColor" text-color="white">{{operations}} Opérations</q-chip>
+        <q-chip v-if="operations>0" class="chip-status" :color="displayColor" text-color="white">{{operations}} Opérations</q-chip>
+        <q-chip v-if="operations==0" class="chip-status" :color="displayColor" text-color="white">Pas d'opération</q-chip>
       </q-item>
     </q-card-section>
   </q-card>
@@ -64,7 +67,7 @@ onMounted(() => {
 
 .bloc-paye{
   width: 85%;
-  height: 120px;
+  height: 100px;
   border-radius: 15px;
   margin-top: 10%;
 }
