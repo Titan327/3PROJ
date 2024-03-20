@@ -2,6 +2,7 @@ const {genSalt, hash} = require("bcrypt");
 const User = require('../models/user.model');
 const UserController = require('./userGroup.controller');
 const TransactionUserController = require('./transactionUser.controller');
+const Joi = require("joi");
 
 const getUser = async (req, res) => {
     try {
@@ -70,6 +71,35 @@ const modifyUser = async (req, res) => {
     }
 }
 
+const modifyPassword = async (req, res) => {
+    console.log(`REST modifyPassword`);
+    const schema = Joi.object({
+        password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required(),
+        passwordConfirm: Joi.ref('password')
+    });
+    if (req.body.userInfos == null) {
+        return res.status(400).send({ message: "User infos are required" });
+    }
+    const { error, value } = schema.validate(req.body.userInfos, { abortEarly: false });
+    if (error) {
+        const errorMessage = error.details.map(detail => detail.message.replace(/"/g, ''));
+        return res.status(400).json({ error: errorMessage });
+    }
+    const { password } = value;
+    const user = await User.findOne({ where: { id: req.authorization.userId } });
+    try {
+        const salt = await genSalt(12);
+        const passwordHash = await hash(password, salt);
+        await user.update({
+            password: passwordHash
+        });
+        res.status(201).send({ message: "Password modified successfully"});
+    } catch (e) {
+        console.error(e);
+        res.status(500).send(e);
+    }
+}
+
 const deleteUser = async (req, res) => {
     console.log(`REST deleteUser`);
     try {
@@ -128,6 +158,7 @@ module.exports = {
     getUser,
     createUser,
     modifyUser,
+    modifyPassword,
     deleteUser,
     getAmountOfAllUserNotRefoundedTransactions,
     getAmountOfAllUserTransactionsThisMonth
