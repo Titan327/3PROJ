@@ -9,15 +9,32 @@ import {api} from "boot/axios";
 
 const router = useRouter();
 let User = ref(DefaultUser());
-let isPhotoHover = ref(false);
-let loading = ref(false);
+let modifiedUser = ref(DefaultUser());
 const $q = useQuasar();
 
+let loading = ref(false);
+
+let isPhotoHover = ref(false);
+let expendUserDatas = ref(true);
+let expendPasswordData = ref(false);
+let expendPaymentMethod = ref(false);
+
+let isUserDataModified = ref(false);
+let isMailModified = ref(false);
+
+
+let pass = ref();
+let pass2 = ref();
+let newPass = ref();
+let newPassConfirmation = ref();
+
+const paiementsMethod = ref();
 
 (async () => {
   const userData = await getUser();
   if (userData != null) {
     User.value = userData;
+    modifiedUser.value = userData;
   }
 })();
 
@@ -26,65 +43,7 @@ function disconnect(){
   router.push('/login');
 }
 
-let pass = ref();
-let passConfirmation = ref()
 
-const checkBasicEmailSyntax = (value) => {
-  const basicEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return basicEmailRegex.test(value) || 'Adresse e-mail invalide';
-};
-const checkPasswordMatch = (value) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-        resolve((value === pass.value) || "Les mots de passe ne correspondent pas");
-      },
-    );
-  });
-};
-
-const computeIsMatchingPassword = computed(() => {
-  if(passConfirmation.value === pass.value){
-    return true;
-  }
-  return false;
-
-});
-
-
-async function modify() {
-
-  loading.value = true;
-  if(computeIsMatchingPassword.value){
-    try {
-
-      const response = await api.post("auth/register", {
-        userInfos:{
-          firstname : User.value.firstname,
-          lastname : User.value.lastname,
-          username : User.value.username,
-          email : User.value.email,
-          birth_date : User.value.birth_date,
-          password : pass.value
-        }
-
-      });
-      if (response.data) {
-        $q.notify({
-          type: 'positive',
-          message: 'Utilisateur créé'
-        })
-        router.push('/#/login');
-      }
-    }
-    catch (error) {
-      $q.notify({
-        type: 'negative',
-        message: 'Une erreur s\'est produite lors de l\'inscription'
-      })
-
-    }
-  }
-}
 </script>
 
 <template>
@@ -100,7 +59,7 @@ async function modify() {
                 size="200px"
               >
                 <img :src="User.profile_picture ? User.profile_picture : 'assets/defaults/user-default.webp'">
-                <div class="absolute-full text-subtitle2 flex flex-center"
+                <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                 v-if="isPhotoHover">
                   Modifier
                 </div>
@@ -115,75 +74,213 @@ async function modify() {
       </q-card>
 
     </div>
-    <div class="inputs">
-      <q-form
-        @submit="modify"
-      >
-        <q-input
-          style="margin-top: 20px;"
-          outlined
-          class="input"
-          v-model="User.firstname"
-          label="Nom"
-          dark
-          hide-bottom-space
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="User.lastname"
-          label="Prénom"
-          dark
-          hide-bottom-space
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="User.email"
-          label="Adresse email"
-          type="email"
-          :rules="[checkBasicEmailSyntax]"
-          dark
-          hide-bottom-space
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="User.username"
-          label="Nom d'utilisateur"
-          dark
-          hide-bottom-space
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="User.birth_date"
-          label="Date de naissance"
-          type="date"
-          dark
-          hide-bottom-space
-        />
-        <q-input
-          class="input"
-          outlined
-          v-model="pass"
-          label="Mot de passe"
-          type="password"
-          dark
-          hide-bottom-space
-        />
-        <q-input
-          class="input"
-          outlined
-          v-model="passConfirmation"
-          label="Confirmer"
-          type="password"
-          :rules="[checkPasswordMatch]"
-          dark
-          hide-bottom-space
-        />
-      </q-form>
-      <br>
+    <div class="q-pa-md row items-start q-gutter-md">
+      <q-card class="card-user-data bg-primary rounded-borders">
+        <q-card-actions>
+          <q-item-label class="text-h6 text-head-card q-pa-md" @click="expendUserDatas = !expendUserDatas">Informations personnelles</q-item-label>
+
+          <q-space />
+
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expendUserDatas ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expendUserDatas = !expendUserDatas"
+          />
+        </q-card-actions>
+
+        <q-slide-transition>
+          <div v-show="expendUserDatas">
+            <q-separator />
+            <q-card-section class="text-subtitle2">
+              <div class="inputs">
+                <q-form
+                  @submit="modify"
+                >
+                  <q-input
+                    style="margin-top: 20px;"
+                    outlined
+                    class="input"
+                    v-model="modifiedUser.lastname"
+                    color="secondary"
+                    label="Nom"
+                    dark
+                    hide-bottom-space
+                    @update:modelValue="isUserDataModified = true"
+                  />
+                  <q-input
+                    outlined
+                    class="input"
+                    v-model="modifiedUser.firstname"
+                    label="Prénom"
+                    color="secondary"
+                    dark
+                    hide-bottom-space
+                    @update:modelValue="isUserDataModified = true"
+
+                  />
+                  <q-input
+                    outlined
+                    class="input"
+                    v-model="modifiedUser.email"
+                    label="Adresse email"
+                    type="email"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                    @update:modelValue="isUserDataModified = true;isMailModified = true"
+
+                  />
+                  <q-input
+                    outlined
+                    class="input"
+                    v-model="modifiedUser.username"
+                    label="Nom d'utilisateur"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                    @update:modelValue="isUserDataModified = true"
+
+                  />
+                  <q-input
+                    outlined
+                    class="input"
+                    v-model="modifiedUser.birth_date"
+                    label="Date de naissance"
+                    type="date"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                    @update:modelValue="isUserDataModified = true"
+
+                  />
+                  <q-input
+                    class="input confirm-pwd"
+                    outlined
+                    v-model="pass"
+                    label="Entrez le mot de passe pour confirmer le changement d'Email"
+                    type="password"
+                    v-if="isMailModified"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                  />
+                </q-form>
+                <q-btn
+                v-if="isUserDataModified"
+                color="green"
+                class="save-btn"
+                rounded
+                >
+                  Enregistrer
+                </q-btn>
+                <br>
+              </div>
+            </q-card-section>
+          </div>
+        </q-slide-transition>
+      </q-card>
+    </div>
+
+    <div class="q-pa-md row items-start q-gutter-md">
+      <q-card class="card-user-data bg-primary rounded-borders">
+        <q-card-actions>
+          <q-item-label class="text-h6 text-head-card q-pa-md" @click="expendPasswordData = !expendPasswordData">Modifier le mot de passe</q-item-label>
+
+          <q-space />
+
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expendPasswordData ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expendPasswordData = !expendPasswordData"
+          />
+        </q-card-actions>
+
+        <q-slide-transition>
+          <div v-show="expendPasswordData">
+            <q-separator />
+            <q-card-section class="text-subtitle2">
+              <div class="inputs">
+                <q-form
+                  @submit="modifyPass"
+                >
+                  <q-input
+                    class="input"
+                    outlined
+                    v-model="pass2"
+                    label="Mot de passe actuel"
+                    type="password"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                  />
+                  <q-input
+                    class="input"
+                    outlined
+                    v-model="newPass"
+                    label="Nouveau mot de passe"
+                    type="password"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                  />
+                  <q-input
+                    class="input"
+                    outlined
+                    v-model="newPassConfirmation"
+                    label="Confirmer nouveau mot de passe"
+                    type="password"
+                    color="secondary"
+                    :rules="[checkPasswordMatch]"
+                    dark
+                    hide-bottom-space
+                  />
+                </q-form>
+                <br>
+              </div>
+            </q-card-section>
+          </div>
+        </q-slide-transition>
+      </q-card>
+    </div>
+
+    <div class="q-pa-md row items-start q-gutter-md">
+      <q-card class="card-user-data bg-primary rounded-borders">
+        <q-card-actions>
+          <q-item-label class="text-h6 text-head-card q-pa-md" @click="expendPaymentMethod = !expendPaymentMethod">Moyens de paiement</q-item-label>
+
+          <q-space />
+
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expendPaymentMethod ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expendPaymentMethod = !expendPaymentMethod"
+          />
+        </q-card-actions>
+
+        <q-slide-transition>
+          <div v-show="expendPaymentMethod">
+            <q-separator />
+            <q-card-section class="text-subtitle2 row items-center justify-evenly">
+                <q-img src="/public/assets/card/paypal-card.webp"
+                       class="rounded-borders paiement"
+              >
+                  <div class="absolute-bottom text-subtitle2 text-center">
+                    {{ 'test' }}
+                  </div>
+                </q-img>
+            </q-card-section>
+          </div>
+        </q-slide-transition>
+      </q-card>
     </div>
     <div class="row items-center justify-evenly">
       <q-btn clickable :onclick="disconnect" color="red" class="text-white q-mx-auto" rounded>
@@ -194,13 +291,42 @@ async function modify() {
 </template>
 
 <style scoped>
+.card-user-data{
+  width: 100%;
+}
+.text-head-card{
+  margin-bottom: 15px;
+}
 .inputs {
   width: 80%;
   display: flex;
+  margin: auto;
   flex-direction: column;
 }
 .input{
   margin-bottom: 12px;
 }
+.save-btn{
+  width: 15%;
+  margin: 20px 0 0 0;
+}
+.confirm-pwd{
+  margin-top: 50px;
+}
+.paiement{
+  width: 30%;
+  margin: 20px;
+}
 
+@media screen and (max-width: 1200px) {
+  .paiement{
+    width: 40%;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .paiement {
+    width: 90%;
+  }
+}
 </style>

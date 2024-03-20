@@ -31,6 +31,8 @@ onMounted(() => {
 <style>
 body{
   background: #141332;
+  //background: linear-gradient(345deg, rgba(181,0,150,0.8855917366946778) 0%, rgba(22,20,101,1) 42%);
+
   color: #ffff
 }
 </style>

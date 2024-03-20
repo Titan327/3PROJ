@@ -124,18 +124,22 @@ async function register() {
             style="margin-top: 20px;"
             outlined
             class="input"
-            v-model="newUser.firstname"
+            v-model="newUser.lastname"
             label="Nom"
             :rules="[checkNotNull]"
             dark
+            color="secondary"
+
           />
           <q-input
             outlined
             class="input"
-            v-model="newUser.lastname"
+            v-model="newUser.firstname"
             label="Prénom"
             :rules="[checkNotNull]"
             dark
+            color="secondary"
+
           />
           <q-input
             outlined
@@ -145,6 +149,8 @@ async function register() {
             type="email"
             :rules="[checkNotNull, checkBasicEmailSyntax]"
             dark
+            color="secondary"
+
           />
           <q-input
             outlined
@@ -153,6 +159,8 @@ async function register() {
             label="Nom d'utilisateur"
             :rules="[checkNotNull]"
             dark
+            color="secondary"
+
           />
           <q-input
             outlined
@@ -162,6 +170,8 @@ async function register() {
             type="date"
             :rules="[checkNotNull, checkAge]"
             dark
+            color="secondary"
+
           />
           <q-input
             class="input"
@@ -171,6 +181,8 @@ async function register() {
             type="password"
             :rules="[checkNotNull, checkPasswordComplexity]"
             dark
+            color="secondary"
+
           />
           <q-input
             class="input"
@@ -180,6 +192,8 @@ async function register() {
             type="password"
             :rules="[checkNotNull, checkPasswordMatch]"
             dark
+            color="secondary"
+
           />
           <div class="links">
             <a href="#/login"><b>Déja un compte ?</b></a>
