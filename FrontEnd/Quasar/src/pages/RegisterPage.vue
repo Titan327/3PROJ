@@ -200,22 +200,22 @@ async function register() {
               <q-btn
                 @click="console.log('Google')"
                 class="btn-log shadow-6 bg-white">
-                <img src="/public/assets/icons/googleIcon.svg" alt="Google"/>
+                <img src="assets/icons/googleIcon.svg" alt="Google"/>
               </q-btn>
               <q-btn
                 @click="console.log('Apple')"
                 class="btn-log shadow-6 bg-white">
-                <img src="/public/assets/icons/appleIcon.svg" alt="Apple"/>
+                <img src="assets/icons/appleIcon.svg" alt="Apple"/>
               </q-btn>
               <q-btn
                 @click="console.log('Microsoft')"
                 class="btn-log shadow-6 bg-white">
-                <img src="/public/assets/icons/microsoftIcon.svg" alt="Microsoft"/>
+                <img src="assets/icons/microsoftIcon.svg" alt="Microsoft"/>
               </q-btn>
               <q-btn
                 @click="console.log('Facebook')"
                 class="btn-log shadow-6 bg-white">
-                <img src="/public/assets/icons/facebookIcon.svg" alt="Facebook"/>
+                <img src="assets/icons/facebookIcon.svg" alt="Facebook"/>
               </q-btn>
             </div>
           </div>

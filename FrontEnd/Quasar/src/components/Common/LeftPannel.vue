@@ -37,7 +37,7 @@ function disconnect(){
       <q-list>
         <q-img
           class="logo-drawer"
-          src="src/assets/logo-500.png"
+          src="assets/logo-500.png"
           style="height: 140px; max-width: 150px"
         />
         <q-item clickable v-ripple  @click="router.push('/#')">
