@@ -12,9 +12,22 @@ const props = defineProps({
 });
 onMounted(async () => {
 
-  inviteLink.value = `https://3proj-front.tristan-tourbier.com/#/join-group/token${props.link}`;
+  inviteLink.value = `https://3proj-front.tristan-tourbier.com/#/join-group/${props.link}`;
 
 });
+
+async function copyLink() {
+  await navigator.clipboard.writeText(inviteLink.value)
+    .then(() => {
+      $q.notify({
+        type: 'positive',
+        message: 'Lien copié'
+      })
+    })
+    .catch(err => {
+      console.error('Impossible de copier la variable dans le presse-papiers : ', err);
+    });
+}
 </script>
 
 <template>
@@ -26,9 +39,14 @@ onMounted(async () => {
       </q-card-section>
       <q-card-section>
         <q-item-label class="text-subtitle2">Vous pouvez copier ce lien d'invitation et l'envoyer à vos amis</q-item-label>
-        <div class="bloc-link">
+        <div class="bloc-link column">
           <q-input v-model="inviteLink" outlined dense readonly dark color="secondary"></q-input>
-
+          <q-btn
+            @click="copyLink"
+            label="Copier"
+            color="secondary"
+            class="btn">
+          </q-btn>
         </div>
       </q-card-section>
     </q-card>
@@ -39,7 +57,6 @@ onMounted(async () => {
 <style scoped>
 
 .btn {
-  width: 50%;
   border-radius: 10px;
   margin: 10px 25%;
 }
