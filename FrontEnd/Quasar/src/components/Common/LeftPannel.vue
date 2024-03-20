@@ -72,7 +72,7 @@ function disconnect(){
           <q-item-section>Groupes</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple>
+        <q-item clickable v-ripple @click="router.push('/user-data')">
           <q-item-section avatar>
             <q-icon color="secondary" name="person" />
           </q-item-section>
@@ -93,7 +93,7 @@ function disconnect(){
       <template v-slot:header="{}">
         <q-item-section avatar>
           <q-avatar>
-            <img :src="pictureUrl ? pictureUrl : 'src/assets/defaults/user-default.webp'">
+            <img :src="pictureUrl ? pictureUrl : 'public/assets/defaults/user-default.webp'">
           </q-avatar>
         </q-item-section>
 
