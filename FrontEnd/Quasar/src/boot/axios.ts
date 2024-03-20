@@ -14,7 +14,7 @@ declare module '@vue/runtime-core' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'https://3proj-back.tristan-tourbier.com/api' }); //localhost:9002 docker
+const api = axios.create({ baseURL: 'http://localhost:9002/api/' }); //localhost:9002 docker
 api.interceptors.request.use(
   (config) => {
     // Récupère le token de l'utilisateur depuis le local storage
