@@ -270,7 +270,7 @@ function disconnect(){
           <div v-show="expendPaymentMethod">
             <q-separator />
             <q-card-section class="text-subtitle2 row items-center justify-evenly">
-                <q-img src="/public/assets/card/paypal-card.webp"
+                <q-img src="assets/card/paypal-card.webp"
                        class="rounded-borders paiement"
               >
                   <div class="absolute-bottom text-subtitle2 text-center">
