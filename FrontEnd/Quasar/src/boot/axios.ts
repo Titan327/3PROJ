@@ -17,9 +17,21 @@ declare module '@vue/runtime-core' {
 const api = axios.create({ baseURL: 'https://3proj-back.tristan-tourbier.com/api' }); //localhost:9002 docker
 api.interceptors.request.use(
   (config) => {
-    // Récupère le token de l'utilisateur depuis le local storage
     const userToken = localStorage.getItem('userToken');
-    // Vérifie si le token est disponible et ajoute-le aux en-têtes
+    if (userToken) {
+      config.headers.Authorization = `Bearer ${userToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+const back = axios.create({ baseURL: 'https://3proj-back.tristan-tourbier.com/' }); //localhost:9002 docker
+back.interceptors.request.use(
+  (config) => {
+    const userToken = localStorage.getItem('userToken');
     if (userToken) {
       config.headers.Authorization = `Bearer ${userToken}`;
     }
@@ -37,8 +49,10 @@ export default boot(({ app }) => {
   //       so you won't necessarily have to import axios in each vue file
 
   app.config.globalProperties.$api = api;
+
+  app.config.globalProperties.$api = back;
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
 });
 
-export { api };
+export { api, back};

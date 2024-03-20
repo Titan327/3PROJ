@@ -3,7 +3,7 @@ import { getUser } from "stores/userStore";
 import { ref } from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useQuasar} from "quasar";
-import {api} from "boot/axios";
+import {back} from "boot/axios";
 
 const $q = useQuasar()
 const user = ref(getUser());
@@ -22,7 +22,7 @@ const token = route.params.token;
 
 async function joinGroup() {
   try {
-    const response = await api.post(`{token}`, {});
+    const response = await back.post(`${token}`);
     if (response.data) {
       $q.notify({
         type: 'positive',
