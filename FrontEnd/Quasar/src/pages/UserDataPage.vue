@@ -99,7 +99,7 @@ async function modify() {
                 @mouseleave ="isPhotoHover=false"
                 size="200px"
               >
-                <img :src="User.profile_picture ? User.profile_picture : 'public/assets/defaults/user-default.webp'">
+                <img :src="User.profile_picture ? User.profile_picture : 'assets/defaults/user-default.webp'">
                 <div class="absolute-full text-subtitle2 flex flex-center"
                 v-if="isPhotoHover">
                   Modifier
