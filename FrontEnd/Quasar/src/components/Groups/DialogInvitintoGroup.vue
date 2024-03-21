@@ -23,6 +23,7 @@ async function copyLink() {
         type: 'positive',
         message: 'Lien copié'
       })
+      isOpen.value = false;
     })
     .catch(err => {
       console.error('Impossible de copier la variable dans le presse-papiers : ', err);
@@ -33,20 +34,20 @@ async function copyLink() {
 <template>
   <q-dialog v-model="isOpen">
     <q-card class="bg-primary" style="width: 500px; max-width: 80vw;">
-      <q-card-section>
-        <q-item-label class="text-h5">Créer une invitation</q-item-label>
-        <q-item-label class="text-subtitle1">{{props.name}}</q-item-label>
+      <q-card-section class="row items-center">
+        <div class="text-h5">
+          <q-item-label class="text-h5">Créer une invitation</q-item-label>
+          <q-item-label class="text-subtitle1">{{props.name}}</q-item-label>
+        </div>
+        <q-space />
+        <q-btn icon="close" flat round dense v-close-popup />
+
       </q-card-section>
       <q-card-section>
         <q-item-label class="text-subtitle2">Vous pouvez copier ce lien d'invitation et l'envoyer à vos amis</q-item-label>
-        <div class="bloc-link column">
-          <q-input v-model="inviteLink" outlined dense readonly dark color="secondary"></q-input>
-          <q-btn
-            @click="copyLink"
-            label="Copier"
-            color="secondary"
-            class="btn">
-          </q-btn>
+        <div class="bloc-link row items-center justify-evenly">
+          <q-input v-model="inviteLink" outlined dense readonly dark class="link" color="secondary"></q-input>
+          <q-btn color="secondary" class="btn" outline @click="copyLink" icon="content_copy" > </q-btn>
         </div>
       </q-card-section>
     </q-card>
@@ -58,10 +59,17 @@ async function copyLink() {
 
 .btn {
   border-radius: 10px;
-  margin: 10px 25%;
+  margin: 0 5px;
+  height: 42px;
+}
+.link{
+  border-radius: 10px;
+  margin: 0 5px;
+  width: 80%;
 }
 .bloc-link{
-  width: 80%;
+  width: 100%;
   margin: 20px auto;
+  height: 42px;
 }
 </style>
