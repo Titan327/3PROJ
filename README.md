@@ -23,3 +23,7 @@ Faite cette commande pour acceder aux logs de Quasar:
 ```bash
 docker logs API-QUASAR -f 
 ```
+Pour build le projet veuillez lancer les conteneurs avec cette commande:
+```bash
+docker-compose -f prod.yaml up -d
+```
