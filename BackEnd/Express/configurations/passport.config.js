@@ -10,7 +10,7 @@ GOOGLE_CLIENT_SECRET = "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";
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:9002/api/oauth2/google/callback",
+        callbackURL: "http://3proj-back.tristan-tourbier.com/api/oauth2/google/callback",
         passReqToCallback: true
     },
     function(request,accessToken, refreshToken, profile, done) {
