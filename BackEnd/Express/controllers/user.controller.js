@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const UserController = require('./userGroup.controller');
 const TransactionUserController = require('./transactionUser.controller');
 const Joi = require("joi");
+const UserMiddleware = require('../middlewares/user.middleware');
 
 const getUser = async (req, res) => {
     try {
@@ -43,24 +44,26 @@ const createUser = async (req, res) => {
 
 const modifyUser = async (req, res) => {
     console.log(`REST modifyUser`);
-    const { lastname, firstname, username, email, birth_date, password } = req.value;
+    const { lastname, firstname, username, email, birth_date } = req.value;
     const user = await User.findOne({ where: { id: req.authorization.userId } });
-    if (email !== user.email && await User.findOne({ where: { email: email } }) !== null) {
-        return res.status(409).send({ message: "Email already taken"});
+    console.log(user.email);
+    console.log(email);
+    if (email !== user.email){
+        if (await User.findOne({ where: { email: email } }) !== null) {
+            return res.status(409).send({ message: "Email already taken"});
+        }
+        await UserMiddleware.verifyPasswordForSensibleInfos(req, res, () => {});
     }
     if (username !== user.username && await User.findOne({ where: { username: username } }) !== null) {
         return res.status(409).send({ message: "Username already taken"});
     }
     try {
-        const salt = await genSalt(12);
-        const passwordHash = await hash(password, salt);
         await User.update({
             firstname,
             lastname,
             username,
             email,
-            birth_date,
-            password: passwordHash
+            birth_date
         }, {
             where: { id: req.authorization.userId }
         });
