@@ -67,10 +67,10 @@ const modifyUser = async (req, res) => {
         }, {
             where: { id: req.authorization.userId }
         });
-        res.status(201).send({ message: "User modified successfully"});
+        return res.status(201).send({ message: "User modified successfully"});
     } catch (e) {
         console.error(e);
-        res.status(500).send(e);
+        return res.status(500).send(e);
     }
 }
 

@@ -5,7 +5,7 @@ const UserMiddleware = require('../middlewares/user.middleware');
 
 //PUBLIC
 //POST http://localhost:9002/api/auth/register
-router.post("/register", UserMiddleware.verifyUserInfos , UserMiddleware.verifyPasswordWhenCreating ,AuthController.register);
+router.post("/register", UserMiddleware.verifyUserInfos , UserMiddleware.verifyPasswordWhenCreatingOrUpdating ,AuthController.register);
 //POST http://localhost:9002/api/auth/login
 router.post("/login",AuthController.authentication);
 //POST http://localhost:9000/api/auth/forgottenPassword

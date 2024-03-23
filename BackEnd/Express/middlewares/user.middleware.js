@@ -26,7 +26,7 @@ const verifyUserInfos = async (req, res, next) => {
     next();
 }
 
-const verifyPasswordWhenCreating = async (req, res, next) => {
+const verifyPasswordWhenCreatingOrUpdating = async (req, res, next) => {
     console.log(`REST verifyPasswordWhenCreating`);
     const schema = Joi.object({
         password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required(),
@@ -61,6 +61,6 @@ const verifyPasswordForSensibleInfos = async (req, res, next) => {
 
 module.exports = {
     verifyUserInfos,
-    verifyPasswordWhenCreating,
+    verifyPasswordWhenCreatingOrUpdating,
     verifyPasswordForSensibleInfos
 }
