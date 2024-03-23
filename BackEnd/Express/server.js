@@ -13,6 +13,9 @@ const app = express();
 const server = http.createServer(app); // Création du serveur HTTP
 const io = socketIo(server);
 
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -42,6 +45,9 @@ io.on('connection', function(socket){
     });
 });
 
+app.use(passport.initialize());
+
+
 const PORT = process.env.PORT;
 
 server.listen(PORT, () => console.log(`Server up and running on http://localhost:${PORT}`));
@@ -62,3 +68,4 @@ app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));
 app.use("/api/user", require("./routes/user.route"));
 app.use("/api/transaction", require("./routes/transaction.route"));
+app.use("/api/oauth2", require("./routes/oauth2.route"));

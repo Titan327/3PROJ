@@ -25,9 +25,9 @@ router.get("/:userId/transactions/thisMonth", securityMiddleware.verifyIsAuthAnd
 //GET http://localhost:9002/api/user/{id}
 router.get("/:userId", securityMiddleware.verifyIsAuthAndActivUser, UserController.getUser);
 //PUT http://localhost:9002/api/user/{id}
-router.put("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyUserInfos, userMiddleware.verifyPasswordForSensibleInfosWhenModifying, UserController.modifyUser);
-//PUT http://localhost:9002/api/user/{id}
-router.put("/:userId", userMiddleware.verifyUserInfos, userMiddleware.verifyPasswordForSensibleInfos, UserController.modifyPassword);
+router.put("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyUserInfos, UserController.modifyUser);
+//PUT http://localhost:9002/api/user/{id}/password
+router.put("/:userId/password", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyPasswordForSensibleInfos, userMiddleware.verifyPasswordWhenCreatingOrUpdating, UserController.modifyPassword);
 //DELETE http://localhost:9002/api/user/{id}
 router.delete("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyPasswordForSensibleInfos, UserController.deleteUser);
 

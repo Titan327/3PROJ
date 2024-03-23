@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onUnmounted, ref} from 'vue';
 import {api} from "boot/axios";
-import { useQuasar } from 'quasar'
+import {LocalStorage, useQuasar} from 'quasar'
 import {useRouter} from "vue-router";
-import {updateUser} from "stores/userStore";
+import {getUser, updateUser} from "stores/userStore";
 
 const $q = useQuasar();
 let loading = ref(false)
@@ -14,6 +14,20 @@ let password = ref(null);
 let email = ref(null);
 
 
+function getCookie(name: string): string | undefined {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+}
+
+(async () => {
+  const token = getCookie('jwt');
+
+  if (token) {
+    console.log('JWT Token:', token);
+  }
+
+})();
 
 async function login() {
   loading.value = true;
@@ -30,6 +44,7 @@ async function login() {
         password: password.value,
         email: email.value,
       });
+
       if (response.data) {
         updateUser(response.data);
         await router.push('../#');
@@ -58,6 +73,32 @@ async function login() {
   }
   loading.value = false;
 }
+
+async function loginGoogle() {
+
+  console.log('tezstte');
+
+  // Ouvrir une nouvelle fenêtre pour l'authentification avec Google
+  const authWindow = window.open('http://localhost:9002/api/oauth2/google', '_blank', 'height=600,width=600');
+
+
+
+
+  window.addEventListener('message', (event) => {
+
+    if (event.data.token){
+      console.log('Message reçu de la fenêtre enfant :', event.data.token);
+      localStorage.setItem('userToken', event.data.token);
+      window.location.href = '/';
+    }
+
+  });
+
+
+
+}
+
+
 </script>
 
 <template>
@@ -113,7 +154,7 @@ async function login() {
 
         <div class="btns">
           <q-btn
-            @click="console.log('Google')"
+            @click="loginGoogle"
             class="btn-log shadow-6 bg-white">
             <img src="assets/icons/googleIcon.svg" alt="Google"/>
           </q-btn>
