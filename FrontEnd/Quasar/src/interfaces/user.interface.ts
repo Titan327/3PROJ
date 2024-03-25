@@ -1,10 +1,12 @@
 export interface IUser {
   id?: number
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  birthdate: string;
+  username?: string;
+  email?: string;
+  firstname?: string;
+  lastname?: string;
+  birth_date?: string;
+  token?: string;
+  profile_picture?: string;
 }
 
 export function DefaultUser(): IUser {
@@ -12,8 +14,10 @@ export function DefaultUser(): IUser {
     id: 0,
     username: '',
     email: '',
-    birthdate: '',
-    firstName: '',
-    lastName: '',
+    birth_date: '',
+    firstname: '',
+    lastname: '',
+    token: '',
+    profile_picture: ''
   };
 }

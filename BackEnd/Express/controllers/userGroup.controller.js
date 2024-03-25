@@ -1,11 +1,11 @@
 const UserGroup = require('../models/userGroup.model');
 
-const createUserGroupRelation = async (user_id, group_id) => {
+const createUserGroupRelation = async (userId, groupId) => {
     console.log(`REST createUserGroupRelation`);
-try {
+    try {
     return await UserGroup.create({
-        user_id,
-        group_id
+        userId,
+        groupId: groupId
     });
     } catch (e) {
         console.error(e);
@@ -13,6 +13,19 @@ try {
     }
 }
 
+const deleteUserGroupRelationsWhenDeletingUser = async (userId) => {
+    console.log(`REST deleteUserGroupRelationsWhenDeletingUser`);
+    try {
+        await UserGroup.destroy({
+            where: { userId }
+        });
+    } catch (e) {
+        console.error(e);
+        return e;
+    }
+}
+
 module.exports = {
-    createUserGroupRelation
+    createUserGroupRelation,
+    deleteUserGroupRelationsWhenDeletingUser
 }

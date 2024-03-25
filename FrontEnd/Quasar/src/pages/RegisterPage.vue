@@ -76,12 +76,14 @@ async function register() {
     try {
 
       const response = await api.post("auth/register", {
-        firstname : newUser.value.firstName,
-        lastname : newUser.value.lastName,
+      userInfos:{
+        firstname : newUser.value.firstname,
+        lastname : newUser.value.lastname,
         username : newUser.value.username,
         email : newUser.value.email,
-        birth_date : newUser.value.birthdate,
+        birth_date : newUser.value.birth_date,
         password : pass.value
+      }
 
       });
       if (response.data) {
@@ -112,109 +114,129 @@ async function register() {
 </script>
 
 <template>
-  <div class="form q-pa-lg q-ma-lg">
-    <div class="inputs">
-      <q-form
-        @submit="register"
-      >
-        <span class="text-primary text-h5">Créer un compte</span>
-        <q-input
-          style="margin-top: 20px;"
-          outlined
-          class="input"
-          v-model="newUser.firstName"
-          label="Nom"
-          :rules="[checkNotNull]"
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="newUser.lastName"
-          label="Prénom"
-          :rules="[checkNotNull]"
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="newUser.email"
-          label="Adresse email"
-          type="email"
-          :rules="[checkNotNull, checkBasicEmailSyntax]"
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="newUser.username"
-          label="Nom d'utilisateur"
-          :rules="[checkNotNull]"
-        />
-        <q-input
-          outlined
-          class="input"
-          v-model="newUser.birthdate"
-          label="Date de naissance"
-          type="date"
-          :rules="[checkNotNull, checkAge]"
-        />
-        <q-input
-          class="input"
-          outlined
-          v-model="pass"
-          label="Mot de passe"
-          type="password"
-          :rules="[checkNotNull, checkPasswordComplexity]"
-        />
-        <q-input
-          class="input"
-          outlined
-          v-model="passConfirmation"
-          label="Confirmer"
-          type="password"
-          :rules="[checkNotNull, checkPasswordMatch]"
+    <div class="form q-pa-lg q-ma-lg flex row">
+      <div class="inputs">
+        <q-form
+          @submit="register"
+        >
+          <span class="text-grey-2 text-h5">Créer un compte</span>
+          <q-input
+            style="margin-top: 20px;"
+            outlined
+            class="input"
+            v-model="newUser.lastname"
+            label="Nom"
+            :rules="[checkNotNull]"
+            dark
+            color="secondary"
 
-        />
-        <div class="links">
-          <a href="#/login"><b>Déja un compte ?</b></a>
-        </div>
-        <q-btn
-          class="btn"
-          color="primary"
-          text-color="white"
-          unelevated
-          label="Créer mon compte"
-          type="submit"
-          :loading="loading"
-        />
-        <div class="external-services">
-          <q-item-label class="text-secondary">Inscription avec:</q-item-label>
+          />
+          <q-input
+            outlined
+            class="input"
+            v-model="newUser.firstname"
+            label="Prénom"
+            :rules="[checkNotNull]"
+            dark
+            color="secondary"
 
-          <div class="btns">
-            <q-btn
-              @click="console.log('Google')"
-              class="btn-log shadow-6">
-              <img src="/../src/assets/icons/googleIcon.svg" alt="Google"/>
-            </q-btn>
-            <q-btn
-              @click="console.log('Apple')"
-              class="btn-log shadow-6">
-              <img src="/../src/assets/icons/appleIcon.svg" alt="Apple"/>
-            </q-btn>
-            <q-btn
-              @click="console.log('Microsoft')"
-              class="btn-log shadow-6">
-              <img src="/../src/assets/icons/microsoftIcon.svg" alt="Microsoft"/>
-            </q-btn>
-            <q-btn
-              @click="console.log('Facebook')"
-              class="btn-log shadow-6">
-              <img src="/../src/assets/icons/facebookIcon.svg" alt="Facebook"/>
-            </q-btn>
+          />
+          <q-input
+            outlined
+            class="input"
+            v-model="newUser.email"
+            label="Adresse email"
+            type="email"
+            :rules="[checkNotNull, checkBasicEmailSyntax]"
+            dark
+            color="secondary"
+
+          />
+          <q-input
+            outlined
+            class="input"
+            v-model="newUser.username"
+            label="Nom d'utilisateur"
+            :rules="[checkNotNull]"
+            dark
+            color="secondary"
+
+          />
+          <q-input
+            outlined
+            class="input"
+            v-model="newUser.birth_date"
+            label="Date de naissance"
+            type="date"
+            :rules="[checkNotNull, checkAge]"
+            dark
+            color="secondary"
+
+          />
+          <q-input
+            class="input"
+            outlined
+            v-model="pass"
+            label="Mot de passe"
+            type="password"
+            :rules="[checkNotNull, checkPasswordComplexity]"
+            dark
+            color="secondary"
+
+          />
+          <q-input
+            class="input"
+            outlined
+            v-model="passConfirmation"
+            label="Confirmer"
+            type="password"
+            :rules="[checkNotNull, checkPasswordMatch]"
+            dark
+            color="secondary"
+
+          />
+          <div class="links">
+            <a href="#/login"><b>Déja un compte ?</b></a>
           </div>
-        </div>
-      </q-form>
-      <br>
+          <q-btn
+            class="btn"
+            color="secondary"
+            text-color="white"
+            unelevated
+            label="Créer mon compte"
+            type="submit"
+            :loading="loading"
+          />
+          <div class="external-services">
+            <q-item-label class="text-secondary">Inscription avec:</q-item-label>
+
+            <div class="btns">
+              <q-btn
+                @click="console.log('Google')"
+                class="btn-log shadow-6 bg-white">
+                <img src="assets/icons/googleIcon.svg" alt="Google"/>
+              </q-btn>
+              <q-btn
+                @click="console.log('Apple')"
+                class="btn-log shadow-6 bg-white">
+                <img src="assets/icons/appleIcon.svg" alt="Apple"/>
+              </q-btn>
+              <q-btn
+                @click="console.log('Microsoft')"
+                class="btn-log shadow-6 bg-white">
+                <img src="assets/icons/microsoftIcon.svg" alt="Microsoft"/>
+              </q-btn>
+              <q-btn
+                @click="console.log('Facebook')"
+                class="btn-log shadow-6 bg-white">
+                <img src="assets/icons/facebookIcon.svg" alt="Facebook"/>
+              </q-btn>
+            </div>
+          </div>
+        </q-form>
+        <br>
+      </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
@@ -275,7 +297,6 @@ async function register() {
   flex-wrap: wrap;
   justify-content: space-evenly;
 }
-
 /* RESPONSIVE */
 @media screen and (min-width: 600px) {
   .form {

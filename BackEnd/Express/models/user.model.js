@@ -33,11 +33,11 @@ const UserModel = sequelize.define("User", {
     },
     birth_date: {
         type: DataTypes.DATE,
-        allowNull: false
+        //allowNull: false
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        //allowNull: false
     },
     profile_picture: {
         type: DataTypes.STRING,

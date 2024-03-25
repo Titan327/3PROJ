@@ -21,7 +21,7 @@ const GroupModel = sequelize.define("Group", {
         type: DataTypes.STRING,
         allowNull: true
     },
-    owner_id: {
+    ownerId: {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {

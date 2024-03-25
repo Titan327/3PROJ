@@ -10,7 +10,7 @@ const TransactionModel = sequelize.define("Transaction", {
         autoIncrement: true,
         allowNull: false
     },
-    group_id: {
+    groupId: {
         type: DataTypes.BIGINT,
         allowNull: false
     },
@@ -30,19 +30,19 @@ const TransactionModel = sequelize.define("Transaction", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    sender_id: {
+    senderId: {
         type: DataTypes.BIGINT,
         allowNull: false
     },
-    category_id: {
+    categoryId: {
         type: DataTypes.BIGINT,
         allowNull: false
     }
 });
 
 // Relation entre les transactions et les groupes / catégories
-TransactionModel.belongsTo(GroupModel, { foreignKey: 'group_id' });
-TransactionModel.belongsTo(TransactionCategoryModel, { foreignKey: 'category_id' });
+TransactionModel.belongsTo(GroupModel, { foreignKey: 'groupId' });
+TransactionModel.belongsTo(TransactionCategoryModel, { foreignKey: 'categoryId' });
 
 sequelize.sync().then(() => {
     console.log('TransactionModel table created successfully!');

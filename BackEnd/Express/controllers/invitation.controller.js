@@ -6,28 +6,28 @@ const crypto = require('crypto');
 const createInvitation = async (req, res) => {
     try {
         console.log('REST createInvitation');
-        const user_id = req.authorization.user_id;
-        console.log(`user_id: ${user_id}`);
-        if (await UserGroup.findOne({where: {user_id: user_id, group_id: req.params.groupId}}) === null) {
-            res.status(403).send({error: "You are not allowed to create an invitation for this group"});
+        const userId = req.authorization.userId;
+        console.log(`userId: ${userId}`);
+        if (await UserGroup.findOne({where: {userId: userId, groupId: req.params.groupId}}) === null) {
+            return res.status(403).send({error: "You are not allowed to create an invitation for this group"});
         }
-        const group_id = req.params.groupId;
+        const groupId = req.params.groupId;
         const {remaining_uses, expiration_date } = req.body;
 
         const token = crypto.randomBytes(20).toString('hex');
 
         let newInvitation = await Invitation.create({
-            group_id,
+            groupId,
             remaining_uses,
             expiration_date,
             token
         });
 
         // Envoyer une réponse avec l'invitation créée
-        res.status(201).send({ message: "Invitation created successfully", invitation: newInvitation });
+        return res.status(201).send({ message: "Invitation created successfully", invitation: newInvitation });
     } catch (e) {
         console.error(e);
-        res.status(500).send(e);
+        return res.status(500).send(e);
     }
 }
 
@@ -36,7 +36,7 @@ const joinGroup = async (req, res) => {
     console.log('REST joinGroup');
 
     const token = req.params.token;
-    const user_id = req.authorization.user_id;
+    const userId = req.authorization.userId;
     
     const invitation = await Invitation.findOne({where: {token: token}});
     if (invitation === null) {
@@ -48,7 +48,7 @@ const joinGroup = async (req, res) => {
         if (invitation.remaining_uses === 0) {
             return res.status(403).send({error: "No more uses for this invitation"});
         }
-        const userGroup = await UserGroup.findOne({where: {user_id: user_id, group_id: invitation.group_id}});
+        const userGroup = await UserGroup.findOne({where: {userId: userId, groupId: invitation.groupId}});
         if (userGroup !== null) {
             if (userGroup.active === true) {
                 return res.status(403).send({error: "You are already in this group"});
@@ -57,7 +57,7 @@ const joinGroup = async (req, res) => {
                 await userGroup.save();
             }
         } else {
-            await createUserGroupRelation(user_id, invitation.group_id);
+            await createUserGroupRelation(userId, invitation.groupId);
         }
         invitation.remaining_uses--;
         await invitation.save();

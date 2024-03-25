@@ -1,42 +1,36 @@
+<script setup lang="ts">
+import TotalPaid from "components/Index/TotalPaid.vue";
+import LastPaiements from "components/Index/LastPaiements.vue";
+import LastGroups from "components/Index/LastGroups.vue";
+import { getUser } from "stores/userStore";
+import { ref } from "vue";
+import {EtatTotalPaidComponent} from "src/interfaces/types";
+import RightPannel from "components/Index/RightPannel.vue";
+
+const user = ref(getUser());
+
+const userFirstName = ref('');
+
+(async () => {
+  const userData = await getUser();
+  if (userData.firstname != null) {
+    userFirstName.value = userData.firstname;
+  }
+})();
+</script>
+
 <template>
+  <right-pannel></right-pannel>
   <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+
+    <h3 class="text-h4">Bienvenue {{ userFirstName }} &#x1F44B;</h3>
+
+
+    <last-groups />
+
+    <last-paiements />
+
   </q-page>
 </template>
-
-<script setup lang="ts">
-import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
-import { ref } from 'vue';
-
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1'
-  },
-  {
-    id: 2,
-    content: 'ct2'
-  },
-  {
-    id: 3,
-    content: 'ct3'
-  },
-  {
-    id: 4,
-    content: 'ct4'
-  },
-  {
-    id: 5,
-    content: 'ct5'
-  }
-]);
-const meta = ref<Meta>({
-  totalCount: 1200
-});
-</script>
+<style scoped>
+</style>

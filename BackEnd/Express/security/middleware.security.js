@@ -29,7 +29,7 @@ const verifyIsAuthAndActivUser = async (req, res, next) => {
     verifyIsAuth(req, res, async () => {
         try {
             // Récupérer l'utilisateur depuis la base de données
-            const user = await User.findOne({ id: req.params.user_id });
+            const user = await User.findOne({ where: { id: req.authorization.userId } });
             if (!user) {
                 return res.status(403).send({ message: "Unauthorized" });
             }

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onUnmounted, ref} from 'vue';
 import {api} from "boot/axios";
-import { useQuasar } from 'quasar'
+import {LocalStorage, useQuasar} from 'quasar'
 import {useRouter} from "vue-router";
+import {getUser, updateUser} from "stores/userStore";
 
 const $q = useQuasar();
 let loading = ref(false)
@@ -11,6 +12,22 @@ const router = useRouter();
 let userName = ref(null);
 let password = ref(null);
 let email = ref(null);
+
+
+function getCookie(name: string): string | undefined {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+}
+
+(async () => {
+  const token = getCookie('jwt');
+
+  if (token) {
+    console.log('JWT Token:', token);
+  }
+
+})();
 
 async function login() {
   loading.value = true;
@@ -27,9 +44,10 @@ async function login() {
         password: password.value,
         email: email.value,
       });
+
       if (response.data) {
-        localStorage.setItem('authToken', response.data);
-        router.push('/#');
+        updateUser(response.data);
+        await router.push('../#');
       }
     }
     catch (error) {
@@ -55,6 +73,23 @@ async function login() {
   }
   loading.value = false;
 }
+
+async function loginGoogle() {
+
+  const authWindow = window.open('https://3proj-back.tristan-tourbier.com/api/oauth2/google', '_blank', 'height=600,width=600');
+
+  window.addEventListener('message', (event) => {
+
+    if (event.data.token){
+      console.log('Message reçu de la fenêtre enfant :', event.data.token);
+      localStorage.setItem('userToken', event.data.token);
+      window.location.href = '/';
+    }
+
+  });
+}
+
+
 </script>
 
 <template>
@@ -62,11 +97,11 @@ async function login() {
     <div class="logo">
       <q-img
         width="100%"
-        src="../assets/logo-web.webp"
+        src="assets/logo-web.webp"
         :ratio="1"
       />
     </div>
-    <span class="text-primary text-h5">Me connecter</span>
+    <span class="text-grey-2 text-h5">Connexion</span>
     <div class="inputs">
       <q-input
         class="input"
@@ -74,12 +109,14 @@ async function login() {
         v-model="userName"
         icon="user"
         label="Nom d'utilisateur"
+        dark
         color="secondary">
         <template v-slot:prepend>
           <q-icon name="person"/>
         </template>
       </q-input>
       <q-input
+        dark
         class="input"
         outlined
         v-model="password"
@@ -96,7 +133,7 @@ async function login() {
       </div>
       <q-btn
         class="btn "
-        color="primary"
+        color="secondary"
         text-color="white"
         unelevated
         label="Se connecter"
@@ -108,24 +145,24 @@ async function login() {
 
         <div class="btns">
           <q-btn
-            @click="console.log('Google')"
-            class="btn-log shadow-6">
-            <img src="/../src/assets/icons/googleIcon.svg" alt="Google"/>
+            @click="loginGoogle"
+            class="btn-log shadow-6 bg-white">
+            <img src="assets/icons/googleIcon.svg" alt="Google"/>
           </q-btn>
           <q-btn
             @click="console.log('Apple')"
-            class="btn-log shadow-6">
-            <img src="/../src/assets/icons/appleIcon.svg" alt="Apple"/>
+            class="btn-log shadow-6 bg-white">
+            <img src="assets/icons/appleIcon.svg" alt="Apple"/>
           </q-btn>
           <q-btn
             @click="console.log('Microsoft')"
-            class="btn-log shadow-6">
-            <img src="/../src/assets/icons/microsoftIcon.svg" alt="Microsoft"/>
+            class="btn-log shadow-6 bg-white">
+            <img src="assets/icons/microsoftIcon.svg" alt="Microsoft"/>
           </q-btn>
           <q-btn
             @click="console.log('Facebook')"
-            class="btn-log shadow-6">
-            <img src="/../src/assets/icons/facebookIcon.svg" alt="Facebook"/>
+            class="btn-log shadow-6 bg-white">
+            <img src="assets/icons/facebookIcon.svg" alt="Facebook"/>
           </q-btn>
         </div>
       </div>

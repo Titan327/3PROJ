@@ -1,0 +1,74 @@
+<script setup lang="ts">
+import { EtatTotalPaidComponent } from "src/interfaces/types";
+import { defineProps, onMounted, ref } from "vue";
+import { Group } from "src/interfaces/group.interface";
+import { getUser } from "stores/userStore";
+import { api } from "boot/axios";
+
+const montantTotal = ref(0);
+const displayColor = ref('red');
+const titleText = ref('');
+const operations = ref(0);
+const icon = ref();
+
+const props = defineProps<{
+  etat: EtatTotalPaidComponent;
+}>();
+
+const userData = ref(getUser());
+
+onMounted(async () => {
+  try {
+    if (props.etat !== EtatTotalPaidComponent.Positive) {
+      displayColor.value = 'red';
+      titleText.value = 'Reste à payer';
+      icon.value = 'north_east';
+      const response = await api.get(`user/${userData.value.id}/transactions/notRefunded`);
+      montantTotal.value = response.data.amount;
+      operations.value = response.data.transactions;
+    } else {
+      displayColor.value = 'green';
+      titleText.value = 'Total payé ce mois-ci';
+      icon.value = 'south_west';
+      const response = await api.get(`user/${userData.value.id}/transactions/thisMonth`);
+      montantTotal.value = response.data.amount;
+      operations.value = response.data.transactions;
+    }
+  } catch (error) {
+    console.error("Une erreur s'est produite lors de la récupération des données :", error);
+  }
+});
+</script>
+
+
+
+<template>
+
+  <q-card class="bloc-paye bg-primary">
+    <q-card-section >
+      <q-item>
+        <q-item-section avatar>
+          <q-avatar rounded color="secondary" text-color="white" :icon="icon" />
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label class="text-grey-5 text-body1">{{titleText}}</q-item-label>
+          <q-item-label class="text-white text-subtitle1" caption lines="2">{{montantTotal}}€</q-item-label>
+        </q-item-section>
+
+        <q-chip v-if="operations>0" class="chip-status" :color="displayColor" text-color="white">{{operations}} Opérations</q-chip>
+        <q-chip v-if="operations==0" class="chip-status" :color="displayColor" text-color="white">Pas d'opération</q-chip>
+      </q-item>
+    </q-card-section>
+  </q-card>
+</template>
+
+<style scoped>
+
+.bloc-paye{
+  width: 85%;
+  height: 100px;
+  border-radius: 15px;
+  margin-top: 10%;
+}
+</style>

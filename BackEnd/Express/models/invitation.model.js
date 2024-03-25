@@ -9,7 +9,7 @@ const InvitationModel = sequelize.define("Invitation", {
         autoIncrement: true,
         allowNull: false
     },
-    group_id: {
+    groupId: {
         type: DataTypes.BIGINT,
         allowNull: false
     },
@@ -28,7 +28,7 @@ const InvitationModel = sequelize.define("Invitation", {
 });
 
 // Relation avec les groupes
-InvitationModel.belongsTo(GroupModel, { foreignKey: 'group_id' });
+InvitationModel.belongsTo(GroupModel, { foreignKey: 'groupId' });
 
 sequelize.sync().then(() => {
     console.log('InvitationModel table created successfully!');

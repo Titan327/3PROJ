@@ -1,65 +1,61 @@
 const Transaction = require('../models/transaction.model');
 const TransactionUser = require('../models/transactionUser.model');
 const UserGroup = require('../models/userGroup.model');
-
-const deleteTransactionAndTransactionUsers = async (transactionId, transactionUserIds) => {
-    await Transaction.destroy({
-        where: {
-            id: transactionId
-        }
-    });
-    await TransactionUser.destroy({
-        where: {
-            id: transactionUserIds
-        }
-    });
-}
+const Group = require('../models/group.model');
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
-    const {group_id, label, total_amount, date, receipt, sender_id, category_id, details} = req.body;
-    console.log(group_id, label, total_amount, date, receipt, sender_id, category_id);
+    const {groupId, label, total_amount, date, receipt, senderId, categoryId, details} = req.body;
     try {
         let transaction = await Transaction.create({
-            group_id,
+            groupId,
             label,
             total_amount,
             date,
             receipt,
-            sender_id,
-            category_id
+            senderId,
+            categoryId
         });
 
         const detailsArray = Object.values(details);
-        let transactionUserIds = [];
         let totalDetailAmount = 0;
+        let currentUserTransactionAmount = 0;
 
         for (const detail of detailsArray) {
+            totalDetailAmount += detail.amount;
+
             const userInGroup = await UserGroup.findOne({
                 where: {
-                    group_id: group_id,
-                    user_id: detail.user_id
+                    groupId: groupId,
+                    userId: detail.userId
                 }
             });
 
             if (!userInGroup) {
-                await deleteTransactionAndTransactionUsers(transaction.id, transactionUserIds);
-                return res.status(400).send('User is not part of the group');
+                return res.status(400).send('User '+ detail.userId + ' is not part of the group');
             }
+        }
 
-            const transactionUser = await TransactionUser.create({
-                transaction_id: transaction.id,
-                user_id: detail.user_id,
-                amount: detail.amount
-            });
-            transactionUserIds.push(transactionUser.id);
-            totalDetailAmount += detail.amount;
+        if (totalDetailAmount === total_amount) {
+            for (const detail of detailsArray) {
+                const transactionUser = await TransactionUser.create({
+                    transactionId: transaction.id,
+                    userId: detail.userId,
+                    amount: detail.amount
+                });
+                if (transactionUser.userId === senderId) {
+                    currentUserTransactionAmount = transactionUser.amount;
+                }
+            }
+            let userGroup = await UserGroup.findOne({groupId, userId: senderId});
+            userGroup.balance += total_amount - currentUserTransactionAmount;
+            const group = await Group.findOne({where: {id: groupId}});
+            await Group.update({description: "updated"}, {where: {id: groupId}});
+            await Group.update({description: group.description}, {where: {id: groupId}});
+            return res.status(201).send(transaction);
+        } else {
+            return res.status(400).send('The total amount of the transaction is not equal to the sum of the details');
         }
-        if (totalDetailAmount !== total_amount) {
-            await deleteTransactionAndTransactionUsers(transaction.id, transactionUserIds);
-            return res.status(400).send('The sum of the details amount must be equal to the total amount');
-        }
-        return res.status(201).send(transaction);
     } catch (e) {
         console.error(e);
         return res.status(500).send(e);
@@ -85,7 +81,7 @@ const getUserTransactions = async (req, res) => {
     try {
         const transaction = await Transaction.findAll({
             where: {
-                sender_id: req.params.userId
+                senderId: req.params.userId
             }
         });
         if(transaction === null) {
@@ -98,9 +94,39 @@ const getUserTransactions = async (req, res) => {
     }
 }
 
+const getXLastsUserTransactions = async (req, res) => {
+    console.log(`REST getTransaction`);
+    try {
+        const limit = parseInt(req.query.limit);
+        const transactions = await TransactionUser.findAll({
+            where: {
+                userId: req.params.userId
+            },
+            order: [
+                ['createdAt', 'DESC']
+            ],
+            limit: limit,
+            include: [{
+                model: Transaction,
+                include: [{
+                    model: Group
+                }]
+            }]
+        });
+        if(transactions === null) {
+            return res.status(404).send('No transaction found for this user');
+        }
+        return res.status(200).send(transactions);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send(e);
+    }
+}
+
 
 module.exports = {
     createTransaction,
     getTransaction,
-    getUserTransactions
+    getUserTransactions,
+    getXLastsUserTransactions
 }
