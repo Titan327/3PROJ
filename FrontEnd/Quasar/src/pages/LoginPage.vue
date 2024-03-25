@@ -76,13 +76,7 @@ async function login() {
 
 async function loginGoogle() {
 
-  console.log('tezstte');
-
-  // Ouvrir une nouvelle fenêtre pour l'authentification avec Google
-  const authWindow = window.open('http://localhost:9002/api/oauth2/google', '_blank', 'height=600,width=600');
-
-
-
+  const authWindow = window.open('https://3proj-back.tristan-tourbier.com/api/oauth2/google', '_blank', 'height=600,width=600');
 
   window.addEventListener('message', (event) => {
 
@@ -93,9 +87,6 @@ async function loginGoogle() {
     }
 
   });
-
-
-
 }
 
 
