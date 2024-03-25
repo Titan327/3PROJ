@@ -8,6 +8,7 @@ const http = require('http'); // Importation du module http
 const socketIo = require('socket.io');
 const path = require('path');
 const { createTransport } = require("nodemailer");
+const {initializeBucket} = require("./configurations/minio.config");
 
 const app = express();
 const server = http.createServer(app); // Création du serveur HTTP
@@ -69,6 +70,7 @@ app.use("/api/group", require("./routes/group.route"));
 app.use("/api/user", require("./routes/user.route"));
 app.use("/api/transaction", require("./routes/transaction.route"));
 app.use("/api/oauth2", require("./routes/oauth2.route"));
+app.use("/api/img", require("./routes/image.route"));
 
 initializeBucket("pp-user");
 initializeBucket("pp-group");
