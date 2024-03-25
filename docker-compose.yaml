@@ -21,7 +21,7 @@ services:
     volumes:
       - ./FrontEnd/Quasar:/Quasar
     ports:
-      - "${QUASAR_PORT}:9000"
+      - "${QUASAR_PORT}"
     command: sh -c "npm install && npm run dev"
 
   Postgres:
