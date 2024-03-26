@@ -13,6 +13,8 @@ const getUser = async (req, res) => {
         if (user === null) {
             return res.status(404).send('User not found');
         }
+        const base_url = user.profile_picture;
+        user.profile_picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
         return res.status(200).send(user);
     } catch (e) {
         console.error(e);
@@ -154,7 +156,6 @@ const getAmountOfAllUserTransactionsThisMonth = async (req, res) => {
         console.error(e);
         res.status(500).send(e);
     }
-
 }
 
 module.exports = {
