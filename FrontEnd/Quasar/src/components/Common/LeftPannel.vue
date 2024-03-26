@@ -15,7 +15,7 @@ const pictureUrl = ref('');
   if (userData != null) {
     userString.value = `${userData.firstname} ${userData.lastname}`;
     if (userData.profile_picture != null) {
-      pictureUrl.value = userData.profile_picture;
+      pictureUrl.value = userData.profile_picture[0];
     }
   }
 })();
