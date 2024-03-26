@@ -8,6 +8,7 @@ const http = require('http'); // Importation du module http
 const socketIo = require('socket.io');
 const path = require('path');
 const { createTransport } = require("nodemailer");
+const {initializeBucket} = require("./configurations/minio.config");
 
 const app = express();
 const server = http.createServer(app); // Création du serveur HTTP
