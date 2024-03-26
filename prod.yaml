@@ -13,6 +13,7 @@ services:
       #- Storage-minio
     volumes:
       - ${EXPRESS_VOLUME}
+    restart: always
 
   Quasar-app:
     image: ${QUASAR_IMG}
@@ -23,6 +24,7 @@ services:
     ports:
       - "${QUASAR_PORT}"
     command: sh -c "npm install && npm run build"
+    restart: always
 
   Postgres:
     image: ${POSTGRES_IMG}
@@ -35,6 +37,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - ${POSTGRES_VOLUME}
+    restart: always
 
   Minio-storage:
     image: minio/minio
@@ -47,6 +50,7 @@ services:
     volumes:
       - ${MINIO_VOLUME}
     command: server --address :9001 /data
+    restart: always
 
   Quasar-webserver:
     image: httpd:latest
@@ -59,5 +63,6 @@ services:
     depends_on:
       Quasar-app:
         condition: service_completed_successfully
+
 
 
