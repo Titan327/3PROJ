@@ -7,6 +7,7 @@ const uploadUserPic = async (req, res) => {
 
     try {
         const tokenValue = req.authorization
+        const userId = tokenValue.userId
 
         if (!req.resizedImages) {
             return res.status(400).json({ error: 'Aucune image redimensionnée trouvée' });
@@ -19,14 +20,22 @@ const uploadUserPic = async (req, res) => {
                 'Content-Type': 'jpg',
             };
             */
-            minioClient.putObject("pp-user", tokenValue.user_id+'/'+image.name, image.buffer);
+            minioClient.putObject("pp-user", userId+'/'+image.name, image.buffer);
         });
+
+        const existing = await User.findOne({
+            where: {
+                id: userId,
+            },
+        });
+        existing.profile_picture = process.env.APP_URL+"api/img/profile-picture/"+userId;
+        await existing.save();
 
         res.status(200).json({ message: 'photo de profile upload' });
     }catch (e){
         res.status(500).json({ error: 'Erreur lors du redimensionnement des images' });
+        console.log(e);
     }
-
 }
 
 const GetUserPic = async (req, res) => {
@@ -42,7 +51,7 @@ const GetUserPic = async (req, res) => {
     if (existing){
         await minioClient.getObject(bucketName, userId+'/'+size, (err, dataStream) => {
             if (err) {
-                return res.status(500).json({ error: "Une erreur interne au serveur est surenue, veuiller contacter les administrateurs" });
+                return res.status(500).json({ error: "Photo introuvable" });
             }
             dataStream.pipe(res);
         });
@@ -78,7 +87,6 @@ const uploadGroupPic = async (req, res) => {
     }catch (e){
         return res.status(500).json({ error: 'Erreur interne' });
     }
-
 }
 
 const GetGroupPic = async (req, res) => {
@@ -95,7 +103,7 @@ const GetGroupPic = async (req, res) => {
         if (existing){
             await minioClient.getObject(bucketName, groupId+'/'+size, (err, dataStream) => {
                 if (err) {
-                    return res.status(500).json({ error: "Une erreur interne au serveur est surenue, veuiller contacter les administrateurs" });
+                    return res.status(500).json({ error: "Photo introuvable" });
                 }
                 dataStream.pipe(res);
             });
@@ -105,7 +113,6 @@ const GetGroupPic = async (req, res) => {
     }catch (e){
         return res.status(500).json({ error: 'Erreur interne' });
     }
-
 }
 
 module.exports={
