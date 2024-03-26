@@ -24,7 +24,6 @@ services:
     ports:
       - "${QUASAR_PORT}"
     command: sh -c "npm install && npm run build"
-    restart: always
 
   Postgres:
     image: ${POSTGRES_IMG}
