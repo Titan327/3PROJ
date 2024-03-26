@@ -37,6 +37,7 @@ async function getUserData(): Promise<void> {
   } catch (error) {
 
     console.error("Erreur lors de la récupération des données utilisateur :", error);
+    disconnectUser();
   }
 }
 
