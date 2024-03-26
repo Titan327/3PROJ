@@ -14,7 +14,11 @@ const getUser = async (req, res) => {
             return res.status(404).send('User not found');
         }
         const base_url = user.profile_picture;
-        user.profile_picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
+        if (base_url){
+            user.profile_picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
+        }else {
+            user.profile_picture = null;
+        }
         return res.status(200).send(user);
     } catch (e) {
         console.error(e);
