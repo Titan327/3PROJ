@@ -9,7 +9,7 @@ const upload = multer();
 router.post("/upload/profile-picture", securityMiddleware.verifyIsAuth, upload.single('image'),resize,pp.uploadUserPic);
 router.get("/profile-picture/:userId/:size",pp.GetUserPic);
 
-router.post("/upload/group-picture", securityMiddleware.verifyIsAuth, upload.single('image'),resize,pp.uploadUserPic);
-router.get("/group-picture/:userId/:size",pp.GetUserPic);
+router.post("/upload/group-picture/:groupId", securityMiddleware.verifyIsAuth, upload.single('image'),resize,pp.uploadGroupPic);
+router.get("/group-picture/:groupId/:size",pp.GetGroupPic);
 
 module.exports = router;

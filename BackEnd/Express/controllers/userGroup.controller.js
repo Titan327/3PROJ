@@ -1,4 +1,5 @@
 const UserGroup = require('../models/userGroup.model');
+const User = require("../models/user.model");
 
 const createUserGroupRelation = async (userId, groupId) => {
     console.log(`REST createUserGroupRelation`);
@@ -25,7 +26,24 @@ const deleteUserGroupRelationsWhenDeletingUser = async (userId) => {
     }
 }
 
+const verifyUserInGroup = async (userId,groupId) => {
+    try{
+        const user = await UserGroup.findOne({
+            where: {
+                userId: userId,
+                groupId:groupId
+            },
+        });
+        return !!user;
+    }catch (e){
+        console.error(e);
+        return e;
+    }
+
+}
+
 module.exports = {
     createUserGroupRelation,
-    deleteUserGroupRelationsWhenDeletingUser
+    deleteUserGroupRelationsWhenDeletingUser,
+    verifyUserInGroup
 }
