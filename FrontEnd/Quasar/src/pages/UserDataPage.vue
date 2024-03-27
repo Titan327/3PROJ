@@ -6,6 +6,8 @@ import {useRouter} from "vue-router";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {api} from "boot/axios";
+import DialogInvitintoGroup from "components/Groups/DialogInvitintoGroup.vue";
+import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 
 const router = useRouter();
 let User = ref(DefaultUser());
@@ -18,6 +20,7 @@ let isPhotoHover = ref(false);
 let expendUserDatas = ref(true);
 let expendPasswordData = ref(false);
 let expendPaymentMethod = ref(false);
+let dialogModifyPp = ref(false);
 
 let isUserDataModified = ref(false);
 let isMailModified = ref(false);
@@ -31,12 +34,16 @@ let newPassConfirmation = ref();
 const paiementsMethod = ref();
 
 (async () => {
+  await getUserData();
+})();
+
+async function getUserData() {
   const userData = await getUser();
   if (userData != null) {
     User.value = userData;
     modifiedUser.value = userData;
   }
-})();
+}
 
 function disconnect(){
   disconnectUser()
@@ -44,6 +51,20 @@ function disconnect(){
 }
 
 
+async function openDialogPP(){
+
+       dialogModifyPp.value = true;
+      $q.dialog({
+        component: DialogUpdateImage,
+
+        componentProps: {
+          isOpen: dialogModifyPp,
+        }
+      }).onDismiss(() => {
+        window.location.reload();
+      })
+
+}
 </script>
 
 <template>
@@ -53,7 +74,7 @@ function disconnect(){
         <q-card-section horizontal>
             <div class="q-pa-md q-gutter-sm">
               <q-avatar
-                @click="console.log('change img')"
+                @click="openDialogPP"
                 @mouseenter ="isPhotoHover=true"
                 @mouseleave ="isPhotoHover=false"
                 size="200px"
