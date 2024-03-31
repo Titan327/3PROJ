@@ -102,6 +102,7 @@ async function loginGoogle() {
       />
     </div>
     <span class="text-grey-2 text-h5">Connexion</span>
+    <q-form  @submit="login">
     <div class="inputs">
       <q-input
         class="input"
@@ -137,7 +138,7 @@ async function loginGoogle() {
         text-color="white"
         unelevated
         label="Se connecter"
-        @click="login"
+        type="submit"
         :loading="loading"
       />
       <div class="external-services">
@@ -167,6 +168,7 @@ async function loginGoogle() {
         </div>
       </div>
     </div>
+    </q-form>
   </div>
 </template>
 
