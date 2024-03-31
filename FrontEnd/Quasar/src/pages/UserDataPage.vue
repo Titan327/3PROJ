@@ -63,7 +63,6 @@ async function openDialogPP(){
       }).onDismiss(() => {
         window.location.reload();
       })
-
 }
 </script>
 
@@ -89,7 +88,6 @@ async function openDialogPP(){
           <q-card-section>
             <q-item-label class="text-h4">{{ `${User.firstname} ${User.lastname}` }}</q-item-label>
             <q-item-label class="text-subtitle1">{{ `@${User.username}` }}</q-item-label>
-
           </q-card-section>
         </q-card-section>
       </q-card>

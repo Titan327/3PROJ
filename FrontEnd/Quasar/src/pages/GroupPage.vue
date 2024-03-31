@@ -7,9 +7,11 @@ import {getUser} from "stores/userStore";
 import DialogCreateGroup from "components/Groups/DialogCreateGroup.vue";
 import {useQuasar} from "quasar";
 import DialogInvitintoGroup from "components/Groups/DialogInvitintoGroup.vue";
+import {useRouter} from "vue-router";
 
 let groupList = ref<Group[]>([]);
 const $q = useQuasar()
+const router = useRouter();
 
 let DialogCreate = ref(false);
 let DialogInvite = ref(false);
@@ -136,6 +138,7 @@ async function openDialogInvite(id: number, name: string){
               rounded
               outline
               class="btn-consulter"
+              @click="router.push(`/group/${group.id}`)"
             >
             </q-btn>
           </q-item-section>

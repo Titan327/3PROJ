@@ -25,8 +25,27 @@ onMounted(async () => {
 
 async function getGroup() {
   User.value = await getUser();
-  const response = await api.get(`/group/${groupId}`);
-  group.value = response.data;
+  //const response = await api.get(`/group/${groupId}`);
+  group.value = {
+    id: 1,
+    name: 'Groupe défaut',
+    description: 'Seraphin code moi la route pour get un groupe fdp',
+    picture: 'assets/defaults/group-default.webp',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    members: [
+      {
+        id: 1,
+        firstname: 'Ryan',
+        lastname: 'Dordain',
+        username: 'Ryverze',
+        email: '',
+        profile_picture: 'assets/defaults/user-default.webp'
+      }
+    ]
+  }
+
+  urlPhoto.value = `/api/img/group-picture/${groupId}/200`;
 }
 
 </script>
@@ -44,7 +63,7 @@ async function getGroup() {
               @mouseleave ="isPhotoHover=false"
               size="200px"
             >
-              <img :src="User.profile_picture ? User.profile_picture : 'assets/defaults/user-default.webp'">
+              <img :src="urlPhoto ? urlPhoto : 'assets/defaults/group-default.webp'">
               <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                    v-if="isPhotoHover">
                 Modifier
@@ -52,9 +71,8 @@ async function getGroup() {
             </q-avatar>
           </div>
           <q-card-section>
-            <q-item-label class="text-h4">{{ `${User.firstname} ${User.lastname}` }}</q-item-label>
-            <q-item-label class="text-subtitle1">{{ `@${User.username}` }}</q-item-label>
-
+            <q-item-label class="text-h4">{{}}</q-item-label>
+            <q-item-label class="text-subtitle1">{{}}</q-item-label>
           </q-card-section>
         </q-card-section>
       </q-card>
