@@ -64,6 +64,41 @@ async function openDialogPP(){
         window.location.reload();
       })
 }
+
+async function changeUserPassword(){
+  try {
+    if (newPass.value != newPassConfirmation.value ){
+      $q.notify({
+        type: 'negative',
+        message: 'Les mots de passe ne correspondent pas'
+      })
+      return
+    }
+
+    const response = await api.put(`user/${User.value.id}/password`, {
+      "password": pass2.value,
+      "userInfos": {
+        "password": newPass.value,
+        "passwordConfirm": newPassConfirmation.value
+      }
+
+    });
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Mot de passe mis à jour'
+      })
+    }
+  }
+  catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Une erreur s\'est produite'
+    })
+
+  }
+}
+
 </script>
 
 <template>
@@ -226,7 +261,7 @@ async function openDialogPP(){
             <q-card-section class="text-subtitle2">
               <div class="inputs">
                 <q-form
-                  @submit="modifyPass"
+                  @submit="changeUserPassword"
                 >
                   <q-input
                     class="input"
