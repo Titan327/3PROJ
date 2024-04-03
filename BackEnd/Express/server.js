@@ -12,7 +12,13 @@ const {initializeBucket} = require("./configurations/minio.config");
 
 const app = express();
 const server = http.createServer(app); // Création du serveur HTTP
-const io = socketIo(server);
+const io = socketIo(server, {
+    cors: {
+        origin: "http://localhost:9000", // Remplacez cette URL par l'URL de votre front-end
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -40,10 +46,15 @@ io.on('connection', function(socket){
         console.log('A user is disconnected');
     });
 
-    socket.on('chat message', function (msg){
-        console.log('Message received: ' + msg);
-        io.emit('chat message', msg);
+    socket.on('chat message', function (msg, group){
+        io.emit(`chat-group-${group}`, msg, group);
     });
+});
+app.post('/api/messages', (req, res) => {
+    const { message } = req.body;
+    // Diffuser le message à tous les utilisateurs connectés
+    io.emit('chat message', message);
+    res.status(200).send('Message sent successfully');
 });
 
 app.use(passport.initialize());

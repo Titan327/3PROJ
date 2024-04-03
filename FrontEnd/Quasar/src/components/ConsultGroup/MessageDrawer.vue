@@ -3,6 +3,27 @@ import { ref } from 'vue';
 import { IMessage } from "src/interfaces/message.interface";
 import { getUser } from "stores/userStore";
 import { DefaultUser } from "src/interfaces/user.interface";
+import { io } from 'socket.io-client';
+import {api} from "boot/axios";
+
+const props = defineProps({
+  groupId: Number,
+});
+const socket = io('http://localhost:9002');
+
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
+
+socket.on(`chat-group-${props.groupId}`, (msg, group) => {
+  messages.value.push({
+    text: msg,
+    stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
+    user: { username : User.value.username, profile_picture : User.value.profile_picture[0] }
+  });
+  //getMessages();
+  scrollNewMsg()
+});
 
 const drawerOpen = ref(true);
 const messages = ref<IMessage[]>([]);
@@ -32,15 +53,34 @@ function openCloseDrawer() {
   drawerOpen.value = !drawerOpen.value;
 }
 
+async function getMessages() {
+  try {
+    const response = await api.get(`/group/${props.groupId}/messages`);
+    messages.value = response.data;
+  } catch (error) {
+    console.error('Error getting messages:', error);
+  }
+}
+
 async function sendMessage() {
   if (writingMessage.value.trim() === '') return;
   try {
+    //const response = await api.post(`/group/${props.groupId}/messages`, {
+      //message: {
+        //text: writingMessage.value,
+        //stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
+        //user: { username : User.value.username, profile_picture : User.value.profile_picture[0] }
+      //}
+    //});
+
     messages.value.push({
       text: writingMessage.value,
       stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
       user: { username : User.value.username, profile_picture : User.value.profile_picture[0] }
     });
     console.log(messages.value)
+
+    socket.emit('chat message', writingMessage.value, props.groupId);
     writingMessage.value = '';
     scrollNewMsg()
   } catch (error) {
