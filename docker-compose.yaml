@@ -48,5 +48,13 @@ services:
       - ${MINIO_VOLUME}
     command: server --address :9001 /data
 
-
-
+  mongodb:
+    image: mongo
+    container_name: API-MONGO
+    ports:
+      - "${MONO_PORT}:27017"
+    volumes:
+      - ${MONGO_VOLUME}:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
