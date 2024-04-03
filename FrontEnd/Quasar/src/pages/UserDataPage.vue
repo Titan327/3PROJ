@@ -107,6 +107,50 @@ async function changeUserPassword(){
   loading.value = false;
 }
 
+async function changeUserData(){
+  try {
+    loading.value = true;
+    const response = await api.put(`user/${User.value.id}`, {
+      "userInfos":
+        {
+          "firstname": User.value.firstname,
+          "lastname": User.value.lastname,
+          "username": User.value.username,
+          "email": User.value.email,
+          "birth_date": User.value.birth_date
+        },
+        "password": pass.value,
+    });
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Vos informations ont été mises à jour'
+      })
+    }
+  }
+  catch (error) {
+    if (error.response.status===401) {
+      $q.notify({
+        type: 'negative',
+        message: 'Mot de passe incorrect'
+      })
+    }
+    else if (error.response.status===409) {
+      $q.notify({
+        type: 'negative',
+        message: 'Ce nom d\'utilisateur ou cette adresse email est déjà utilisé'
+      })
+    }
+    else {
+      $q.notify({
+        type: 'negative',
+        message: 'Une erreur s\'est produite'
+      })
+    }
+  }
+  loading.value = false;
+}
+
 </script>
 
 <template>
@@ -159,7 +203,7 @@ async function changeUserPassword(){
             <q-card-section class="text-subtitle2">
               <div class="inputs">
                 <q-form
-                  @submit="modify"
+                  @submit="changeUserData"
                 >
                   <q-input
                     style="margin-top: 20px;"
@@ -229,23 +273,17 @@ async function changeUserPassword(){
                     color="secondary"
                     hide-bottom-space
                   />
+                  <q-btn
+                    v-if="isUserDataModified"
+                    color="green"
+                    class="save-btn"
+                    rounded
+                    type="submit"
+                    :loading="loading"
+                  >
+                    Enregistrer
+                  </q-btn>
                 </q-form>
-                <q-btn
-                v-if="isUserDataModified"
-                color="green"
-                class="save-btn"
-                rounded
-                >
-                  Enregistrer
-                </q-btn>
-                <q-btn
-                  v-if="isUserDataModified"
-                  color="green"
-                  class="save-btn"
-                  rounded
-                >
-                  Enregistrer
-                </q-btn>
                 <br>
               </div>
             </q-card-section>
