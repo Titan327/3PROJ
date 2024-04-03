@@ -74,7 +74,7 @@ async function changeUserPassword(){
       })
       return
     }
-
+    loading.value = true;
     const response = await api.put(`user/${User.value.id}/password`, {
       "password": pass2.value,
       "userInfos": {
@@ -91,12 +91,20 @@ async function changeUserPassword(){
     }
   }
   catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Une erreur s\'est produite'
-    })
-
+    if (error.response.status===401) {
+      $q.notify({
+        type: 'negative',
+        message: 'Mot de passe actuel incorrect'
+      })
+    }
+    else {
+      $q.notify({
+        type: 'negative',
+        message: 'Une erreur s\'est produite, vérifiez que votre nouveau mot de passe correspond aux critères de sécurité'
+      })
+    }
   }
+  loading.value = false;
 }
 
 </script>
@@ -230,6 +238,14 @@ async function changeUserPassword(){
                 >
                   Enregistrer
                 </q-btn>
+                <q-btn
+                  v-if="isUserDataModified"
+                  color="green"
+                  class="save-btn"
+                  rounded
+                >
+                  Enregistrer
+                </q-btn>
                 <br>
               </div>
             </q-card-section>
@@ -290,16 +306,18 @@ async function changeUserPassword(){
                     label="Confirmer nouveau mot de passe"
                     type="password"
                     color="secondary"
-                    :rules="[checkPasswordMatch]"
                     dark
                     hide-bottom-space
                   />
+                  <q-item-label class="text-negative" v-if="newPass != newPassConfirmation">Le nouveau mot de passe et la confirmation ne correspondent pas.</q-item-label>
+
                   <q-btn
                     v-if="newPass && newPassConfirmation && pass2"
                     color="green"
                     class="save-btn"
                     rounded
                     type="submit"
+                    :loading="loading"
                   >
                     Enregistrer
                   </q-btn>
