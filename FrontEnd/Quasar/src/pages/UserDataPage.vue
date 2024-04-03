@@ -294,6 +294,15 @@ async function changeUserPassword(){
                     dark
                     hide-bottom-space
                   />
+                  <q-btn
+                    v-if="newPass && newPassConfirmation && pass2"
+                    color="green"
+                    class="save-btn"
+                    rounded
+                    type="submit"
+                  >
+                    Enregistrer
+                  </q-btn>
                 </q-form>
                 <br>
               </div>
