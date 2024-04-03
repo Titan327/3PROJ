@@ -52,7 +52,7 @@ services:
     image: mongo
     container_name: API-MONGO
     ports:
-      - "${MONO_PORT}:27017"
+      - "${MOGNO_PORT}:27017"
     volumes:
       - ${MONGO_VOLUME}:/data/db
     environment:
