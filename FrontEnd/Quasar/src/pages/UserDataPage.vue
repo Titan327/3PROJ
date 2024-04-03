@@ -63,8 +63,94 @@ async function openDialogPP(){
       }).onDismiss(() => {
         window.location.reload();
       })
-
 }
+
+async function changeUserPassword(){
+  try {
+    if (newPass.value != newPassConfirmation.value ){
+      $q.notify({
+        type: 'negative',
+        message: 'Les mots de passe ne correspondent pas'
+      })
+      return
+    }
+    loading.value = true;
+    const response = await api.put(`user/${User.value.id}/password`, {
+      "password": pass2.value,
+      "userInfos": {
+        "password": newPass.value,
+        "passwordConfirm": newPassConfirmation.value
+      }
+
+    });
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Mot de passe mis à jour'
+      })
+    }
+  }
+  catch (error) {
+    if (error.response.status===401) {
+      $q.notify({
+        type: 'negative',
+        message: 'Mot de passe actuel incorrect'
+      })
+    }
+    else {
+      $q.notify({
+        type: 'negative',
+        message: 'Une erreur s\'est produite, vérifiez que votre nouveau mot de passe correspond aux critères de sécurité'
+      })
+    }
+  }
+  loading.value = false;
+}
+
+async function changeUserData(){
+  try {
+    loading.value = true;
+    const response = await api.put(`user/${User.value.id}`, {
+      "userInfos":
+        {
+          "firstname": User.value.firstname,
+          "lastname": User.value.lastname,
+          "username": User.value.username,
+          "email": User.value.email,
+          "birth_date": User.value.birth_date
+        },
+        "password": pass.value,
+    });
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Vos informations ont été mises à jour'
+      })
+    }
+  }
+  catch (error) {
+    if (error.response.status===401) {
+      $q.notify({
+        type: 'negative',
+        message: 'Mot de passe incorrect'
+      })
+    }
+    else if (error.response.status===409) {
+      $q.notify({
+        type: 'negative',
+        message: 'Ce nom d\'utilisateur ou cette adresse email est déjà utilisé'
+      })
+    }
+    else {
+      $q.notify({
+        type: 'negative',
+        message: 'Une erreur s\'est produite'
+      })
+    }
+  }
+  loading.value = false;
+}
+
 </script>
 
 <template>
@@ -89,7 +175,6 @@ async function openDialogPP(){
           <q-card-section>
             <q-item-label class="text-h4">{{ `${User.firstname} ${User.lastname}` }}</q-item-label>
             <q-item-label class="text-subtitle1">{{ `@${User.username}` }}</q-item-label>
-
           </q-card-section>
         </q-card-section>
       </q-card>
@@ -118,7 +203,7 @@ async function openDialogPP(){
             <q-card-section class="text-subtitle2">
               <div class="inputs">
                 <q-form
-                  @submit="modify"
+                  @submit="changeUserData"
                 >
                   <q-input
                     style="margin-top: 20px;"
@@ -188,15 +273,17 @@ async function openDialogPP(){
                     color="secondary"
                     hide-bottom-space
                   />
+                  <q-btn
+                    v-if="isUserDataModified"
+                    color="green"
+                    class="save-btn"
+                    rounded
+                    type="submit"
+                    :loading="loading"
+                  >
+                    Enregistrer
+                  </q-btn>
                 </q-form>
-                <q-btn
-                v-if="isUserDataModified"
-                color="green"
-                class="save-btn"
-                rounded
-                >
-                  Enregistrer
-                </q-btn>
                 <br>
               </div>
             </q-card-section>
@@ -228,7 +315,7 @@ async function openDialogPP(){
             <q-card-section class="text-subtitle2">
               <div class="inputs">
                 <q-form
-                  @submit="modifyPass"
+                  @submit="changeUserPassword"
                 >
                   <q-input
                     class="input"
@@ -257,10 +344,21 @@ async function openDialogPP(){
                     label="Confirmer nouveau mot de passe"
                     type="password"
                     color="secondary"
-                    :rules="[checkPasswordMatch]"
                     dark
                     hide-bottom-space
                   />
+                  <q-item-label class="text-negative" v-if="newPass != newPassConfirmation">Le nouveau mot de passe et la confirmation ne correspondent pas.</q-item-label>
+
+                  <q-btn
+                    v-if="newPass && newPassConfirmation && pass2"
+                    color="green"
+                    class="save-btn"
+                    rounded
+                    type="submit"
+                    :loading="loading"
+                  >
+                    Enregistrer
+                  </q-btn>
                 </q-form>
                 <br>
               </div>

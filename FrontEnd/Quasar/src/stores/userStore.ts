@@ -32,7 +32,7 @@ async function getUserData(): Promise<void> {
     user.value.lastname = userData.lastname;
     user.value.username = userData.username;
     user.value.email = userData.email;
-    user.value.birth_date = userData.birth_date;
+    user.value.birth_date = new Date(userData.birth_date).toISOString().split('T')[0];
     user.value.profile_picture = userData.profile_picture;
   } catch (error) {
 
