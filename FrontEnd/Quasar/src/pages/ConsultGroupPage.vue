@@ -51,7 +51,7 @@ async function getGroup() {
 </script>
 
 <template>
-  <message-drawer></message-drawer>
+  <message-drawer :groupId = groupId></message-drawer>
   <q-page class="q-pa-md">
     <div class="div-first-last-name">
       <q-card class="transparent no-box-shadow">
