@@ -1,8 +1,34 @@
 const Group = require('../models/group.model');
 const UserGroup = require('../models/userGroup.model');
+const User = require('../models/user.model');
 const Joi = require('joi');
 const {createUserGroupRelation} = require("./userGroup.controller");
 const {Op} = require("sequelize");
+
+const getGroup = async (req, res) => {
+    console.log(`REST getGroup`);
+    const { groupId } = req.params;
+    try {
+        const group = await Group.findOne({
+            where: {id: groupId},
+            include: [{
+                model: User,
+                as: 'Users',
+                attributes: ['username', 'profile_picture']
+            }]
+        });
+        if (group === null) {
+            return res.status(404).send({error: "Group not found"});
+        }
+        if (UserGroup.findOne({where: {groupId: groupId, userId: req.authorization.userId}})) {
+            return res.status(200).send(group);
+        }
+        return res.status(403).send({error: "You are not part of this group"});
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send(e);
+    }
+}
 
 const getGroups = async (req, res) => {
     console.log(`REST getGroups`);
@@ -135,6 +161,7 @@ const switchGroupOwnerWhenDeletingUser = async (userId) => {
 }
 
 module.exports = {
+    getGroup,
     createGroup,
     modifyGroup,
     getGroups,
