@@ -4,8 +4,10 @@ import {onMounted, ref } from "vue";
 import {Group} from "src/interfaces/group.interface";
 import {api} from "boot/axios";
 import {getUser} from "stores/userStore";
+import {useRouter} from "vue-router";
 
 let groupList = ref<Group[]>([]);
+const router = useRouter();
 
 onMounted(async () => {
 
@@ -31,6 +33,7 @@ onMounted(async () => {
           v-for="group in groupList" :key="group.id"
           rounded
           flat
+          @click="router.push(`/group/${group.id}`)"
         >
           <q-avatar
             size="100px"
