@@ -2,14 +2,14 @@
 import { ref } from 'vue';
 import { IMessage } from "src/interfaces/message.interface";
 import { getUser } from "stores/userStore";
-import { DefaultUser } from "src/interfaces/user.interface";
+import {DefaultUser, IUser} from "src/interfaces/user.interface";
 import { io } from 'socket.io-client';
 import {api} from "boot/axios";
 
 const props = defineProps({
   groupId: Number,
 });
-const socket = io('http://localhost:9002');
+const socket = io('https://3proj-back.tristan-tourbier.com/');
 
 socket.on('connect', () => {
   console.log('Connected to server');
@@ -19,14 +19,16 @@ socket.on(`chat-group-${props.groupId}`, (msg, group) => {
   messages.value.push({
     text: msg,
     stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
-    user: { username : User.value.username, profile_picture : User.value.profile_picture[0] }
+    userId: User.value.id
   });
   //getMessages();
+  getSenderData(User.value.id);
   scrollNewMsg()
 });
 
 const drawerOpen = ref(true);
 const messages = ref<IMessage[]>([]);
+const senders = ref<Partial<IUser>[]>([]);
 let writingMessage = ref('');
 const scrollAreaRef = ref(null);
 
@@ -57,8 +59,22 @@ async function getMessages() {
   try {
     const response = await api.get(`/group/${props.groupId}/messages`);
     messages.value = response.data;
+    await getSenderData(response.data.userId);
   } catch (error) {
     console.error('Error getting messages:', error);
+  }
+}
+
+async function getSenderData(id){
+  try {
+    if(senders.value.find(sender => sender.id === id)) return;
+    else {
+      const response = await api.get(`/user/${id}`);
+      senders.value.push(response.data);
+    }
+  }
+  catch (error) {
+    console.error('Error getting sender data:', error);
   }
 }
 
@@ -69,14 +85,14 @@ async function sendMessage() {
       //message: {
         //text: writingMessage.value,
         //stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
-        //user: { username : User.value.username, profile_picture : User.value.profile_picture[0] }
+        //userId:User.value.id
       //}
     //});
 
     messages.value.push({
       text: writingMessage.value,
       stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
-      user: { username : User.value.username, profile_picture : User.value.profile_picture[0] }
+      userId: User.value.id
     });
     console.log(messages.value)
 
@@ -87,6 +103,13 @@ async function sendMessage() {
     console.error('Error sending message:', error);
   }
 }
+
+function getSenderPicture(id:number){
+  return senders.value.find(sender => sender.id === id)?.profile_picture[0];
+};
+function getSenderPseudo(id:number){
+  return senders.value.find(sender => sender.id === id)?.username;
+};
 </script>
 
 <template>
@@ -111,9 +134,9 @@ async function sendMessage() {
               :key="index"
               :text="[message.text]"
               :stamp="[message.stamp]"
-              :name="[message.user.username]"
-              :avatar="[message.user.profile_picture]"
-              :sent="message.user.username == User.username"
+              :name="[getSenderPseudo(index)]"
+              :avatar="[getSenderPicture(index)]"
+              :sent="getSenderPseudo(index) == User.username"
             />
           </q-scroll-area>
         </div>
