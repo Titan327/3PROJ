@@ -1,3 +1,5 @@
+import {IUser} from "src/interfaces/user.interface";
+
 export interface Group{
   id : number,
   name: string,
@@ -5,6 +7,7 @@ export interface Group{
   picture?: string,
   owner_id?: number,
   updatedAt?: Date,
+  Users?: IUser[],
 }
 
 export function DefaultGroup(): Group {
