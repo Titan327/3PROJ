@@ -13,6 +13,8 @@ services:
       #- Storage-minio
     volumes:
       - ${EXPRESS_VOLUME}
+    networks:
+      - Bill-network
 
   Quasar-app:
     image: ${QUASAR_IMG}
@@ -23,6 +25,8 @@ services:
     ports:
       - "${QUASAR_PORT}"
     command: sh -c "npm install && npm run dev"
+    networks:
+      - Bill-network
 
   Postgres:
     image: ${POSTGRES_IMG}
@@ -35,6 +39,8 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - ${POSTGRES_VOLUME}
+    networks:
+      - Bill-network
 
   Minio-storage:
     image: minio/minio
@@ -47,6 +53,23 @@ services:
     volumes:
       - ${MINIO_VOLUME}
     command: server --address :9001 /data
+    networks:
+      - Bill-network
 
+  mongo:
+    image: mongo:latest
+    container_name: API-MONGO
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_DATABASE: app
+    volumes:
+      - ${MONGO_VOLUME}:/data/db
+    networks:
+      - Bill-network
 
-
+networks:
+  Bill-network:
+    driver: bridge

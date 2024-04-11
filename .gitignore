@@ -6,6 +6,7 @@ node_modules/
 # Data SQL
 Data/Postgres_data*
 Data/Minio_data*
+Data/Mongo_data*
 
 # fichier .env
 *.env
