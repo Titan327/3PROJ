@@ -6,6 +6,7 @@ import {DefaultUser, IUser} from "src/interfaces/user.interface";
 import { io } from 'socket.io-client';
 import {api} from "boot/axios";
 
+
 const props = defineProps({
   groupId: Number,
 });
@@ -16,13 +17,8 @@ socket.on('connect', () => {
 });
 
 socket.on(`chat-group-${props.groupId}`, (msg, group) => {
-  messages.value.push({
-    text: msg,
-    stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
-    userId: User.value.id
-  });
-  //getMessages();
-  scrollNewMsg()
+  getMessages();
+  scrollNewMsg();
 });
 
 const drawerOpen = ref(true);
@@ -31,7 +27,8 @@ const senders = ref<Partial<IUser>[]>([]);
 let writingMessage = ref('');
 const scrollAreaRef = ref(null);
 
-const position = ref(0)
+const position = ref(0);
+const msgPage = ref(1);
 const User = ref(DefaultUser());
 
 function scrollNewMsg () {
@@ -43,6 +40,7 @@ onMounted(async () => {
 
   await getUserData();
   await getGroup();
+  await getMessages();
 
 });
 
@@ -70,8 +68,10 @@ function openCloseDrawer() {
 
 async function getMessages() {
   try {
-    const response = await api.get(`/group/${props.groupId}/messages`);
-    messages.value = response.data;
+    const response = await api.get(`/message/${props.groupId}?limit=50&page=${msgPage.value}`);
+    messages.value = response.data.messages
+    messages.value.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
   } catch (error) {
     console.error('Error getting messages:', error);
   }
@@ -81,20 +81,15 @@ async function getMessages() {
 async function sendMessage() {
   if (writingMessage.value.trim() === '') return;
   try {
-    //const response = await api.post(`/group/${props.groupId}/messages`, {
-      //message: {
-        //text: writingMessage.value,
-        //stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
-        //userId:User.value.id
-      //}
-    //});
-
-    messages.value.push({
-      text: writingMessage.value,
-      stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
-      userId: User.value.id
+    const response = await api.post(`/message/${props.groupId}`, {
+        text: writingMessage.value,
     });
-    console.log(messages.value)
+
+   // messages.value.push({
+     // text: writingMessage.value,
+    //  stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
+    //  userId: User.value.id
+   // });
 
     socket.emit('chat message', writingMessage.value, props.groupId);
     writingMessage.value = '';
@@ -137,7 +132,7 @@ function getSenderPseudo(id:number){
               v-for="(message, index) in messages"
               :key="index"
               :text="[message.text]"
-              :stamp="[message.stamp]"
+              :stamp="[`${new Date(message.timestamp).getHours()}:${new Date(message.timestamp).getMinutes()}`]"
               :name="[getSenderPseudo(message.userId)]"
               :avatar="[getSenderPicture(message.userId)]"
               :sent="getSenderPseudo(message.userId) == User.username"

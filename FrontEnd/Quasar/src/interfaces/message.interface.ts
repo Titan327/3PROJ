@@ -1,5 +1,9 @@
 export interface IMessage {
-  text: string;
-  stamp: Date;
-  userId: number;
+  messages: [
+    _id: string,
+    text: string,
+    timestamp: Date,
+    userId: number,
+    groupId: number,
+  ]
 }
