@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import { IMessage } from "src/interfaces/message.interface";
 import { getUser } from "stores/userStore";
 import {DefaultUser, IUser} from "src/interfaces/user.interface";
@@ -22,7 +22,6 @@ socket.on(`chat-group-${props.groupId}`, (msg, group) => {
     userId: User.value.id
   });
   //getMessages();
-  getSenderData(User.value.id);
   scrollNewMsg()
 });
 
@@ -40,9 +39,23 @@ function scrollNewMsg () {
   position.value = position.value + 300
 }
 
-(async () => {
+onMounted(async () => {
+
   await getUserData();
-})();
+  await getGroup();
+
+});
+
+async function getGroup() {
+  try {
+    const response = await api.get(`/group/${props.groupId}`);
+    senders.value = response.data.Users;
+    console.log(senders.value)
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
 
 async function getUserData() {
   const userData = await getUser();
@@ -59,24 +72,11 @@ async function getMessages() {
   try {
     const response = await api.get(`/group/${props.groupId}/messages`);
     messages.value = response.data;
-    await getSenderData(response.data.userId);
   } catch (error) {
     console.error('Error getting messages:', error);
   }
 }
 
-async function getSenderData(id){
-  try {
-    if(senders.value.find(sender => sender.id === id)) return;
-    else {
-      const response = await api.get(`/user/${id}`);
-      senders.value.push(response.data);
-    }
-  }
-  catch (error) {
-    console.error('Error getting sender data:', error);
-  }
-}
 
 async function sendMessage() {
   if (writingMessage.value.trim() === '') return;
@@ -105,11 +105,15 @@ async function sendMessage() {
 }
 
 function getSenderPicture(id:number){
-  return senders.value.find(sender => sender.id === id)?.profile_picture[0];
-};
+  console.log(id)
+  const thisSender = senders.value.find(sender => Number(sender.UserGroup.userId) == id);
+  console.log(thisSender)
+  return `${senders.value.find(sender => sender.UserGroup.userId == id)?.profile_picture}/100`;
+}
+
 function getSenderPseudo(id:number){
-  return senders.value.find(sender => sender.id === id)?.username;
-};
+  return senders.value.find(sender => sender.UserGroup.userId == id)?.username;
+}
 </script>
 
 <template>
@@ -134,9 +138,9 @@ function getSenderPseudo(id:number){
               :key="index"
               :text="[message.text]"
               :stamp="[message.stamp]"
-              :name="[getSenderPseudo(index)]"
-              :avatar="[getSenderPicture(index)]"
-              :sent="getSenderPseudo(index) == User.username"
+              :name="[getSenderPseudo(message.userId)]"
+              :avatar="[getSenderPicture(message.userId)]"
+              :sent="getSenderPseudo(message.userId) == User.username"
             />
           </q-scroll-area>
         </div>

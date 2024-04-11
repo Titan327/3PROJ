@@ -14,7 +14,7 @@ const app = express();
 const server = http.createServer(app); // Création du serveur HTTP
 const io = socketIo(server, {
     cors: {
-        origin: "http://localhost:9000", // Remplacez cette URL par l'URL de votre front-end
+        origin: "*",
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -75,6 +75,9 @@ const TransactionUser = require('./models/transactionUser.model');
 const Invitation = require('./models/invitation.model');
 const Refund = require('./models/refund.model');
 
+require('./configurations/mongo.config');
+const Message = require('./models/message.model');
+
 app.use("", require("./routes/invitation.route"));
 app.use("/api/auth", require("./routes/auth.route"));
 app.use("/api/group", require("./routes/group.route"));
@@ -82,6 +85,7 @@ app.use("/api/user", require("./routes/user.route"));
 app.use("/api/transaction", require("./routes/transaction.route"));
 app.use("/api/oauth2", require("./routes/oauth2.route"));
 app.use("/api/img", require("./routes/image.route"));
+app.use("/api/message", require("./routes/message.route"));
 
 initializeBucket("pp-user");
 initializeBucket("pp-group");

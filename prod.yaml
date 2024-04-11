@@ -63,5 +63,17 @@ services:
       Quasar-app:
         condition: service_completed_successfully
 
+  mongo:
+    image: mongo:latest
+    container_name: API-MONGO
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_DATABASE: app
+    volumes:
+      - ${MONGO_VOLUME}:/data/db
+
 
 

@@ -7,13 +7,14 @@ import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {api} from "boot/axios";
 import MessageDrawer from "components/ConsultGroup/MessageDrawer.vue";
+import {DefaultGroup} from "src/interfaces/group.interface";
 
 const router = useRouter();
 let User = ref(DefaultUser());
 const $q = useQuasar();
 const route = useRoute();
 const groupId = route.params.id;
-let group = ref();
+let group = ref(DefaultGroup());
 let urlPhoto = ref('');
 let isPhotoHover = ref(false);
 
@@ -25,29 +26,9 @@ onMounted(async () => {
 
 async function getGroup() {
   User.value = await getUser();
-  //const response = await api.get(`/group/${groupId}`);
-  group.value = {
-    id: 1,
-    name: 'Groupe défaut',
-    description: 'Seraphin code moi la route pour get un groupe fdp',
-    picture: 'assets/defaults/group-default.webp',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    members: [
-      {
-        id: 1,
-        firstname: 'Ryan',
-        lastname: 'Dordain',
-        username: 'Ryverze',
-        email: '',
-        profile_picture: 'assets/defaults/user-default.webp'
-      }
-    ]
-  }
-
-  urlPhoto.value = `/api/img/group-picture/${groupId}/200`;
+  const response = await api.get(`/group/${groupId}`);
+  group.value = response.data;
 }
-
 </script>
 
 <template>
@@ -71,41 +52,30 @@ async function getGroup() {
             </q-avatar>
           </div>
           <q-card-section>
-            <q-item-label class="text-h4">{{}}</q-item-label>
-            <q-item-label class="text-subtitle1">{{}}</q-item-label>
+            <q-item-label class="text-h4">{{group.name}}</q-item-label>
+            <q-item-label class="text-subtitle1">{{group.description}}</q-item-label>
           </q-card-section>
         </q-card-section>
       </q-card>
+    </div>
+    <div class="q-pa-md q-gutter-sm" style="height: 80px">
+      <q-item-label class="text-h6">36 Membres</q-item-label>
+      <q-avatar
+        v-for="(user, index) in group.Users"
+        :key="user.id"
+        size="40px"
+        class="overlapping"
+        :style="{ left: index * 25 + 'px' }"
+      >
+        <img :src="user.profile_picture ? `${user.profile_picture}/100` : 'assets/defaults/user-default.webp'">
+      </q-avatar>
     </div>
   </q-page>
 </template>
 
 <style scoped>
-.card-user-data{
-  width: 100%;
-}
-.text-head-card{
-  margin-bottom: 15px;
-}
-.inputs {
-  width: 80%;
-  display: flex;
-  margin: auto;
-  flex-direction: column;
-}
-.input{
-  margin-bottom: 12px;
-}
-.save-btn{
-  width: 15%;
-  margin: 20px 0 0 0;
-}
-.confirm-pwd{
-  margin-top: 50px;
-}
-.paiement{
-  width: 30%;
-  margin: 20px;
+.overlapping{
+  position: absolute ;
 }
 
 @media screen and (max-width: 1200px) {
