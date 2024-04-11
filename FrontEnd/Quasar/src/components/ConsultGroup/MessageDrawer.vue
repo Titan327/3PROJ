@@ -105,11 +105,15 @@ async function sendMessage() {
 }
 
 function getSenderPicture(id:number){
-  return senders.value.find(sender => sender.UserGroup.userId == id)?.profile_picture;
-};
+  console.log(id)
+  const thisSender = senders.value.find(sender => Number(sender.UserGroup.userId) == id);
+  console.log(thisSender)
+  return `${senders.value.find(sender => sender.UserGroup.userId == id)?.profile_picture}/100`;
+}
+
 function getSenderPseudo(id:number){
   return senders.value.find(sender => sender.UserGroup.userId == id)?.username;
-};
+}
 </script>
 
 <template>
@@ -134,9 +138,9 @@ function getSenderPseudo(id:number){
               :key="index"
               :text="[message.text]"
               :stamp="[message.stamp]"
-              :name="[getSenderPseudo(index)]"
-              :avatar="[getSenderPicture(index)]"
-              :sent="getSenderPseudo(index) == User.username"
+              :name="[getSenderPseudo(message.userId)]"
+              :avatar="[getSenderPicture(message.userId)]"
+              :sent="getSenderPseudo(message.userId) == User.username"
             />
           </q-scroll-area>
         </div>

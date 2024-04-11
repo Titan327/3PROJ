@@ -67,7 +67,7 @@ async function getGroup() {
         class="overlapping"
         :style="{ left: index * 25 + 'px' }"
       >
-        <img :src="user.profile_picture ? user.profile_picture[0] : 'assets/defaults/user-default.webp'">
+        <img :src="user.profile_picture ? `${user.profile_picture}/100` : 'assets/defaults/user-default.webp'">
       </q-avatar>
     </div>
   </q-page>
