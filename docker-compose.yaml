@@ -58,13 +58,13 @@ services:
 
   mongo:
     image: mongo:latest
-    container_name: API-MONGO
+    container_name: ${MONGO_NAME}
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_DATABASE: app
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_DATABASE: ${MONGO_DB_NAME}
     volumes:
       - ${MONGO_VOLUME}:/data/db
     networks:

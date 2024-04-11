@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://admin:admin@API-MONGO:27017/app?authSource=admin");
+mongoose.connect("mongodb://"+process.env.MONGO_USER+":"+process.env.MONGO_PASSWORD+"@"+process.env.MONGO_NAME+":"+process.env.MONGO_PORT+"/"+process.env.MONGO_DB_NAME+"?authSource=admin");
+
+console.log("ici");
+console.log("mongodb://"+process.env.MONGO_USER+":"+process.env.MONGO_PASSWORD+"@"+process.env.MONGO_NAME+":"+process.env.MONGO_PORT+"/"+process.env.MONGO_DB_NAME+"?authSource=admin");
 
 const db = mongoose.connection;
 
