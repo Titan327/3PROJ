@@ -30,9 +30,9 @@ onMounted(() => {
 </script>
 <style>
 body{
-  background: #141332;
+  //background: #141332;
   //background: linear-gradient(345deg, rgba(181,0,150,0.8855917366946778) 0%, rgba(22,20,101,1) 42%);
-
+  background: linear-gradient(145deg, rgba(9,9,121,1) 0%, rgba(197,0,203,1) 100%);
   color: #ffff
 }
 </style>
