@@ -65,13 +65,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import io.ktor.util.InternalAPI
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
+@OptIn(InternalAPI::class)
 @Composable
 fun ProfilScreen(httpClient: HttpClient, userId: String, jwtToken: String) {
     var usernameState = remember { mutableStateOf("") }
@@ -146,27 +151,118 @@ fun ProfilScreen(httpClient: HttpClient, userId: String, jwtToken: String) {
         TextField(
             value = usernameState.value,
             onValueChange = { usernameState.value = it },
-            label = { Text("Username") }
+            label = { Text("Username") },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
         )
         TextField(
             value = firstnameState.value,
             onValueChange = { firstnameState.value = it },
-            label = { Text("First Name") }
+            label = { Text("First Name") },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
         )
         TextField(
             value = lastnameState.value,
             onValueChange = { lastnameState.value = it },
-            label = { Text("Last Name") }
+            label = { Text("Last Name") },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
         )
         TextField(
             value = emailState.value,
             onValueChange = { emailState.value = it },
-            label = { Text("Email") }
+            label = { Text("Email") },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
         )
         TextField(
             value = birthDateState.value,
             onValueChange = { birthDateState.value = it },
-            label = { Text("Birth Date") }
+            label = { Text("Birth Date") },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
         )
+
+        Button(onClick = {
+            val userInfo = mapOf(
+                "userInfos" to mapOf(
+                    "username" to usernameState.value,
+                    "firstname" to firstnameState.value,
+                    "lastname" to lastnameState.value,
+                    "email" to emailState.value,
+                    "birth_date" to birthDateState.value
+                )
+            )
+
+            val userInfoJson = Json.encodeToString(userInfo)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val response: HttpResponse = withContext(Dispatchers.IO) {
+                        httpClient.put("https://3proj-back.tristan-tourbier.com/api/user/$userId") {
+                            contentType(ContentType.Application.Json)
+                            header("Authorization", "Bearer $jwtToken")
+                            body = userInfoJson
+                        }
+                    }
+                    if (response.status == HttpStatusCode.OK) {
+                        withContext(Dispatchers.Main) {
+                            println("User update request succeeded.")
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            println("User update request failed. Error code: ${response.status.value}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        println("An error occurred while sending the request: ${e.message}")
+                    }
+                }
+            }
+        }) {
+            Text("Update User")
+        }
     }
 }

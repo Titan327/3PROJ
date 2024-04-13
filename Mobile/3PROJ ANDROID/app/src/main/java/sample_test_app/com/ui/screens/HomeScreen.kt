@@ -159,10 +159,19 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                         .padding(vertical = 8.dp),
                     elevation = 4.dp
                 ) {
-                    Text(
-                        text = group,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(16.dp)
-                    )
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.grouplogo),
+                            contentDescription = "Group Logo",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .padding(end = 16.dp)
+                        )
+                        Text(text = group)
+                    }
                 }
             }
         }
