@@ -50,13 +50,9 @@ import kotlinx.serialization.json.jsonPrimitive
 
 import sample_test_app.com.http.Security.JwtUtils.JwtUtils
 
-
 @OptIn(InternalAPI::class)
 @Composable
 fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
-    // État pour stocker la valeur du champ de texte "Email"
-    val emailState = remember { mutableStateOf("") }
-
     // État pour stocker la valeur du champ de texte "Username"
     val usernameState = remember { mutableStateOf("") }
 
@@ -70,17 +66,6 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Champ de texte "Email"
-        TextField(
-            value = emailState.value,
-            onValueChange = { newValue ->
-                emailState.value = newValue
-            },
-            placeholder = { Text("Enter your email") },
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
         // Champ de texte "Username"
         TextField(
             value = usernameState.value,
@@ -106,7 +91,6 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
 
         Button(onClick = {
             val loginInfo = mapOf(
-                "email" to emailState.value,
                 "username" to usernameState.value,
                 "password" to passwordState.value
             )
@@ -139,32 +123,6 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
                             if (userId != null) {
                                 // Navigate to the home screen with the userId
                                 navController.navigate("home/$userId/$responseBody")
-
-                                // Get user information
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    val userInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                                        httpClient.get("https://3proj-back.tristan-tourbier.com/api/user/$userId") {
-                                            contentType(ContentType.Application.Json)
-                                        }
-                                    }
-                                    if (userInfoResponse.status == HttpStatusCode.OK) {
-                                        val userInfoResponseBody = userInfoResponse.bodyAsText()
-                                        withContext(Dispatchers.Main) {
-                                            println("User info request succeeded. Response: $userInfoResponseBody")
-
-                                            val userInfoJson = Json.parseToJsonElement(userInfoResponseBody).jsonObject
-                                            val username = userInfoJson["username"]?.jsonPrimitive?.content
-                                            val email = userInfoJson["email"]?.jsonPrimitive?.content
-
-                                            println("Username: $username")
-                                            println("Email: $email")
-                                        }
-                                    } else {
-                                        withContext(Dispatchers.Main) {
-                                            println("User info request failed. Error code: ${userInfoResponse.status.value}")
-                                        }
-                                    }
-                                }
                             } else {
                                 println("Error: userId is null")
                             }

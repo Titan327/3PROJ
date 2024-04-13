@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,10 +42,12 @@ import androidx.navigation.compose.rememberNavController
 import coil.transform.CircleCropTransformation
 
 
+
 @Composable
 fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navController: NavController) {
     var usernameState = remember { mutableStateOf("") }
     var profilePictureState = remember { mutableStateOf("") }
+    var groupsState = remember { mutableStateOf(listOf<String>()) }
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -73,6 +78,27 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                     println("User info request failed. Error code: ${userInfoResponse.status.value}")
                 }
             }
+
+            val groupsResponse: HttpResponse = withContext(Dispatchers.IO) {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/user/$userId/groups") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer $jwtToken")
+                }
+            }
+            if (groupsResponse.status == HttpStatusCode.OK) {
+                val groupsResponseBody = groupsResponse.bodyAsText()
+                withContext(Dispatchers.Main) {
+                    println("Groups request succeeded. Response: $groupsResponseBody")
+
+                    val groupsJson = Json.parseToJsonElement(groupsResponseBody).jsonArray
+                    val groups = groupsJson.mapNotNull { it.jsonObject["name"]?.jsonPrimitive?.content }
+                    groupsState.value = groups
+                }
+            } else {
+                withContext(Dispatchers.Main) {
+                    println("Groups request failed. Error code: ${groupsResponse.status.value}")
+                }
+            }
         }
     }
 
@@ -101,7 +127,8 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                     .align(Alignment.TopEnd)
                     .padding(top = 16.dp)
                     .clickable {
-                        navController.navigate("ProfilScreen/$userId/$jwtToken")                    }
+                        navController.navigate("ProfilScreen/$userId/$jwtToken")
+                    }
             )
         } else {
             Image(
@@ -117,8 +144,27 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                     .align(Alignment.TopEnd)
                     .padding(top = 16.dp)
                     .clickable {
-                        navController.navigate("ProfilScreen/$userId/$jwtToken")                    }
+                        navController.navigate("ProfilScreen/$userId/$jwtToken")
+                    }
             )
+        }
+
+        LazyColumn(
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            items(groupsState.value) { group ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    elevation = 4.dp
+                ) {
+                    Text(
+                        text = group,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
         }
 
         Image(
