@@ -43,11 +43,14 @@ import coil.transform.CircleCropTransformation
 
 
 
+
+
 @Composable
 fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navController: NavController) {
     var usernameState = remember { mutableStateOf("") }
     var profilePictureState = remember { mutableStateOf("") }
     var groupsState = remember { mutableStateOf(listOf<String>()) }
+    var transactionsState = remember { mutableStateOf(listOf<Map<String, String>>()) } // New state for transactions
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -97,6 +100,41 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
             } else {
                 withContext(Dispatchers.Main) {
                     println("Groups request failed. Error code: ${groupsResponse.status.value}")
+                }
+            }
+
+            val transactionsResponse: HttpResponse = withContext(Dispatchers.IO) {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/user/$userId/transactions") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer $jwtToken")
+                }
+            }
+            if (transactionsResponse.status == HttpStatusCode.OK) {
+                val transactionsResponseBody = transactionsResponse.bodyAsText()
+                withContext(Dispatchers.Main) {
+                    println("Transactions request succeeded. Response: $transactionsResponseBody")
+
+                    val transactionsJson = Json.parseToJsonElement(transactionsResponseBody).jsonArray
+                    val transactions = transactionsJson.mapNotNull { it.jsonObject }
+                        .mapNotNull {
+                            val amount = it["amount"]?.jsonPrimitive?.content
+                            val description = it["description"]?.jsonPrimitive?.content
+                            val date = it["date"]?.jsonPrimitive?.content
+                            if (amount != null && description != null && date != null) {
+                                mapOf(
+                                    "amount" to amount,
+                                    "description" to description,
+                                    "date" to date
+                                )
+                            } else {
+                                null
+                            }
+                        }
+                    transactionsState.value = transactions
+                }
+            } else {
+                withContext(Dispatchers.Main) {
+                    println("Transactions request failed. Error code: ${transactionsResponse.status.value}")
                 }
             }
         }
@@ -174,7 +212,43 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                     }
                 }
             }
+
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    elevation = 4.dp
+                ) {
+                    Column {
+                        Text(text = "Dernières dépenses")
+
+                        // En-têtes du tableau
+                        Row {
+                            Text(text = "Nom", modifier = Modifier.weight(1f))
+                            Text(text = "Date", modifier = Modifier.weight(1f))
+                            Text(text = "Somme", modifier = Modifier.weight(1f))
+                            Text(text = "Statut", modifier = Modifier.weight(1f))
+                        }
+
+                        if (transactionsState.value.isEmpty()) {
+                            Text(text = "Rien à afficher")
+                        } else {
+                            transactionsState.value.forEach { transaction ->
+                                // Ligne du tableau pour chaque transaction
+                                Row {
+                                    Text(text = transaction["description"] ?: "", modifier = Modifier.weight(1f))
+                                    Text(text = transaction["date"] ?: "", modifier = Modifier.weight(1f))
+                                    Text(text = transaction["amount"] ?: "", modifier = Modifier.weight(1f))
+                                    Text(text = "Paid", modifier = Modifier.weight(1f)) // Remplacez "Paid" par le statut réel
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+
 
         Image(
             painter = painterResource(id = R.drawable.notificationbellhome),
