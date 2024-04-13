@@ -19,7 +19,7 @@ onMounted(() => {
 
 <template>
 
-  <q-card class="bloc-paye bg-primary">
+  <q-card class="bloc-paye bg-accent">
     <q-card-section
       class="q-mx-auto flex">
       <h3 class="text-h6">Moyens de paiement</h3>
@@ -27,8 +27,7 @@ onMounted(() => {
         class="btn"
         unelevated color="secondary"
         label="+"
-        rounded
-        outline
+        round
       />
     </q-card-section>
     <q-card-section
@@ -41,7 +40,7 @@ onMounted(() => {
         navigation
         arrows
         height="250px"
-        class="text-purple rounded-borders caroussel bg-primary q-mx-auto"
+        class="text-purple rounded-borders caroussel bg-accent q-mx-auto"
       >
           <q-carousel-slide
             v-for="(paiement, index) in paiementsMethod"
@@ -71,12 +70,12 @@ onMounted(() => {
 <style scoped>
 
 .bloc-paye{
-  width: 85%;
-  height: 380px;
+  width: 100%;
+  height: 420px;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
-  margin-top: 10%;
+  margin-top: 50px;
 }
 
 .caroussel{

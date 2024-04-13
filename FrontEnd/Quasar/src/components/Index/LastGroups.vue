@@ -23,7 +23,7 @@ onMounted(async () => {
 
 
 <template>
-  <q-card class="bloc-paye bg-primary">
+  <q-card class="bloc-group bg-accent">
     <q-card-section>
       <h3 class="text-h6">Mes Groupes</h3>
     </q-card-section>
@@ -51,8 +51,9 @@ onMounted(async () => {
 
 <style scoped>
 
-.bloc-paye{
-  width: 88%;
+.bloc-group{
+  width: 100%;
   border-radius: 15px;
+  margin-top: 50px;
 }
 </style>

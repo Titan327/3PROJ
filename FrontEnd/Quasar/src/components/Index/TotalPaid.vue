@@ -44,7 +44,7 @@ onMounted(async () => {
 
 <template>
 
-  <q-card class="bloc-paye bg-primary">
+  <q-card class="bloc-paye bg-accent">
     <q-card-section >
       <q-item>
         <q-item-section avatar>
@@ -66,9 +66,9 @@ onMounted(async () => {
 <style scoped>
 
 .bloc-paye{
-  width: 85%;
+  width: 100%;
   height: 100px;
   border-radius: 15px;
-  margin-top: 10%;
+  margin-top: 50px;
 }
 </style>

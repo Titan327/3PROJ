@@ -10,6 +10,7 @@ import {api} from "boot/axios";
 const props = defineProps({
   groupId: Number,
 });
+
 const socket = io('https://3proj-back.tristan-tourbier.com/');
 
 socket.on('connect', () => {
@@ -31,11 +32,6 @@ const position = ref(0);
 const msgPage = ref(1);
 const User = ref(DefaultUser());
 
-function scrollNewMsg () {
-  scrollAreaRef.value.setScrollPosition('vertical', position.value, 300)
-  position.value = position.value + 300
-}
-
 onMounted(async () => {
 
   await getUserData();
@@ -43,6 +39,11 @@ onMounted(async () => {
   await getMessages();
 
 });
+
+function scrollNewMsg () {
+  scrollAreaRef.value.setScrollPosition('vertical', position.value, 300)
+  position.value = position.value + 300
+}
 
 async function getGroup() {
   try {
@@ -77,7 +78,6 @@ async function getMessages() {
   }
 }
 
-
 async function sendMessage() {
   if (writingMessage.value.trim() === '') return;
   try {
@@ -85,29 +85,48 @@ async function sendMessage() {
         text: writingMessage.value,
     });
 
-   // messages.value.push({
-     // text: writingMessage.value,
-    //  stamp: new Date().toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" }),
-    //  userId: User.value.id
-   // });
+    if(response.status == 201){
+      socket.emit('chat message', writingMessage.value, props.groupId);
+      writingMessage.value = '';
+      scrollNewMsg()
+    }
 
-    socket.emit('chat message', writingMessage.value, props.groupId);
-    writingMessage.value = '';
-    scrollNewMsg()
   } catch (error) {
     console.error('Error sending message:', error);
   }
 }
 
 function getSenderPicture(id:number){
-  console.log(id)
   const thisSender = senders.value.find(sender => Number(sender.UserGroup.userId) == id);
-  console.log(thisSender)
-  return `${senders.value.find(sender => sender.UserGroup.userId == id)?.profile_picture}/100`;
+
+  const defaultAvatarUrl = 'assets/defaults/group-default.webp';
+  const profilePictureUrl = senders.value.find(sender => sender.UserGroup.userId == id)?.profile_picture;
+
+  return `${profilePictureUrl ? profilePictureUrl + '/100' : defaultAvatarUrl}`;
 }
 
 function getSenderPseudo(id:number){
   return senders.value.find(sender => sender.UserGroup.userId == id)?.username;
+}
+
+function getColor(id:number){
+  const sender = senders.value.find(sender => sender.UserGroup.userId == id)?.username;
+  if(sender == User.value.username){
+    return 'white'
+  }
+  else {
+    return 'cyan-4'
+  }
+}
+
+function getDate(timestamp: string) {
+
+  if(new Date(timestamp).getDate() == new Date().getDate()){
+    return new Date(timestamp).toLocaleString("fr-FR", { hour: "numeric", minute: "numeric" });
+  }
+  else {
+    return new Date(timestamp).toLocaleString("fr-FR", { day: "numeric", month: "numeric"});
+  }
 }
 </script>
 
@@ -130,9 +149,10 @@ function getSenderPseudo(id:number){
             <q-chat-message
               class="message"
               v-for="(message, index) in messages"
+              :bg-color="getColor(message.userId)"
               :key="index"
               :text="[message.text]"
-              :stamp="[`${new Date(message.timestamp).getHours()}:${new Date(message.timestamp).getMinutes()}`]"
+              :stamp="[getDate(message.timestamp)]"
               :name="[getSenderPseudo(message.userId)]"
               :avatar="[getSenderPicture(message.userId)]"
               :sent="getSenderPseudo(message.userId) == User.username"
