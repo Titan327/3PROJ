@@ -85,7 +85,7 @@ async function sendMessage() {
         text: writingMessage.value,
     });
 
-    if(response.status == 201){
+    if(response.status == 200){
       socket.emit('chat message', writingMessage.value, props.groupId);
       writingMessage.value = '';
       scrollNewMsg()
