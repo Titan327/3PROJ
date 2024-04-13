@@ -1,6 +1,8 @@
 package sample_test_app.com.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
@@ -8,6 +10,7 @@ import androidx.compose.material.Button
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
@@ -217,30 +221,40 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 8.dp, horizontal = 16.dp), // Ajout de padding horizontal
                     elevation = 4.dp
                 ) {
-                    Column {
-                        Text(text = "Dernières dépenses")
+                    Column(
+                        modifier = Modifier.padding(16.dp) // Ajout de padding à l'intérieur de la Card
+                    ) {
+                        Text(text = "Dernières dépenses", style = MaterialTheme.typography.h6)
 
                         // En-têtes du tableau
-                        Row {
-                            Text(text = "Nom", modifier = Modifier.weight(1f))
-                            Text(text = "Date", modifier = Modifier.weight(1f))
-                            Text(text = "Somme", modifier = Modifier.weight(1f))
-                            Text(text = "Statut", modifier = Modifier.weight(1f))
+                        Row(
+                            modifier = Modifier
+                                .background(Color.LightGray)
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(text = "Nom", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
+                            Text(text = "Date", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
+                            Text(text = "Somme", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
+                            Text(text = "Statut", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
                         }
 
                         if (transactionsState.value.isEmpty()) {
-                            Text(text = "Rien à afficher")
+                            Text(text = "Rien à afficher", style = MaterialTheme.typography.body1)
                         } else {
                             transactionsState.value.forEach { transaction ->
                                 // Ligne du tableau pour chaque transaction
-                                Row {
-                                    Text(text = transaction["description"] ?: "", modifier = Modifier.weight(1f))
-                                    Text(text = transaction["date"] ?: "", modifier = Modifier.weight(1f))
-                                    Text(text = transaction["amount"] ?: "", modifier = Modifier.weight(1f))
-                                    Text(text = "Paid", modifier = Modifier.weight(1f)) // Remplacez "Paid" par le statut réel
+                                Row(
+                                    modifier = Modifier
+                                        .border(1.dp, Color.LightGray)
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Text(text = transaction["description"] ?: "", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1)
+                                    Text(text = transaction["date"] ?: "", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1)
+                                    Text(text = transaction["amount"] ?: "", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1)
+                                    Text(text = "Paid", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1) // Remplacez "Paid" par le statut réel
                                 }
                             }
                         }
@@ -248,6 +262,8 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                 }
             }
         }
+
+
 
 
         Image(
