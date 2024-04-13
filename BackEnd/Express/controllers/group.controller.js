@@ -14,14 +14,15 @@ const getGroup = async (req, res) => {
             include: [{
                 model: User,
                 as: 'Users',
-                attributes: ['username', 'profile_picture']
+                attributes: ['id', 'username', 'profile_picture']
             }]
         });
         if (group === null) {
             return res.status(404).send({error: "Group not found"});
         }
         if (UserGroup.findOne({where: {groupId: groupId, userId: req.authorization.userId}})) {
-            return res.status(200).send(group);
+            let activeUsersCount = await UserGroup.count({where: {groupId: groupId, active: true}});
+            return res.status(200).send({...group.toJSON(), activeUsersCount: activeUsersCount});
         }
         return res.status(403).send({error: "You are not part of this group"});
     } catch (e) {
@@ -40,17 +41,17 @@ const getGroups = async (req, res) => {
         const limit = parseInt(req.query.limit) || 5;
         let whereCondition = {userId: userId};
 
-        if (req.query.favorite === "true") {
-            whereCondition.favorite = true;
-        } else if (req.query.favorite === "false") {
-            whereCondition.favorite = false;
-        }
-
         const groupsID = await UserGroup.findAll({where: whereCondition});
         if (groupsID.length > 0) {
             let groupIds = groupsID.map(group => group.groupId);
             console.log(`groupIds: ${groupIds}`);
-            let groups = await Group.findAll({where: {id: groupIds}, order: [['updatedAt', 'ASC']], limit: limit});
+            let groups = await Promise.all(groupIds.map(async (id) => {
+                let group = await Group.findOne({where: {id: id}});
+                let activeUsersCount = await UserGroup.count({where: {groupId: id, active: true}});
+                let isFavorite = await UserGroup.findOne({where: {groupId: id, userId: userId, favorite: true}});
+                return {...group.toJSON(), activeUsersCount: activeUsersCount, isFavorite: !!isFavorite};
+            }));
+            groups = groups.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, limit);
             return res.status(200).send(groups);
         }
         return res.status(404).send({ message: "No groups found" });
