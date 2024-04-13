@@ -97,9 +97,8 @@ async function sendMessage() {
 }
 
 function getSenderPicture(id:number){
-  const thisSender = senders.value.find(sender => Number(sender.UserGroup.userId) == id);
 
-  const defaultAvatarUrl = 'assets/defaults/group-default.webp';
+  const defaultAvatarUrl = 'assets/defaults/user-default.webp';
   const profilePictureUrl = senders.value.find(sender => sender.UserGroup.userId == id)?.profile_picture;
 
   return `${profilePictureUrl ? profilePictureUrl + '/100' : defaultAvatarUrl}`;
