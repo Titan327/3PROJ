@@ -47,6 +47,36 @@ const refundTransactions = async (req, res) => {
     }
 }
 
+const getUserDebtForOtherGroupsUsers = async (req, res) => {
+    console.log(`REST getUserDebtForOtherGroupsUsers`);
+    const {userId, groupId} = req.params;
+    try {
+        let totalArray = {};
+        let debts = await TransactionUser.findAll({
+            where: {
+                userId
+            },
+            include: {
+                model: Transaction
+            }
+        });
+        for (const debt of debts) {
+            if (debt.Transaction.senderId !== userId) {
+                console.log(debt.Transaction);
+                if (!totalArray[debt.Transaction.senderId]) {
+                    totalArray[debt.Transaction.senderId] = 0;
+                }
+                totalArray[debt.Transaction.senderId] += debt.amount;
+            }
+        }
+        return res.status(200).send(totalArray);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error getting user debts');
+    }
+}
+
 module.exports = {
-    refundTransactions
+    refundTransactions,
+    getUserDebtForOtherGroupsUsers
 }
