@@ -17,18 +17,26 @@ const groupId = route.params.id;
 let group = ref(DefaultGroup());
 let urlPhoto = ref('');
 let isPhotoHover = ref(false);
+let mounted = ref(false)
 
 onMounted(async () => {
 
   await getGroup()
-
+  mounted.value=true;
 });
 
 async function getGroup() {
   User.value = await getUser();
   const response = await api.get(`/group/${groupId}`);
   group.value = response.data;
+
+  //console.log(group.value)
 }
+
+function isGroupFavorite(userId : number) {
+  return group.value.Users.some(user => user.userId === userId && user.UserGroup.favorite);
+}
+
 </script>
 
 <template>
@@ -52,14 +60,19 @@ async function getGroup() {
             </q-avatar>
           </div>
           <q-card-section>
-            <q-item-label class="text-h4">{{group.name}}</q-item-label>
+            <q-item-label class="text-h4">{{group.name}}<q-icon
+              name="star"
+              v-if="mounted"
+              :color="isGroupFavorite(User.id)? 'yellow' : 'grey'"
+              @click="console.log('star')"
+              size="32px" /></q-item-label>
             <q-item-label class="text-subtitle1">{{group.description}}</q-item-label>
           </q-card-section>
         </q-card-section>
       </q-card>
     </div>
     <div class="q-pa-md q-gutter-sm" style="height: 80px">
-      <q-item-label class="text-h6">36 Membres</q-item-label>
+      <q-item-label class="text-h6">{{memberText}}</q-item-label>
       <q-avatar
         v-for="(user, index) in group.Users"
         :key="user.id"
