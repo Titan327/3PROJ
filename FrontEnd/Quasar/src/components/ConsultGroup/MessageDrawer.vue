@@ -35,7 +35,7 @@ const senders = ref<Partial<IUser>[]>([]);
 let writingMessage = ref('');
 const scrollAreaRef = ref(null);
 
-const position = ref(0);
+const position = ref(10000);
 const msgPage = ref(1);
 const User = ref(DefaultUser());
 
@@ -51,7 +51,7 @@ onMounted(async () => {
 
 function scrollNewMsg () {
   scrollAreaRef.value.setScrollPosition('vertical', position.value, 300)
-  position.value = position.value + 300
+  position.value = 100000
 }
 
 async function getGroup() {
