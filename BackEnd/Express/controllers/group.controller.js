@@ -17,11 +17,34 @@ const getGroup = async (req, res) => {
                 attributes: ['id', 'username', 'profile_picture']
             }]
         });
+
+        const base_url = group.picture;
+        if (base_url){
+            group.picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
+        }else {
+            group.picture = null;
+        }
+
+
+        group.Users.forEach(
+            user => {
+                const base_url = user.profile_picture;
+                if (base_url){
+                    user.profile_picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
+                }else {
+                    user.profile_picture = null;
+                }
+                user.profile_picture;
+                console.log(user);
+            }
+        );
+
+
         if (group === null) {
             return res.status(404).send({error: "Group not found"});
         }
         if (UserGroup.findOne({where: {groupId: groupId, userId: req.authorization.userId}})) {
-            let activeUsersCount = await UserGroup.count({where: {groupId: groupId, active: true}});
+            let activeUsersCount = await UserGroup.count({where: {groupId: groupId, active: true}})
             return res.status(200).send({...group.toJSON(), activeUsersCount: activeUsersCount});
         }
         return res.status(403).send({error: "You are not part of this group"});
