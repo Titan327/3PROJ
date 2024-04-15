@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import { IMessage } from "src/interfaces/message.interface";
 import { getUser } from "stores/userStore";
 import {DefaultUser, IUser} from "src/interfaces/user.interface";
@@ -9,7 +9,14 @@ import {api} from "boot/axios";
 
 const props = defineProps({
   groupId: Number,
+  open: Boolean,
 });
+
+watch(() => props.open, () => {
+  drawerOpen.value = props.open;
+});
+
+const emit = defineEmits(['updateState', 'messages'])
 
 const socket = io('https://3proj-back.tristan-tourbier.com/');
 
@@ -22,17 +29,19 @@ socket.on(`chat-group-${props.groupId}`, (msg, group) => {
   scrollNewMsg();
 });
 
-const drawerOpen = ref(true);
+const drawerOpen = ref(false);
 const messages = ref<IMessage[]>([]);
 const senders = ref<Partial<IUser>[]>([]);
 let writingMessage = ref('');
 const scrollAreaRef = ref(null);
 
-const position = ref(0);
+const position = ref(10000);
 const msgPage = ref(1);
 const User = ref(DefaultUser());
 
 onMounted(async () => {
+
+  drawerOpen.value = props.open;
 
   await getUserData();
   await getGroup();
@@ -42,7 +51,7 @@ onMounted(async () => {
 
 function scrollNewMsg () {
   scrollAreaRef.value.setScrollPosition('vertical', position.value, 300)
-  position.value = position.value + 300
+  position.value = 100000
 }
 
 async function getGroup() {
@@ -63,8 +72,9 @@ async function getUserData() {
   }
 }
 
-function openCloseDrawer() {
-  drawerOpen.value = !drawerOpen.value;
+function CloseDrawer() {
+  drawerOpen.value = false;
+  emit('updateState')
 }
 
 async function getMessages() {
@@ -141,7 +151,16 @@ function getDate(timestamp: string) {
   >
     <div class="content">
 
-      <q-item-label class="text-h4 q-pa-md row">Messages</q-item-label>
+      <div class="column">
+        <q-item-label class="text-h4 q-pa-md row">Messages</q-item-label>
+        <q-btn
+          color="secondary"
+          class="q-ma-md"
+          outline
+          icon="close"
+          @click="CloseDrawer">
+        </q-btn>
+      </div>
 
       <div class="q-pa-md row justify-center">
         <q-label v-if="messages.length == 0" class="text-h6 q-pa-md">Aucun message</q-label>

@@ -8,6 +8,7 @@ import {useQuasar} from "quasar";
 import {api} from "boot/axios";
 import MessageDrawer from "components/ConsultGroup/MessageDrawer.vue";
 import {DefaultGroup} from "src/interfaces/group.interface";
+import ActionsGroupTab from "components/Groups/ActionsGroupTab.vue";
 
 const router = useRouter();
 let User = ref(DefaultUser());
@@ -18,6 +19,7 @@ let group = ref(DefaultGroup());
 let urlPhoto = ref('');
 let isPhotoHover = ref(false);
 let mounted = ref(false)
+let messageState = ref(false);
 
 onMounted(async () => {
 
@@ -27,20 +29,30 @@ onMounted(async () => {
 
 async function getGroup() {
   User.value = await getUser();
-  const response = await api.get(`/group/${groupId}`);
-  group.value = response.data;
-
-  //console.log(group.value)
+  try {
+    const response = await api.get(`/group/${groupId}`);
+    group.value = response.data;
+  }
+  catch (error) {
+    console.error(error);
+  }
 }
 
 function isGroupFavorite(userId : number) {
   return group.value.Users.some(user => user.userId === userId && user.UserGroup.favorite);
 }
 
+function  openCloseMessageDrawer(){
+  messageState.value = !messageState.value;
+}
+function  closeMessageDrawer(){
+  messageState.value = false;
+}
+
 </script>
 
 <template>
-  <message-drawer :groupId = groupId></message-drawer>
+  <message-drawer :groupId = groupId  :open = messageState @updateState="closeMessageDrawer"></message-drawer>
   <q-page class="q-pa-md">
     <div class="div-first-last-name">
       <q-card class="transparent no-box-shadow">
@@ -72,7 +84,9 @@ function isGroupFavorite(userId : number) {
       </q-card>
     </div>
     <div class="q-pa-md q-gutter-sm" style="height: 80px">
-      <q-item-label class="text-h6">{{memberText}}</q-item-label>
+      <q-item-label class="text-h6">
+        {{group.activeUsersCount}} {{ group.activeUsersCount === 1 ? 'Membre' : 'Membres' }}
+      </q-item-label>
       <q-avatar
         v-for="(user, index) in group.Users"
         :key="user.id"
@@ -83,6 +97,10 @@ function isGroupFavorite(userId : number) {
         <img :src="user.profile_picture ? `${user.profile_picture}/100` : 'assets/defaults/user-default.webp'">
       </q-avatar>
     </div>
+    <ActionsGroupTab></ActionsGroupTab>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn fab icon="message" color="secondary" @click="openCloseMessageDrawer"/>
+    </q-page-sticky>
   </q-page>
 </template>
 

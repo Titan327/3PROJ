@@ -100,7 +100,7 @@ async function openDialogInvite(id: number, name: string){
 
     <h3 class="text-h4 q-pa-md">Mes Groupes  <q-btn color="secondary" round outline @click="openDialogCreate">+</q-btn></h3>
 
-    <q-card class="bloc-groupe bg-primary"
+    <q-card class="bloc-groupe bg-accent"
             v-for="group in groupList" :key="group.id">
       <q-separator/>
       <q-card-section>
