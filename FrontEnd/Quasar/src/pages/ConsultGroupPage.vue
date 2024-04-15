@@ -97,7 +97,7 @@ function  closeMessageDrawer(){
         <img :src="user.profile_picture ? `${user.profile_picture}/100` : 'assets/defaults/user-default.webp'">
       </q-avatar>
     </div>
-    <ActionsGroupTab></ActionsGroupTab>
+    <ActionsGroupTab :groupId = groupId :userId = groupId></ActionsGroupTab>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="message" color="secondary" @click="openCloseMessageDrawer"/>
     </q-page-sticky>

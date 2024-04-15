@@ -78,6 +78,14 @@ const uploadGroupPic = async (req, res) => {
                 minioClient.putObject("pp-group", groupId+'/'+image.name, image.buffer);
             });
 
+            const existing = await Group.findOne({
+                where: {
+                    id: groupId,
+                },
+            });
+            existing.picture = process.env.APP_URL+"/api/img/group-picture/"+groupId;
+            await existing.save();
+
             return res.status(200).json({ message: 'photo de groupe upload' });
         }else {
             return res.status(403).send({error: "You are not allowed to change the image of this group"});

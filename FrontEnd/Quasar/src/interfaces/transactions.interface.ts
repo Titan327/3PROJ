@@ -18,3 +18,37 @@ export interface Transaction {
     category_id: number,
   }
 }
+
+export interface TransactionCreated {
+  "groupId": number,
+  "label": string,
+  "total_amount": number,
+  "date":Date,
+  "receipt": string,
+  "senderId": number,
+  "categoryId": number,
+  "details": [
+    {
+    "userId": number,
+    "amount": number
+  }
+  ]
+}
+
+export function DefaultTransactionCreated():TransactionCreated{
+return {
+  "groupId": 0,
+  "label": '',
+  "total_amount": 0,
+  "date": new Date(),
+  "receipt": '',
+  "senderId": 0,
+  "categoryId": 1,
+  "details": [
+    {
+      "userId": 0,
+      "amount": 0,
+    }
+  ]
+}
+}

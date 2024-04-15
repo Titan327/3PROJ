@@ -76,6 +76,7 @@ const TransactionCategory = require('./models/transactionCategory.model');
 const TransactionUser = require('./models/transactionUser.model');
 const Invitation = require('./models/invitation.model');
 const Refund = require('./models/refund.model');
+const PaymentMethode = require('./models/paymentMethode.model');
 
 require('./configurations/mongo.config');
 const Message = require('./models/message.model');
