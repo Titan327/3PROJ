@@ -7,6 +7,7 @@ export interface Group{
   picture?: string,
   owner_id?: number,
   updatedAt?: Date,
+  activeUsersCount?: number,
   Users?: IUser[],
 }
 

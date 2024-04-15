@@ -80,7 +80,7 @@ let mail = ref();
 
 .links * {
   text-decoration: none;
-  color: #4FA4BB;
+  color: #ffa31a;
 }
 
 .btn-log img {
