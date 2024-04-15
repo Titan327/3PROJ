@@ -38,7 +38,7 @@ onMounted(async () => {
           <q-avatar
             size="100px"
           >
-            <img :src="group.picture ? group.picture : 'assets/defaults/group-default.webp'">
+            <img :src="group.picture ? group.picture[1] : 'assets/defaults/group-default.webp'">
             <q-badge color="red" rounded floating >{{group.id}}</q-badge>
 
           </q-avatar>

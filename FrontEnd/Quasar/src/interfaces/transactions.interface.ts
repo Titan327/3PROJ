@@ -27,11 +27,12 @@ export interface TransactionCreated {
   "receipt": string,
   "senderId": number,
   "categoryId": number,
-  "details": [
+  "details"?: [
     {
-    "userId": number,
-    "amount": number
-  }
+    "detail0":{
+      "userId": number,
+      "amount": number
+    } }
   ]
 }
 
@@ -44,11 +45,5 @@ return {
   "receipt": '',
   "senderId": 0,
   "categoryId": 1,
-  "details": [
-    {
-      "userId": 0,
-      "amount": 0,
-    }
-  ]
 }
 }

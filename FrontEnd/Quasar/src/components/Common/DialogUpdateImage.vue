@@ -8,6 +8,10 @@ const $q = useQuasar();
 let isOpen = ref(false);
 let loading = ref(false);
 
+const props = defineProps({
+  groupId : Number,
+});
+
 let file = ref(null);
 function chackHasFile(): boolean {
   if(file.value == null){
@@ -29,7 +33,14 @@ async function update() {
     const formData = new FormData();
     formData.append('image', file.value);
 
-    const response = await api.post("/img/upload/profile-picture", formData);
+    let response = null;
+
+    if(props.groupId){
+      response = await api.post(`/img/upload/group-picture/${props.groupId}`, formData);
+    }
+    else{
+      response = await api.post("/img/upload/profile-picture", formData);
+    }
 
     if (response.data) {
       $q.notify({
