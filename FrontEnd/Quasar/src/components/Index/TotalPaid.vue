@@ -68,6 +68,7 @@ onMounted(async () => {
 .bloc-paye{
   width: 100%;
   height: 100px;
+  min-width: 350px;
   border-radius: 15px;
   margin-top: 50px;
 }

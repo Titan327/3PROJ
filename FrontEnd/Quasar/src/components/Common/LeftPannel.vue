@@ -124,7 +124,18 @@ function disconnect(){
 }
 
 .disconnect-user{
-background-color: #171733;
+background-color: #1b1b1b;
+}
+
+@media (max-height: 920px) {
+  .user-drawer{
+    margin-top: 30vh;
+  }
+}
+@media (max-height: 720px) {
+  .user-drawer{
+    margin-top: 20vh;
+  }
 }
 
 </style>
