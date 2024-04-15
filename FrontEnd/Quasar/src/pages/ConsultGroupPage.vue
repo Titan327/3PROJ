@@ -24,7 +24,6 @@ let messageState = ref(false);
 let dialogModifyPp = ref(false);
 
 onMounted(async () => {
-
   await getGroup()
   mounted.value=true;
 });
