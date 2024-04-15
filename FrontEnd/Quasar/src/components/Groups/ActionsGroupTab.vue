@@ -1,11 +1,37 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {Transaction} from "src/interfaces/transactions.interface";
+import DialogCreateTransaction from "components/Groups/DialogCreateTransaction.vue";
+import {useQuasar} from "quasar";
 
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
+let dialogCreateTransaction = ref(false);
+const $q = useQuasar();
 
+const props = defineProps({
+  groupId: Number,
+  userId: Boolean,
+});
 
+function openDialogCreateTransaction(){
+  dialogCreateTransaction.value = true;
+  $q.dialog({
+    component: DialogCreateTransaction,
+
+    componentProps: {
+      isOpen: dialogCreateTransaction,
+      groupId: props.groupId,
+      userId: props.userId,
+    }
+  }).onOk(() => {
+    console.log('OK')
+  }).onCancel(() => {
+    console.log('Cancel')
+  }).onDismiss(() => {
+    dialogCreateTransaction.value = false;
+  })
+}
 </script>
 
 <template>
@@ -64,6 +90,7 @@ const transactionList = ref<Transaction[]>([]);
                 color="secondary"
                 icon-right="add"
                 label="Nouvelle transaction"
+                @click="openDialogCreateTransaction"
                 no-caps/>
             </div>
             <div class="row">
