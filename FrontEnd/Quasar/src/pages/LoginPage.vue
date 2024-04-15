@@ -208,7 +208,7 @@ async function loginGoogle() {
 
 .links * {
   text-decoration: none;
-  color: #4FA4BB;
+  color: #ffa31a;
 }
 
 .btn-log {

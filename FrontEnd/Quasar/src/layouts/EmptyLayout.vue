@@ -20,7 +20,7 @@
 
 <style>
 body{
-  background: #141332;
+  background: #1b1b1b;
   color: #ffff
 }
 </style>
