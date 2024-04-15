@@ -30,8 +30,8 @@ import sample_test_app.com.ui.screens.WeatherScreen
 import sample_test_app.com.ui.theme.SampleTestAppTheme
 import io.ktor.client.*
 import io.ktor.http.*
+import sample_test_app.com.ui.screens.GroupScreen
 import sample_test_app.com.ui.screens.ProfilScreen
-
 
 
 class MainActivity : ComponentActivity() {
@@ -60,6 +60,11 @@ fun AppNavHost() {
                 val userId = backStackEntry.arguments?.getString("userId") ?: ""
                 val jwtToken = backStackEntry.arguments?.getString("jwtToken") ?: ""
                 ProfilScreen(HttpClient(), userId, jwtToken)
+            }
+            composable("GroupDetailScreen/{groupId}/{jwtToken}") { backStackEntry ->
+                val groupId = backStackEntry.arguments?.getString("groupId") ?: ""
+                val jwtToken = backStackEntry.arguments?.getString("jwtToken") ?: ""
+                GroupScreen(groupId, HttpClient(), jwtToken)
             }
             composable("register") { RegisterScreen(navController , HttpClient()) }
             composable("home/{userId}/{jwtToken}") { backStackEntry ->

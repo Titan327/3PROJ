@@ -198,7 +198,9 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 8.dp)
+                        .clickable {
+                            navController.navigate("GroupScreen/${group}/$jwtToken")},
                     elevation = 4.dp
                 ) {
                     Row(

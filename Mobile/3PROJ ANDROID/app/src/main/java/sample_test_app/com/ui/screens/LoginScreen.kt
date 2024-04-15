@@ -50,6 +50,7 @@ import kotlinx.serialization.json.jsonPrimitive
 
 import sample_test_app.com.http.Security.JwtUtils.JwtUtils
 
+
 @OptIn(InternalAPI::class)
 @Composable
 fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
@@ -66,6 +67,11 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(id = sample_test_app.com.R.drawable.logobig),
+            contentDescription = null
+        )
+
         // Champ de texte "Username"
         TextField(
             value = usernameState.value,
