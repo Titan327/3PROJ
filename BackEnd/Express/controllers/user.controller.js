@@ -1,6 +1,7 @@
 const {genSalt, hash} = require("bcrypt");
 const User = require('../models/user.model');
 const UserController = require('./userGroup.controller');
+const UserGroupController = require('./userGroup.controller');
 const TransactionUserController = require('./transactionUser.controller');
 const Joi = require("joi");
 const UserMiddleware = require('../middlewares/user.middleware');
@@ -125,6 +126,7 @@ const deleteUser = async (req, res) => {
             where: { id: userId }
         });
         await UserController.deleteUserGroupRelationsWhenDeletingUser(req.params.userId);
+        await UserGroupController.deleteUserGroupRelationsWhenDeletingUser(req.params.userId);
         res.status(200).send({ message: "User deleted successfully"});
     } catch (e) {
         console.error(e);
