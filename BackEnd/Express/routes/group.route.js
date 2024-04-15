@@ -3,6 +3,7 @@ const GroupController = require('../controllers/group.controller');
 const UserGroupController = require('../controllers/userGroup.controller');
 const RefundController = require('../controllers/refund.controller');
 const securityMiddleware = require('../security/middleware.security');
+const PaymentMethodeController = require('../controllers/paymentMethode.controller');
 
 //PUBLIC
 //GET http://localhost:9002/api/group/{id}
@@ -18,5 +19,7 @@ router.put("/:groupId/favorite", securityMiddleware.verifyIsAuth, UserGroupContr
 
 //GET http://localhost:9002/api/group/{id}/user/{id}/debts
 router.get("/:groupId/user/:userId/debts", securityMiddleware.verifyIsAuth, RefundController.getUserDebtForOtherGroupsUsers);
+//GET http://localhost:9002/api/group/{id}/user/{id}/paymentMethode
+router.get("/:groupId/user/:userId/paymentMethode", securityMiddleware.verifyIsAuth, PaymentMethodeController.getPaymentMethode);
 
 module.exports = router;
