@@ -1,5 +1,6 @@
 const PaymentMethode = require('../models/paymentMethode.model');
 const UserGroup = require('../models/userGroup.model');
+const crypto = require('crypto');
 
 const getPaymentMethode = async (req, res) => {
     console.log(`REST getPaymentMethode`);
@@ -51,7 +52,18 @@ const createPaymentMethode = async (req, res) => {
     }
 }
 
+const test = async (req, res) => {
+    console.log("ici")
+
+    const aesKey = crypto.randomBytes(32);
+
+    console.log('Clé AES générée:', aesKey.toString('hex'));
+
+    res.status(200).send("ok")
+}
+
 module.exports = {
     getPaymentMethode,
-    createPaymentMethode
+    createPaymentMethode,
+    test,
 }
