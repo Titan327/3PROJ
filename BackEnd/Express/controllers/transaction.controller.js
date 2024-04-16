@@ -7,6 +7,9 @@ const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
     const {groupId, label, total_amount, date, receipt, senderId, categoryId, details} = req.body;
     try {
+        if (parseInt(senderId) !== parseInt(req.authorization.userId)) {
+            return res.status(403).send('You are not the sender of the transaction');
+        }
         let transaction = await Transaction.create({
             groupId,
             label,
@@ -19,7 +22,6 @@ const createTransaction = async (req, res) => {
 
         const detailsArray = Object.values(details);
         let totalDetailAmount = 0;
-        let currentUserTransactionAmount = 0;
 
         for (const detail of detailsArray) {
             totalDetailAmount += detail.amount;
@@ -38,20 +40,28 @@ const createTransaction = async (req, res) => {
 
         if (totalDetailAmount === total_amount) {
             for (const detail of detailsArray) {
-                const transactionUser = await TransactionUser.create({
+                await TransactionUser.create({
                     transactionId: transaction.id,
                     userId: detail.userId,
                     amount: detail.amount
                 });
-                if (transactionUser.userId === senderId) {
-                    currentUserTransactionAmount = transactionUser.amount;
+                let userGroup = await UserGroup.findOne({groupId, userId: detail.userId});
+                let newBalance;
+                if (parseInt(detail.userId) !== parseInt(senderId)) {
+                    newBalance = userGroup.balance - detail.amount;
+                } else {
+                    newBalance = userGroup.balance + total_amount - detail.amount;
                 }
+                await UserGroup.update(
+                    { balance: newBalance },
+                    {
+                        where: {
+                            groupId: groupId,
+                            userId: detail.userId
+                        }
+                    }
+                );
             }
-            let userGroup = await UserGroup.findOne({groupId, userId: senderId});
-            userGroup.balance += total_amount - currentUserTransactionAmount;
-            const group = await Group.findOne({where: {id: groupId}});
-            await Group.update({description: "updated"}, {where: {id: groupId}});
-            await Group.update({description: group.description}, {where: {id: groupId}});
             return res.status(201).send(transaction);
         } else {
             return res.status(400).send('The total amount of the transaction is not equal to the sum of the details');
@@ -65,8 +75,12 @@ const createTransaction = async (req, res) => {
 const getTransaction = async (req, res) => {
     console.log(`REST getTransaction`);
     try {
-        const transaction = await Transaction.findByPk(req.params.id);
-        if(transaction === null) {
+        const transaction = await Transaction.findByPk(req.params.id, {
+            include: [{
+                model: TransactionUser,
+                attributes: ['userId', 'amount']
+            }]
+        });        if(transaction === null) {
             return res.status(404).send('Transaction not found');
         }
         return res.status(200).send(transaction);

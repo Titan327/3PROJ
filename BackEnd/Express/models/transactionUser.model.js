@@ -29,11 +29,6 @@ const TransactionUserModel = sequelize.define("TransactionUser", {
     amount: {
         type: DataTypes.FLOAT,
         allowNull: false
-    },
-    refunded: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
     }
 });
 
@@ -41,6 +36,7 @@ const TransactionUserModel = sequelize.define("TransactionUser", {
 User.belongsToMany(Transaction, { through: TransactionUserModel, foreignKey: 'userId' });
 Transaction.belongsToMany(User, { through: TransactionUserModel, foreignKey: 'transactionId' });
 TransactionUserModel.belongsTo(Transaction, { foreignKey: 'transactionId' });
+Transaction.hasMany(TransactionUserModel, { foreignKey: 'transactionId' }); // Added this line
 
 sequelize.sync().then(() => {
     console.log('TransactionUser table created successfully!');
