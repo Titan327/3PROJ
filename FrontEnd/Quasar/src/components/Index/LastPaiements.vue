@@ -19,9 +19,14 @@ onMounted(async () => {
   console.log(transactionList.value);
 });
 
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.getMonth() + 1; // Ajouter 1 car les mois sont indexés à partir de 0
+  return `${day < 10 ? '0' : ''}${day}/${month < 10 ? '0' : ''}${month}`;
+};
+
 </script>
-
-
 <template>
   <q-card class="bloc-paye bg-accent">
     <q-card-section>
@@ -44,10 +49,6 @@ onMounted(async () => {
         <q-item-section>
           <q-item-label class="">Somme</q-item-label>
         </q-item-section>
-
-        <q-item-section>
-          <q-item-label class="">Statut</q-item-label>
-        </q-item-section>
       </q-item>
     </q-card-section>
     <q-separator/>
@@ -64,14 +65,11 @@ onMounted(async () => {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="text-h6">{{ transaction.Transaction.date }}</q-item-label>
+          <q-item-label class="text-h6">{{ formatDate(transaction.Transaction.date) }}</q-item-label>
         </q-item-section>
 
         <q-item-section>
           <q-item-label class="text-h6">{{ transaction.Transaction.total_amount }}</q-item-label>
-        </q-item-section>
-        <q-item-section>
-          <q-chip class="chip-status" color="green" text-color="white">Payé</q-chip>
         </q-item-section>
       </q-item>
     </q-card-section>
