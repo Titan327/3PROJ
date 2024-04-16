@@ -17,11 +17,11 @@ const $q = useQuasar();
 const route = useRoute();
 const groupId = route.params.id;
 let group = ref(DefaultGroup());
-let urlPhoto = ref('');
 let isPhotoHover = ref(false);
 let mounted = ref(false)
 let messageState = ref(false);
 let dialogModifyPp = ref(false);
+let newMessageNotification = ref(0);
 
 onMounted(async () => {
   await getGroup()
@@ -39,9 +39,11 @@ async function getGroup() {
   }
 }
 
-function isGroupFavorite(userId : number) {
-  return group.value.Users.some(user => user.userId === userId && user.UserGroup.favorite);
-}
+const isGroupFavorite = computed(() => {
+  return (userId: number) => {
+    return group.value.Users.some(user => user.userId === userId && user.UserGroup.favorite);
+  };
+});
 
 function  openCloseMessageDrawer(){
   messageState.value = !messageState.value;
@@ -52,6 +54,7 @@ function  closeMessageDrawer(){
 
 async function openDialogPP(){
 
+  newMessageNotification.value = 0;
   dialogModifyPp.value = true;
   $q.dialog({
     component: DialogUpdateImage,
@@ -65,10 +68,36 @@ async function openDialogPP(){
   })
 }
 
+async function addOrRemoveFav(id) {
+  const isFavorite = isGroupFavorite(id);
+  const favoriteValue = !isFavorite;
+
+  group.value.Users.forEach(user => {
+    if (user.userId === id) {
+      user.UserGroup.favorite = favoriteValue;
+    }
+  });
+
+  try {
+    await api.put(`group/${groupId}/favorite`, { favorite: favoriteValue });
+    $q.notify({
+      type: 'positive',
+      message: 'Ajouté aux favoris'
+    })
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du favori :', error);
+    $q.notify({
+      type: 'negative',
+      message: 'Une erreur s\'est produite'
+    })
+  }
+}
+
+
 </script>
 
 <template>
-  <message-drawer :groupId = groupId  :open = messageState @updateState="closeMessageDrawer"></message-drawer>
+  <message-drawer :groupId = groupId  :open = messageState @updateState="closeMessageDrawer" @messages="newMessageNotification+=1"></message-drawer>
   <q-page class="q-pa-md">
     <div class="div-first-last-name">
       <q-card class="transparent no-box-shadow">
@@ -80,21 +109,38 @@ async function openDialogPP(){
               @mouseleave ="isPhotoHover=false"
               size="200px"
             >
-              <img :src="urlPhoto ? urlPhoto[1] : 'assets/defaults/group-default.webp'">
+              <img :src="group.picture ? group.picture[1] : 'assets/defaults/group-default.webp'">
               <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                    v-if="isPhotoHover">
                 Modifier
               </div>
             </q-avatar>
           </div>
-          <q-card-section>
+          <q-card-section class="q-pa-xl">
             <q-item-label class="text-h4">{{group.name}}<q-icon
-              name="star"
+              name="edit"
+              class="q-ml-md"
               v-if="mounted"
-              :color="isGroupFavorite(User.id)? 'yellow' : 'grey'"
+              color="secondary"
               @click="console.log('star')"
               size="32px" /></q-item-label>
-            <q-item-label class="text-subtitle1">{{group.description}}</q-item-label>
+            <q-item-label class="text-subtitle1">{{group.description}}<q-icon
+              name="edit"
+              class="q-ml-md"
+              v-if="mounted"
+              color="secondary"
+              @click="console.log('star')"
+              size="18px" />
+            </q-item-label>
+            <q-btn class="btn-fav"
+                   no-caps
+                   v-if="mounted"
+                   color="secondary"
+                   :outline="isGroupFavorite(User.id)"
+                   @click="addOrRemoveFav(User.id)"
+                   rounded
+            >{{ isGroupFavorite(User.id)? 'Retirer des favoris' : 'Ajouter aux favoris' }}
+            </q-btn>
           </q-card-section>
         </q-card-section>
       </q-card>
@@ -116,6 +162,7 @@ async function openDialogPP(){
     <ActionsGroupTab :groupId = groupId :userId = groupId></ActionsGroupTab>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="message" color="secondary" @click="openCloseMessageDrawer"/>
+      <q-badge rounded floating color="red" v-if="newMessageNotification>0">{{newMessageNotification}}</q-badge>
     </q-page-sticky>
   </q-page>
 </template>
@@ -123,6 +170,14 @@ async function openDialogPP(){
 <style scoped>
 .overlapping{
   position: absolute ;
+}
+
+.text-h4{
+  margin-bottom: 10px;
+}
+
+.btn-fav{
+  margin-top: 30px;
 }
 
 @media screen and (max-width: 1200px) {

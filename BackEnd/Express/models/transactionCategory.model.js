@@ -14,10 +14,35 @@ const TransactionCategoryModel = sequelize.define("TransactionCategory", {
     },
 });
 
-sequelize.sync().then(() => {
-    console.log('TransactionCategoryModel table created successfully!');
-}).catch((error) => {
-    console.error('Unable to create table TransactionCategoryModel : ', error);
-});
+async function syncDatabase() {
+    try {
+        await sequelize.sync();
+        console.log('Base de données synchronisée.');
+
+        const count = await TransactionCategoryModel.count();
+        if (count === 0) {
+
+            await TransactionCategoryModel.bulkCreate([
+                { label: 'Alimentation' },
+                { label: 'Divertissement' },
+                { label: 'Voyages' },
+                { label: 'Cadeaux' },
+                { label: 'Courses' },
+                { label: 'Activités sportives' },
+                { label: 'Sorties' },
+                { label: 'Soins personnels' },
+                { label: 'Événements spéciaux' }
+
+            ]);
+            console.log('Données de base ajoutées avec succès.');
+        } else {
+            console.log('La table Test contient déjà des données.');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la synchronisation:', error);
+    }
+}
+
+syncDatabase();
 
 module.exports = TransactionCategoryModel;
