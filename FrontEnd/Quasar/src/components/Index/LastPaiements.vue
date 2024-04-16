@@ -5,9 +5,11 @@ import {api} from "boot/axios";
 import {getUser} from "stores/userStore";
 import {Transaction} from "src/interfaces/transactions.interface";
 import {DefaultUser} from "src/interfaces/user.interface";
+import {useRouter} from "vue-router";
 
 const transactionList = ref<Transaction[]>([]);
 const User = ref(DefaultUser());
+const router = useRouter();
 
 onMounted(async () => {
 
@@ -52,6 +54,10 @@ const formatDate = (dateString) => {
           <q-item-label class="">Somme</q-item-label>
         </q-item-section>
 
+        <q-item-section>
+          <q-item-label class="">Action</q-item-label>
+        </q-item-section>
+
       </q-item>
     </q-card-section>
     <q-separator/>
@@ -73,6 +79,10 @@ const formatDate = (dateString) => {
 
         <q-item-section>
           <q-item-label class="">{{ transaction.amount }}€</q-item-label>
+        </q-item-section>
+
+        <q-item-section>
+         <q-btn outline color="secondary" rounded  @click="router.push(`/group/${transaction.Transaction.groupId}`)">Consulter</q-btn>
         </q-item-section>
 
       </q-item>

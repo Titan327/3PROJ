@@ -17,7 +17,6 @@ const props = defineProps<{
   etat: EtatTotalPaidComponent;
 }>();
 
-
 onMounted(async () => {
   User.value = await getUser()
   try {
