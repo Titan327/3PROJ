@@ -22,7 +22,6 @@ router.get("/:userId/transactions/notRefunded", securityMiddleware.verifyIsAuthA
 router.get("/:userId/transactions/thisMonth", securityMiddleware.verifyIsAuthAndActivUser, UserController.getAmountOfAllUserTransactionsThisMonth);
 
 
-
 //GET http://localhost:9002/api/user/{id}
 router.get("/:userId", securityMiddleware.verifyIsAuthAndActivUser, UserController.getUser);
 //PUT http://localhost:9002/api/user/{id}

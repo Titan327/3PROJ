@@ -4,15 +4,16 @@ import {onMounted, ref } from "vue";
 import {api} from "boot/axios";
 import {getUser} from "stores/userStore";
 import {Transaction} from "src/interfaces/transactions.interface";
+import {DefaultUser} from "src/interfaces/user.interface";
 
 const transactionList = ref<Transaction[]>([]);
-
+const User = ref(DefaultUser());
 
 onMounted(async () => {
 
-  const userData = await getUser();
+  User.value = await getUser();
 
-  const response = await api.get(`user/${userData.id}/lastTransactions?limit=5`);
+  const response = await api.get(`user/${User.value.id}/lastTransactions?limit=5`);
 
   transactionList.value = response.data;
 
@@ -36,7 +37,7 @@ const formatDate = (dateString) => {
     <q-card-section>
       <q-item>
         <q-item-section avatar>
-          <q-avatar rounded text-color="white" icon="account_circle" />
+          <q-avatar rounded text-color="white" icon="group" />
         </q-item-section>
 
         <q-item-section>
@@ -50,6 +51,7 @@ const formatDate = (dateString) => {
         <q-item-section>
           <q-item-label class="">Somme</q-item-label>
         </q-item-section>
+
       </q-item>
     </q-card-section>
     <q-separator/>
@@ -57,7 +59,7 @@ const formatDate = (dateString) => {
       <q-item v-for="transaction in transactionList" :key="transaction.id">
         <q-item-section avatar>
           <q-avatar rounded color="secondary" text-color="white">
-            {{ transaction.Transaction.group.picture[0] }}
+            <img :src="transaction.Transaction.Group.picture ? `${transaction.Transaction.Group.picture}/100` : 'assets/defaults/group-default.webp'"/>
           </q-avatar>
         </q-item-section>
 
@@ -70,8 +72,9 @@ const formatDate = (dateString) => {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="">{{ transaction.Transaction.total_amount }}€</q-item-label>
+          <q-item-label class="">{{ transaction.amount }}€</q-item-label>
         </q-item-section>
+
       </q-item>
     </q-card-section>
     <q-card-section v-if="transactionList.length == 0">
