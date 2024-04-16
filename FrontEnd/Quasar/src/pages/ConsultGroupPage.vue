@@ -22,6 +22,7 @@ let isPhotoHover = ref(false);
 let mounted = ref(false)
 let messageState = ref(false);
 let dialogModifyPp = ref(false);
+let newMessageNotification = ref(0);
 
 onMounted(async () => {
   await getGroup()
@@ -52,6 +53,7 @@ function  closeMessageDrawer(){
 
 async function openDialogPP(){
 
+  newMessageNotification.value = 0;
   dialogModifyPp.value = true;
   $q.dialog({
     component: DialogUpdateImage,
@@ -68,7 +70,7 @@ async function openDialogPP(){
 </script>
 
 <template>
-  <message-drawer :groupId = groupId  :open = messageState @updateState="closeMessageDrawer"></message-drawer>
+  <message-drawer :groupId = groupId  :open = messageState @updateState="closeMessageDrawer" @messages="newMessageNotification+=1"></message-drawer>
   <q-page class="q-pa-md">
     <div class="div-first-last-name">
       <q-card class="transparent no-box-shadow">
@@ -116,6 +118,7 @@ async function openDialogPP(){
     <ActionsGroupTab :groupId = groupId :userId = groupId></ActionsGroupTab>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="message" color="secondary" @click="openCloseMessageDrawer"/>
+      <q-badge rounded floating color="red" v-if="newMessageNotification>0">{{newMessageNotification}}</q-badge>
     </q-page-sticky>
   </q-page>
 </template>
