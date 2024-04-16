@@ -57,7 +57,7 @@ const formatDate = (dateString) => {
       <q-item v-for="transaction in transactionList" :key="transaction.id">
         <q-item-section avatar>
           <q-avatar rounded color="secondary" text-color="white">
-            {{ transaction.Transaction.group.picture }}
+            {{ transaction.Transaction.group.picture[0] }}
           </q-avatar>
         </q-item-section>
 
@@ -70,7 +70,7 @@ const formatDate = (dateString) => {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="">{{ transaction.Transaction.total_amount }}</q-item-label>
+          <q-item-label class="">{{ transaction.Transaction.total_amount }}€</q-item-label>
         </q-item-section>
       </q-item>
     </q-card-section>
