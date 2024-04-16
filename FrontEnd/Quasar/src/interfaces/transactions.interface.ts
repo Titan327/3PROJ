@@ -29,10 +29,9 @@ export interface TransactionCreated {
   "categoryId": number,
   "details"?: [
     {
-    "detail0":{
       "userId": number,
       "amount": number
-    } }
+    }
   ]
 }
 

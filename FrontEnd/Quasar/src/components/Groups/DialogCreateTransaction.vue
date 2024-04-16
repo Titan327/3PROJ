@@ -24,7 +24,18 @@ const props = defineProps({
 
 onMounted(async () => {
   await getGroup();
+  await getCatOptn();
 });
+
+async function getCatOptn(){
+  try {
+    const response = await api.get(`/transactionCategory/`);
+    catOptn.value = response.data;
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
 
 const checkNotNull = (value) => {
   return !!value || "Champ Obligatoire";
@@ -40,7 +51,7 @@ async function createTransaction() {
         "date": new Date(),
         "receipt": "receipt test",
         "senderId": props.userId,
-        "categoryId": _transaction.value.categoryId,
+        "categoryId": _transaction.value.categoryId.id,
         "details": _transaction.value.details
       });
       if (response.data) {
@@ -65,10 +76,8 @@ function createDetail() {
   const detailList = [];
   group.value.Users.forEach(user => {
     detailList.push({
-      [`detail${user.id}`]: {
         "userId": user.id,
-        "amount": 0,
-      }
+        "amount": 10,
     });
   });
   _transaction.value.details = detailList;
@@ -87,18 +96,16 @@ async function getGroup() {
   }
 }
 
-function calculateTotal() {
-  let total = 0;
-  _transaction.value.details.forEach(detail => {
-    for (const key in detail) {
-      if (Object.hasOwnProperty.call(detail, key)) {
-        total += detail[key].amount;
-      }
+function calculateTotal(): number {
+  let totalAmount = 0;
+
+  if (_transaction.value.details && _transaction.value.details.length > 0) {
+    for (const detail of _transaction.value.details) {
+      totalAmount += detail.amount;
     }
-  });
-  _transaction.value.total_amount = total;
-  console.log(_transaction.value)
-  return total;
+  }
+  _transaction.value.total_amount = totalAmount;
+  return totalAmount;
 }
 
 </script>
@@ -129,11 +136,13 @@ function calculateTotal() {
                 outlined
                 class="cat"
                 v-model="_transaction.categoryId"
-                label="Description"
+                label="Catégorie"
                 dark
                 color="secondary"
                 autogrow
-                :options="['test','test']"
+                :option-value="catOptn => catOptn.id"
+                :option-label="catOptn => catOptn.label"
+                :options="catOptn"
                 :rules="[checkNotNull]"
                 hide-bottom-space
               />

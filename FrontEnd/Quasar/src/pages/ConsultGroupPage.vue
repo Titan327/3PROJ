@@ -142,15 +142,16 @@ async function editGroup() {
               </div>
             </q-avatar>
           </div>
-          <q-card-section class="q-pa-xl">
+          <q-card-section class="q-pa-xl" style="min-width: 600px">
             <q-input
-              class="input-group-name"
+              class="input-group-name text-h4"
               v-if="isEditGroupName"
               v-model="group.name"
               @blur="isEditGroupName = false"
               @keyup.enter="editGroup"
               dark
               dense
+              autofocus
               outlined
               color="secondary"
               rounded
@@ -164,13 +165,14 @@ async function editGroup() {
               @click="isEditGroupName = true"
               size="32px" /></q-item-label>
             <q-input
-              class="input-group-desc"
+              class="input-group-desc text-subtitle1"
               v-if="isEditGroupDesc"
               v-model="group.description"
               @blur="isEditGroupDesc = false"
               @keyup.enter="editGroup"
               dark
               outlined
+              autofocus
               dense
               color="secondary"
               rounded
@@ -178,7 +180,7 @@ async function editGroup() {
             </q-input>
             <q-item-label v-if="!isEditGroupDesc" class="text-subtitle1">{{group.description}}<q-icon
               name="edit"
-              class="q-ml-md"
+              class="q-ml-md text-subtitle1"
               v-if="mounted"
               color="secondary"
               @click="isEditGroupDesc = true"
