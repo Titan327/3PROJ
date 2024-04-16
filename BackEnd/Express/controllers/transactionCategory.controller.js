@@ -1,4 +1,4 @@
-const TransactionCategory = require('../models/TransactionCategory.model');
+const TransactionCategory = require('../models/transactionCategory.model');
 
 const getAllTrasactionCategory = async (req, res) => {
     try {
