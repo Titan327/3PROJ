@@ -22,8 +22,9 @@ onMounted(async () => {
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   const day = date.getDate();
-  const month = date.getMonth() + 1; // Ajouter 1 car les mois sont indexés à partir de 0
-  return `${day < 10 ? '0' : ''}${day}/${month < 10 ? '0' : ''}${month}`;
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${day < 10 ? '0' : ''}${day}/${month < 10 ? '0' : ''}${month}/${year}`;
 };
 
 </script>
@@ -61,15 +62,15 @@ const formatDate = (dateString) => {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="text-h6">{{ transaction.Transaction.id}}</q-item-label>
+          <q-item-label class="">{{ transaction.Transaction.label}}</q-item-label>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="text-h6">{{ formatDate(transaction.Transaction.date) }}</q-item-label>
+          <q-item-label class="">{{ formatDate(transaction.Transaction.date) }}</q-item-label>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="text-h6">{{ transaction.Transaction.total_amount }}</q-item-label>
+          <q-item-label class="">{{ transaction.Transaction.total_amount }}</q-item-label>
         </q-item-section>
       </q-item>
     </q-card-section>
