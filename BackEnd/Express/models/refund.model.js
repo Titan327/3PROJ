@@ -1,6 +1,6 @@
 const { DataTypes, Transaction} = require('sequelize');
 const sequelize = require('../configurations/db.config')
-const TransactionUserModel = require('./transactionUser.model');
+const GroupModel = require('./group.model');
 const UserModel = require('./user.model');
 
 const RefundModel = sequelize.define("Refund", {
@@ -10,7 +10,7 @@ const RefundModel = sequelize.define("Refund", {
         autoIncrement: true,
         allowNull: false
     },
-    transactionId: {
+    groupId: {
         type: DataTypes.BIGINT,
         allowNull: false
     },
@@ -28,8 +28,8 @@ const RefundModel = sequelize.define("Refund", {
     },
 });
 
-// Relation avec les users & userTransaction
-RefundModel.belongsTo(TransactionUserModel, { foreignKey: 'transactionId' });
+// Relation avec les users & userTransaction & group
+RefundModel.belongsTo(GroupModel, { foreignKey: 'groupId' });
 RefundModel.belongsTo(UserModel, { foreignKey: 'refundingUserId' });
 RefundModel.belongsTo(UserModel, { foreignKey: 'refundedUserId' });
 
