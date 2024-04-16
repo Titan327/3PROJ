@@ -17,8 +17,6 @@ const TransactionCategoryModel = sequelize.define("TransactionCategory", {
 async function syncDatabase() {
     try {
         await sequelize.sync();
-        console.log('Base de données synchronisée.');
-
         const count = await TransactionCategoryModel.count();
         if (count === 0) {
 
@@ -36,7 +34,7 @@ async function syncDatabase() {
             ]);
             console.log('Données de base ajoutées avec succès.');
         } else {
-            console.log('La table Test contient déjà des données.');
+            console.log('La table TransactionCategoryModel contient déjà des données.');
         }
     } catch (error) {
         console.error('Erreur lors de la synchronisation:', error);
