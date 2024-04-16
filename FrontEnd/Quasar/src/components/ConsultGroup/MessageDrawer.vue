@@ -113,7 +113,7 @@ function getSenderPicture(id:number){
   const defaultAvatarUrl = 'assets/defaults/user-default.webp';
   const profilePictureUrl = senders.value.find(sender => sender.UserGroup.userId == id)?.profile_picture;
 
-  return `${profilePictureUrl ? profilePictureUrl + '/100' : defaultAvatarUrl}`;
+  return `${profilePictureUrl ? profilePictureUrl[0] : defaultAvatarUrl}`;
 }
 
 function getSenderPseudo(id:number){

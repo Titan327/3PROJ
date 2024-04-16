@@ -57,7 +57,17 @@ const userFirstName = ref('');
 .text-h4{
   margin: 10px 50px;
 }
-@media (max-width: 900px) {
+
+@media (max-width: 1900px) {
+  .group-1{
+    width: 55%;
+  }
+  .group-2{
+    width: 35%;
+  }
+}
+
+@media (max-width: 1300px) {
   .group-1{
     width: 90%;
   }

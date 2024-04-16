@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {disconnectUser, getUser} from "stores/userStore";
 import {useRouter} from "vue-router";
 
@@ -9,8 +9,9 @@ const router = useRouter();
 const userString = ref('');
 const pictureUrl = ref('');
 
+let width = ref(350);
 
-(async () => {
+onMounted(async () => {
   const userData = await getUser();
   if (userData != null) {
     userString.value = `${userData.firstname} ${userData.lastname}`;
@@ -18,7 +19,12 @@ const pictureUrl = ref('');
       pictureUrl.value = userData.profile_picture[0];
     }
   }
-})();
+
+  //if(window.innerWidth < 600){
+    //width.value = 600;
+    //drawer.value = true;
+  //}
+});
 
 function disconnect(){
   disconnectUser()
@@ -30,7 +36,7 @@ function disconnect(){
 <template>
   <q-drawer
     v-model="drawer"
-    :width="350"
+    :width="width"
     mini-width="250"
     elevated
     class="bg-primary text-white border-radius">
@@ -124,7 +130,18 @@ function disconnect(){
 }
 
 .disconnect-user{
-background-color: #171733;
+background-color: #1b1b1b;
+}
+
+@media (max-height: 920px) {
+  .user-drawer{
+    margin-top: 30vh;
+  }
+}
+@media (max-height: 720px) {
+  .user-drawer{
+    margin-top: 20vh;
+  }
 }
 
 </style>

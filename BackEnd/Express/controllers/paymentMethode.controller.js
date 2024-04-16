@@ -21,6 +21,12 @@ const getPaymentMethode = async (req, res) => {
             if (paymentMethodes === null) {
                 return res.status(404).send({ error: "Payment methode not found" });
             }
+            const key = process.env.AES_PAYEMENT_KEY;
+            const aesKey = Buffer.from(key, 'hex');
+            const decipher = crypto.createDecipheriv('aes-256-cbc', aesKey, iv);
+            let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
+            decryptedData += decipher.final('utf8');
+
             return res.status(200).send(paymentMethodes);
         }
     } catch (e) {
@@ -40,10 +46,18 @@ const createPaymentMethode = async (req, res) => {
         } else if(PaymentMethode.findOne({ where: { userId: userId, type: type, value: value } })) {
             return res.status(409).send({ error: "Payment methode already exists" });
         }
+
+        const key = process.env.AES_PAYEMENT_KEY;
+        const aesKey = Buffer.from(key, 'hex');
+        const iv = crypto.randomBytes(16);
+        const cipher = crypto.createCipheriv('aes-256-cbc', aesKey, iv);
+        let encryptedData = cipher.update(plaintext, 'utf8', 'hex');
+        encryptedData += cipher.final('hex');
+
         await PaymentMethode.create({
             userId,
             type,
-            value
+            encryptedData
         });
         res.status(201).send({ message: "Payment methode created successfully" });
     } catch (e) {
@@ -53,8 +67,6 @@ const createPaymentMethode = async (req, res) => {
 }
 
 const test = async (req, res) => {
-    console.log("ici")
-
     const aesKey = crypto.randomBytes(32);
 
     console.log('Clé AES générée:', aesKey.toString('hex'));

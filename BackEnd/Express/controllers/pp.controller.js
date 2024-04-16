@@ -83,7 +83,7 @@ const uploadGroupPic = async (req, res) => {
                     id: groupId,
                 },
             });
-            existing.picture = process.env.APP_URL+"/api/img/group-picture/"+groupId;
+            existing.picture = process.env.APP_URL+"api/img/group-picture/"+groupId;
             await existing.save();
 
             return res.status(200).json({ message: 'photo de groupe upload' });

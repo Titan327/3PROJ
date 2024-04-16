@@ -15,6 +15,7 @@ let User = ref(DefaultUser());
 let group = ref(DefaultGroup());
 const _transaction = ref(DefaultTransactionCreated());
 const catOptn = ref([]);
+let mounted = ref(false);
 
 const props = defineProps({
   groupId: Number,
@@ -22,8 +23,7 @@ const props = defineProps({
 });
 
 onMounted(async () => {
-
-  await getGroup()
+  await getGroup();
 });
 
 const checkNotNull = (value) => {
@@ -41,24 +41,7 @@ async function createTransaction() {
         "receipt": "receipt test",
         "senderId": props.userId,
         "categoryId": _transaction.value.categoryId,
-        "details":
-          {
-            "detail1":
-              {
-                "userId": 1,
-                "amount": 73
-              },
-            "detail2":
-              {
-                "userId": 2,
-                "amount": 50
-              },
-            "detail3":
-              {
-                "userId": 3,
-                "amount": 77
-              }
-          }
+        "details": _transaction.value.details
       });
       if (response.data) {
         $q.notify({
@@ -84,7 +67,7 @@ function createDetail() {
     detailList.push({
       [`detail${user.id}`]: {
         "userId": user.id,
-        "amount": 0
+        "amount": 0,
       }
     });
   });
@@ -97,11 +80,27 @@ async function getGroup() {
     const response = await api.get(`/group/${props.groupId}`);
     group.value = response.data;
     createDetail();
+    mounted.value = true;
   }
   catch (error) {
     console.error(error);
   }
 }
+
+function calculateTotal() {
+  let total = 0;
+  _transaction.value.details.forEach(detail => {
+    for (const key in detail) {
+      if (Object.hasOwnProperty.call(detail, key)) {
+        total += detail[key].amount;
+      }
+    }
+  });
+  _transaction.value.total_amount = total;
+  console.log(_transaction.value)
+  return total;
+}
+
 </script>
 
 
@@ -147,7 +146,7 @@ async function getGroup() {
                   <q-item clickable v-ripple>
                     <q-item-section avatar>
                       <q-avatar>
-                      <img :src="user.profile_picture ? `${user.profile_picture}/100` : 'assets/defaults/user-default.webp'"/>
+                      <img :src="user.profile_picture ? `${user.profile_picture[0]}` : 'assets/defaults/user-default.webp'"/>
                       </q-avatar>
                     </q-item-section>
 
@@ -156,18 +155,20 @@ async function getGroup() {
                     <q-input
                       type="number"
                       outlined
-                      v-model="_transaction.details[`detail${user.id}`].amount"
+                      :v-model="_transaction.details.find(detail => detail.userId === userId)"
                       label="Montant"
                       dark
                       color="secondary"
                       suffix="€"
+                      @update:model-value="calculateTotal()"
                     />
                   </q-item>
                 </div>
               </q-scroll-area>
             </q-list>
           </div>
-          <div class="q-mx-auto div-total">
+          <div class="q-mx-auto div-total row">
+            <q-space></q-space>
          <q-item-label class="text-h6">   Total: {{_transaction.total_amount}} €</q-item-label>
           </div>
           <div class="inputs row">

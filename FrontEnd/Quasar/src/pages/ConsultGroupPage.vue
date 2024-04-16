@@ -9,6 +9,7 @@ import {api} from "boot/axios";
 import MessageDrawer from "components/ConsultGroup/MessageDrawer.vue";
 import {DefaultGroup} from "src/interfaces/group.interface";
 import ActionsGroupTab from "components/Groups/ActionsGroupTab.vue";
+import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 
 const router = useRouter();
 let User = ref(DefaultUser());
@@ -20,9 +21,9 @@ let urlPhoto = ref('');
 let isPhotoHover = ref(false);
 let mounted = ref(false)
 let messageState = ref(false);
+let dialogModifyPp = ref(false);
 
 onMounted(async () => {
-
   await getGroup()
   mounted.value=true;
 });
@@ -49,6 +50,21 @@ function  closeMessageDrawer(){
   messageState.value = false;
 }
 
+async function openDialogPP(){
+
+  dialogModifyPp.value = true;
+  $q.dialog({
+    component: DialogUpdateImage,
+
+    componentProps: {
+      isOpen: dialogModifyPp,
+      groupId: groupId,
+    }
+  }).onDismiss(() => {
+    window.location.reload();
+  })
+}
+
 </script>
 
 <template>
@@ -59,12 +75,12 @@ function  closeMessageDrawer(){
         <q-card-section horizontal>
           <div class="q-pa-md q-gutter-sm">
             <q-avatar
-              @click="console.log('change img')"
+              @click="openDialogPP"
               @mouseenter ="isPhotoHover=true"
               @mouseleave ="isPhotoHover=false"
               size="200px"
             >
-              <img :src="urlPhoto ? urlPhoto : 'assets/defaults/group-default.webp'">
+              <img :src="urlPhoto ? urlPhoto[1] : 'assets/defaults/group-default.webp'">
               <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                    v-if="isPhotoHover">
                 Modifier
@@ -94,7 +110,7 @@ function  closeMessageDrawer(){
         class="overlapping"
         :style="{ left: index * 25 + 'px' }"
       >
-        <img :src="user.profile_picture ? `${user.profile_picture}/100` : 'assets/defaults/user-default.webp'">
+        <img :src="user.profile_picture ? `${user.profile_picture[0]}` : 'assets/defaults/user-default.webp'">
       </q-avatar>
     </div>
     <ActionsGroupTab :groupId = groupId :userId = groupId></ActionsGroupTab>
