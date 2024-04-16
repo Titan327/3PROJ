@@ -17,7 +17,6 @@ const $q = useQuasar();
 const route = useRoute();
 const groupId = route.params.id;
 let group = ref(DefaultGroup());
-let urlPhoto = ref('');
 let isPhotoHover = ref(false);
 let mounted = ref(false)
 let messageState = ref(false);
@@ -82,7 +81,7 @@ async function openDialogPP(){
               @mouseleave ="isPhotoHover=false"
               size="200px"
             >
-              <img :src="urlPhoto ? urlPhoto[1] : 'assets/defaults/group-default.webp'">
+              <img :src="group.picture ? group.picture[1] : 'assets/defaults/group-default.webp'">
               <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                    v-if="isPhotoHover">
                 Modifier
