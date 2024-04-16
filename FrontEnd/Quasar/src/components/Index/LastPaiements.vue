@@ -37,7 +37,7 @@ const formatDate = (dateString) => {
     <q-card-section>
       <q-item>
         <q-item-section avatar>
-          <q-avatar rounded text-color="white" icon="group" />
+          <q-avatar round text-color="white" icon="group" />
         </q-item-section>
 
         <q-item-section>
@@ -58,7 +58,7 @@ const formatDate = (dateString) => {
     <q-card-section v-if="transactionList.length > 0">
       <q-item v-for="transaction in transactionList" :key="transaction.id">
         <q-item-section avatar>
-          <q-avatar rounded color="secondary" text-color="white">
+          <q-avatar round color="secondary" text-color="white">
             <img :src="transaction.Transaction.Group.picture ? `${transaction.Transaction.Group.picture}/100` : 'assets/defaults/group-default.webp'"/>
           </q-avatar>
         </q-item-section>
