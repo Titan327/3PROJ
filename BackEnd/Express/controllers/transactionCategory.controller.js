@@ -12,6 +12,7 @@ const getAllTrasactionCategory = async (req, res) => {
     }
 }
 
+
 module.exports = {
     getAllTrasactionCategory
 }
