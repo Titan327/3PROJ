@@ -27,6 +27,7 @@ const paymentMethodeModel = sequelize.define("PaymentMethode", {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
+            /*
             isValid(value) {
                 if (this.type === 'Paypal email') {
                     const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
@@ -40,6 +41,7 @@ const paymentMethodeModel = sequelize.define("PaymentMethode", {
                     }
                 }
             }
+            */
         }
     },
 });

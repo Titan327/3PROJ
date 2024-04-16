@@ -21,13 +21,28 @@ const getPaymentMethode = async (req, res) => {
             if (paymentMethodes === null) {
                 return res.status(404).send({ error: "Payment methode not found" });
             }
-            const key = process.env.AES_PAYEMENT_KEY;
-            const aesKey = Buffer.from(key, 'hex');
-            const decipher = crypto.createDecipheriv('aes-256-cbc', aesKey, iv);
-            let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
-            decryptedData += decipher.final('utf8');
 
-            return res.status(200).send(paymentMethodes);
+            //console.log(typeof paymentMethodes)
+
+            var result = [];
+
+            paymentMethodes.forEach(
+                methode => {
+                    const crypt = methode.value.split(':');
+                    // recup iv
+                    const iv = Buffer.from(crypt.shift(), 'hex');
+                    const encryptedText = Buffer.from(crypt.join(':'), 'hex');
+                    // decrypt
+                    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(process.env.AES_PAYEMENT_KEY,'hex'), iv);
+                    let decrypted = decipher.update(encryptedText);
+                    decrypted = Buffer.concat([decrypted, decipher.final()]);
+                    const decrypt = decrypted.toString();
+
+                    result.push({[methode.type]:decrypt});
+                }
+            )
+
+            return res.status(200).send(result);
         }
     } catch (e) {
         console.error(e);
@@ -43,21 +58,27 @@ const createPaymentMethode = async (req, res) => {
     try {
         if (!type || !value) {
             return res.status(400).send({ error: "Missing type or value" });
-        } else if(PaymentMethode.findOne({ where: { userId: userId, type: type, value: value } })) {
+        } else if(await PaymentMethode.findOne({ where: { userId: userId, type: type, value: value } })) {
             return res.status(409).send({ error: "Payment methode already exists" });
         }
 
         const key = process.env.AES_PAYEMENT_KEY;
-        const aesKey = Buffer.from(key, 'hex');
+        console.log('Longueur de la clé:', key.length);
+        console.log('Type de la clé:', typeof key);
+
+        // creation de iv (comme le salt)
         const iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipheriv('aes-256-cbc', aesKey, iv);
-        let encryptedData = cipher.update(plaintext, 'utf8', 'hex');
-        encryptedData += cipher.final('hex');
+        // creation du chiffreur (cipher)
+        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(process.env.AES_PAYEMENT_KEY,'hex'), iv);
+        // chiffrage
+        let encrypted = cipher.update(value);
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
+        value = iv.toString('hex') + ':' + encrypted.toString('hex');
 
         await PaymentMethode.create({
             userId,
             type,
-            encryptedData
+            value
         });
         res.status(201).send({ message: "Payment methode created successfully" });
     } catch (e) {
