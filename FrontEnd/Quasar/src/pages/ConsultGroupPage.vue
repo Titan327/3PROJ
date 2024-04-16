@@ -23,6 +23,9 @@ let messageState = ref(false);
 let dialogModifyPp = ref(false);
 let newMessageNotification = ref(0);
 
+let isEditGroupName = ref(false);
+let isEditGroupDesc = ref(false);
+
 onMounted(async () => {
   await getGroup()
   mounted.value=true;
@@ -93,6 +96,29 @@ async function addOrRemoveFav(id) {
   }
 }
 
+async function editGroup() {
+
+  isEditGroupDesc.value = false;
+  isEditGroupName.value = false;
+
+  try {
+    await api.put(`group/${groupId}/`, {
+      name: group.value.name,
+      description: group.value.description
+    });
+    $q.notify({
+      type: 'positive',
+      message: 'Modifié avec succès'
+    })
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du groupe :', error);
+    $q.notify({
+      type: 'negative',
+      message: 'Une erreur s\'est produite'
+    })
+  }
+}
+
 
 </script>
 
@@ -117,21 +143,56 @@ async function addOrRemoveFav(id) {
             </q-avatar>
           </div>
           <q-card-section class="q-pa-xl">
-            <q-item-label class="text-h4">{{group.name}}<q-icon
+            <q-input
+              class="input-group-name"
+              v-if="isEditGroupName"
+              v-model="group.name"
+              @blur="isEditGroupName = false"
+              @keyup.enter="editGroup"
+              dark
+              dense
+              outlined
+              color="secondary"
+              rounded
+              label="Nom du groupe">
+            </q-input>
+            <q-item-label v-if="!isEditGroupName" class="text-h4">{{group.name}}<q-icon
               name="edit"
               class="q-ml-md"
               v-if="mounted"
               color="secondary"
-              @click="console.log('star')"
+              @click="isEditGroupName = true"
               size="32px" /></q-item-label>
-            <q-item-label class="text-subtitle1">{{group.description}}<q-icon
+            <q-input
+              class="input-group-desc"
+              v-if="isEditGroupDesc"
+              v-model="group.description"
+              @blur="isEditGroupDesc = false"
+              @keyup.enter="editGroup"
+              dark
+              outlined
+              dense
+              color="secondary"
+              rounded
+              label="Description">
+            </q-input>
+            <q-item-label v-if="!isEditGroupDesc" class="text-subtitle1">{{group.description}}<q-icon
               name="edit"
               class="q-ml-md"
               v-if="mounted"
               color="secondary"
-              @click="console.log('star')"
+              @click="isEditGroupDesc = true"
               size="18px" />
             </q-item-label>
+            <q-btn class="btn-fav"
+                   no-caps
+                   v-if="isEditGroupDesc || isEditGroupName"
+                   color="positive"
+                   @click="editGroup"
+                   rounded
+            >Sauvegarder les modifications
+            </q-btn>
+            <br>
             <q-btn class="btn-fav"
                    no-caps
                    v-if="mounted"
@@ -175,10 +236,17 @@ async function addOrRemoveFav(id) {
 .text-h4{
   margin-bottom: 10px;
 }
+.input-group-name{
+  width: 100%;
+}
+.input-group-desc{
+  width: 100%;
+}
 
 .btn-fav{
   margin-top: 30px;
 }
+
 
 @media screen and (max-width: 1200px) {
   .paiement{
