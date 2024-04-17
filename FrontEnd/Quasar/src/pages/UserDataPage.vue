@@ -165,7 +165,7 @@ async function changeUserData(){
                 @mouseleave ="isPhotoHover=false"
                 size="200px"
               >
-                <img :src="User.profile_picture ? User.profile_picture[1] : 'assets/defaults/user-default.webp'">
+                <img :src="User.profile_picture ? User.profile_picture[2] : 'assets/defaults/user-default.webp'">
                 <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                 v-if="isPhotoHover">
                   Modifier
