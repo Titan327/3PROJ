@@ -4,30 +4,71 @@ import { defineProps, onMounted, ref } from "vue";
 import {Group} from "src/interfaces/group.interface";
 import {getUser} from "stores/userStore";
 import {api} from "boot/axios";
+import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
+import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue";
+import {DefaultUser} from "src/interfaces/user.interface";
+import {useQuasar} from "quasar";
+import {DefaultPaymentMethod} from "src/interfaces/paymentMethod.interface";
 
-
-const userData = ref(getUser());
 const  slide = ref('slide-0');
-const paiementsMethod = ref(['carte1','carte2'])
+const paiementsMethod = ref([DefaultPaymentMethod(),DefaultPaymentMethod(),DefaultPaymentMethod()]);
+let dialogIsOpen = ref(false);
+let User = ref(DefaultUser());
+const $q = useQuasar();
+let mounted = ref(false);
 
-onMounted(() => {
-  console.log("payment mounted")
+onMounted(async () => {
+  User.value = await getUser();
+  mounted.value=true;
+  getMethod();
 });
 
+async function getMethod(){
+  try {
+    console.log(paiementsMethod.value)
+    //const response = await api.get(`/user/${User.value.id}/paymentMethode`)
+    //paiementsMethod.value = response.data
+  }
+  catch(e){
+    console.error(e)
+  }
+}
+
+
+async function openDialgAddPayment(type:string){
+
+  dialogIsOpen.value = true;
+  $q.dialog({
+    component: DialogAddPaymentMethod,
+
+    componentProps: {
+      isOpen: dialogIsOpen,
+      userId: User.value.id,
+      type: type
+    }
+  }).onDismiss(() => {
+    getMethod();
+  })
+}
+
+const redirectToPaypal = (username:string) => {
+  window.open(`https://paypal.me/${username}`, '_blank');
+};
 </script>
 
 
 <template>
 
-  <q-card class="bloc-paye bg-accent">
+  <q-card class="bloc-paye bg-accent" style="height: 500px" v-if="mounted">
     <q-card-section
-      class="q-mx-auto flex">
+      class="q-pa-md row">
       <h3 class="text-h6">Moyens de paiement</h3>
       <q-btn
-        class="btn"
+        class="btn q-mx-auto"
         unelevated color="secondary"
         label="+"
         round
+        @click="openDialgAddPayment('RIB')"
       />
     </q-card-section>
     <q-card-section
@@ -39,7 +80,7 @@ onMounted(() => {
         control-color="secondary"
         navigation
         arrows
-        height="250px"
+        style="max-height: 350px"
         class="text-purple rounded-borders caroussel bg-accent q-mx-auto"
       >
           <q-carousel-slide
@@ -48,9 +89,17 @@ onMounted(() => {
             :name="`slide-${index}`"
           >
             <q-card class="method rounded-borders">
-              <q-img src="/assets/card/paypal-card.webp" class="rounded-borders">
-                <div class="absolute-bottom text-subtitle2 text-center">
-                  {{ paiement }}
+              <q-img
+                :src="paiement.type === 'Paypal' ? '/assets/card/paypal-card.webp' : '/assets/card/rib-card.webp'"
+                class="rounded-borders"
+              >
+                <div class="absolute-bottom text-subtitle2 row">
+                  <q-item-label class="q-pa-xs">@{{paiement.value}}</q-item-label>
+                  <q-space></q-space>
+                  <q-item-label class="text-h6" v-if="paiement.type=='Paypal'">
+                    <q-icon name="open_in_new" @click="redirectToPaypal(paiement.value)" style="cursor: pointer;"
+                    />
+                  </q-item-label>
                 </div>
               </q-img>
             </q-card>
@@ -60,9 +109,31 @@ onMounted(() => {
     </q-card-section>
     <q-card-section
       v-if="paiementsMethod.length == 0"
-      class="q-mx-auto">
+      class="q-mx-auto q-pa-md">
 
-      Vous n'avez aucun moyen de paiement enregistré
+      <div class="q-mx-auto q-pa-md column">
+        <q-item-label class="btn-no-payment text-h6">
+          Vous n'avez aucun moyen de paiement enregistré
+        </q-item-label>
+
+        <q-btn
+          class="btn-no-payment q-pa-md"
+          rounded
+          color="secondary"
+          @click="openDialgAddPayment('PayPal')"
+        >
+          Ajouter PayPal
+        </q-btn>
+        <q-space></q-space>
+        <q-btn
+          rounded
+          color="secondary"
+          @click="openDialgAddPayment('RIB')"
+          class="btn-no-payment q-pa-md">
+          Ajouter RIB
+        </q-btn>
+      </div>
+
     </q-card-section>
   </q-card>
 </template>
@@ -83,6 +154,12 @@ onMounted(() => {
   width: 100%;
 }
 .btn{
-  margin: 20px;
+  margin: auto 10px;
+}
+
+.btn-no-payment{
+  margin: 30px auto;
+  width: 80%;
+  text-align: center;
 }
 </style>

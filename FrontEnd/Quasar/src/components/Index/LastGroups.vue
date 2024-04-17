@@ -29,20 +29,14 @@ onMounted(async () => {
     </q-card-section>
     <q-card-section>
       <div class="q-gutter-md q-ml-none">
-        <q-btn
-          v-for="group in groupList" :key="group.id"
-          rounded
-          flat
-          @click="router.push(`/group/${group.id}`)"
-        >
-          <q-avatar
+        <q-avatar
+            v-for="group in groupList" :key="group.id"
             size="100px"
+            @click="router.push(`/group/${group.id}`)"
           >
             <img :src="group.picture ? group.picture+'/200' : 'assets/defaults/group-default.webp'">
             <q-badge color="red" rounded floating >{{group.id}}</q-badge>
-
           </q-avatar>
-        </q-btn>
       </div>
     </q-card-section>
     <q-separator/>
