@@ -31,7 +31,7 @@ onMounted(async () => {
       displayColor.value = 'green';
       titleText.value = 'Total payé ce mois-ci';
       icon.value = 'south_west';
-      const response = await api.get(`user/${userData.value.id}/transactions/thisMonth`);
+      const response = await api.get(`user/${User.value.id}/transactions/thisMonth`);
       montantTotal.value = response.data.amount;
       operations.value = response.data.transactions;
     }
