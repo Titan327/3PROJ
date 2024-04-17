@@ -40,27 +40,29 @@ const createTransaction = async (req, res) => {
 
         if (totalDetailAmount === total_amount) {
             for (const detail of detailsArray) {
-                await TransactionUser.create({
-                    transactionId: transaction.id,
-                    userId: detail.userId,
-                    amount: detail.amount
-                });
-                let userGroup = await UserGroup.findOne({groupId, userId: detail.userId});
-                let newBalance;
-                if (parseInt(detail.userId) !== parseInt(senderId)) {
-                    newBalance = userGroup.balance - detail.amount;
-                } else {
-                    newBalance = userGroup.balance + total_amount - detail.amount;
-                }
-                await UserGroup.update(
-                    { balance: newBalance },
-                    {
-                        where: {
-                            groupId: groupId,
-                            userId: detail.userId
-                        }
+                if (detail.amount > 0) {
+                    await TransactionUser.create({
+                        transactionId: transaction.id,
+                        userId: detail.userId,
+                        amount: detail.amount
+                    });
+                    let userGroup = await UserGroup.findOne({groupId, userId: detail.userId});
+                    let newBalance;
+                    if (parseInt(detail.userId) !== parseInt(senderId)) {
+                        newBalance = userGroup.balance - detail.amount;
+                    } else {
+                        newBalance = userGroup.balance + total_amount - detail.amount;
                     }
-                );
+                    await UserGroup.update(
+                        { balance: newBalance },
+                        {
+                            where: {
+                                groupId: groupId,
+                                userId: detail.userId
+                            }
+                        }
+                    );
+                }
             }
             return res.status(201).send(transaction);
         } else {
