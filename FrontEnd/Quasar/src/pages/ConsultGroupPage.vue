@@ -222,7 +222,7 @@ async function editGroup() {
         <img :src="user.profile_picture ? `${user.profile_picture[0]}` : 'assets/defaults/user-default.webp'">
       </q-avatar>
     </div>
-    <ActionsGroupTab :groupId = groupId :userId = groupId></ActionsGroupTab>
+    <ActionsGroupTab :groupId = groupId :userId = User.id></ActionsGroupTab>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="message" color="secondary" @click="openCloseMessageDrawer"/>
       <q-badge rounded floating color="red" v-if="newMessageNotification>0">{{newMessageNotification}}</q-badge>

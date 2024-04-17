@@ -77,7 +77,7 @@ function createDetail() {
   group.value.Users.forEach(user => {
     detailList.push({
         "userId": user.id,
-        "amount": 10,
+        "amount": 0,
     });
   });
   _transaction.value.details = detailList;
@@ -101,7 +101,7 @@ function calculateTotal(): number {
 
   if (_transaction.value.details && _transaction.value.details.length > 0) {
     for (const detail of _transaction.value.details) {
-      totalAmount += detail.amount;
+      totalAmount += Number(detail.amount);
     }
   }
   _transaction.value.total_amount = totalAmount;
@@ -139,7 +139,6 @@ function calculateTotal(): number {
                 label="Catégorie"
                 dark
                 color="secondary"
-                autogrow
                 :option-value="catOptn => catOptn.id"
                 :option-label="catOptn => catOptn.label"
                 :options="catOptn"
@@ -162,9 +161,9 @@ function calculateTotal(): number {
                     <q-item-section>{{user.username}}</q-item-section>
 
                     <q-input
-                      type="number"
+                      mask="##.##"
                       outlined
-                      :v-model="_transaction.details.find(detail => detail.userId === userId)"
+                      v-model.number="_transaction.details.find(detail => detail.userId === user.id).amount"
                       label="Montant"
                       dark
                       color="secondary"
