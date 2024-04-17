@@ -42,7 +42,6 @@ onMounted(async () => {
 </script>
 
 
-
 <template>
 
   <q-card class="bloc-paye bg-accent">

@@ -2,6 +2,7 @@ const Transaction = require('../models/transaction.model');
 const TransactionUser = require('../models/transactionUser.model');
 const UserGroup = require('../models/userGroup.model');
 const Group = require('../models/group.model');
+const {where} = require("sequelize");
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
@@ -49,8 +50,13 @@ const createTransaction = async (req, res) => {
                         userId: detail.userId,
                         amount: detail.amount
                     });
-                    let userGroup = await UserGroup.findOne({groupId, userId: detail.userId});
-                    let newBalance;
+                    let userGroup = await UserGroup.findOne({
+                        where: {
+                            groupId: groupId,
+                            userId: detail.userId
+                        }
+                    });
+                    let newBalance = userGroup.balance;
                     if (parseInt(detail.userId) !== parseInt(senderId)) {
                         newBalance = userGroup.balance - detail.amount;
                     } else {
