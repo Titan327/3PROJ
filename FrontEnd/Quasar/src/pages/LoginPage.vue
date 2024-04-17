@@ -12,6 +12,7 @@ const router = useRouter();
 let userName = ref(null);
 let password = ref(null);
 let email = ref(null);
+let isPwd = ref(true);
 
 
 function getCookie(name: string): string | undefined {
@@ -122,10 +123,14 @@ async function loginGoogle() {
         outlined
         v-model="password"
         label="Mot de passe"
-        type="password"
+        :type="isPwd ? 'password' : 'text'"
         color="secondary">
-        <template v-slot:prepend>
-          <q-icon name="key" />
+        <template v-slot:append>
+          <q-icon
+            :name="isPwd ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="isPwd = !isPwd"
+          />
         </template>
       </q-input>
       <div class="links">
