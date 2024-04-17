@@ -6,6 +6,9 @@ const Group = require('../models/group.model');
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
     const {groupId, label, total_amount, date, receipt, senderId, categoryId, details} = req.body;
+    if (total_amount <= 0) {
+        return res.status(400).send('The total amount of the transaction must be greater than 0');
+    }
     try {
         if (parseInt(senderId) !== parseInt(req.authorization.userId)) {
             return res.status(403).send('You are not the sender of the transaction');
