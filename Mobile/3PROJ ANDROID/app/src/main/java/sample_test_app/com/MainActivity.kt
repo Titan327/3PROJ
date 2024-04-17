@@ -61,10 +61,8 @@ fun AppNavHost() {
                 val jwtToken = backStackEntry.arguments?.getString("jwtToken") ?: ""
                 ProfilScreen(HttpClient(), userId, jwtToken)
             }
-            composable("GroupDetailScreen/{groupId}/{jwtToken}") { backStackEntry ->
-                val groupId = backStackEntry.arguments?.getString("groupId") ?: ""
-                val jwtToken = backStackEntry.arguments?.getString("jwtToken") ?: ""
-                GroupScreen(groupId, HttpClient(), jwtToken)
+            composable("GroupScreen/{groupId}/{jwtToken}") { backStackEntry ->
+                GroupScreen(backStackEntry, HttpClient())
             }
             composable("register") { RegisterScreen(navController , HttpClient()) }
             composable("home/{userId}/{jwtToken}") { backStackEntry ->

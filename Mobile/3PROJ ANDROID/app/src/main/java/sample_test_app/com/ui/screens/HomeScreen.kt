@@ -18,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -41,19 +40,15 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import sample_test_app.com.R
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-
 import coil.transform.CircleCropTransformation
-
-
-
+import kotlinx.serialization.json.JsonArray
 
 
 @Composable
 fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navController: NavController) {
     var usernameState = remember { mutableStateOf("") }
     var profilePictureState = remember { mutableStateOf("") }
-    var groupsState = remember { mutableStateOf(listOf<String>()) }
+    var groupsState = remember { mutableStateOf(listOf<Pair<String, String>>()) }
     var transactionsState = remember { mutableStateOf(listOf<Map<String, String>>()) } // New state for transactions
 
     LaunchedEffect(key1 = userId) {
@@ -71,8 +66,12 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
 
                     val userInfoJson = Json.parseToJsonElement(userInfoResponseBody).jsonObject
                     val username = userInfoJson["username"]?.jsonPrimitive?.content
-                    val profilePicture = userInfoJson["profile_picture"]?.jsonArray?.get(0)?.jsonPrimitive?.content
+                    val profilePicture = if (userInfoJson["profile_picture"] is JsonArray && userInfoJson["profile_picture"]?.jsonArray?.isNotEmpty() == true) {
+                        userInfoJson["profile_picture"]?.jsonArray?.get(0)?.jsonPrimitive?.content
 
+                    } else {
+                        null
+                    }
                     if (username != null) {
                         usernameState.value = username
                     }
@@ -98,7 +97,16 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                     println("Groups request succeeded. Response: $groupsResponseBody")
 
                     val groupsJson = Json.parseToJsonElement(groupsResponseBody).jsonArray
-                    val groups = groupsJson.mapNotNull { it.jsonObject["name"]?.jsonPrimitive?.content }
+                    val groups = groupsJson.mapNotNull { it.jsonObject }
+                        .mapNotNull {
+                            val id = it["id"]?.jsonPrimitive?.content
+                            val name = it["name"]?.jsonPrimitive?.content
+                            if (id != null && name != null) {
+                                Pair(id, name)
+                            } else {
+                                null
+                            }
+                        }
                     groupsState.value = groups
                 }
             } else {
@@ -200,7 +208,26 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                         .clickable {
-                            navController.navigate("GroupScreen/${group}/$jwtToken")},
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val groupInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
+                                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/group/${group.first}") {
+                                        contentType(ContentType.Application.Json)
+                                        header("Authorization", "Bearer $jwtToken")
+                                    }
+                                }
+                                if (groupInfoResponse.status == HttpStatusCode.OK) {
+                                    val groupInfoResponseBody = groupInfoResponse.bodyAsText()
+                                    withContext(Dispatchers.Main) {
+                                        println("Group info request succeeded. Response: $groupInfoResponseBody")
+                                        navController.navigate("GroupScreen/${group.first}/$jwtToken")
+                                    }
+                                } else {
+                                    withContext(Dispatchers.Main) {
+                                        println("Group info request failed. Error code: ${groupInfoResponse.status.value}")
+                                    }
+                                }
+                            }
+                        },
                     elevation = 4.dp
                 ) {
                     Row(
@@ -214,8 +241,7 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                                 .size(50.dp)
                                 .padding(end = 16.dp)
                         )
-                        Text(text = group)
-                    }
+                        Text(text = group.second)                    }
                 }
             }
 
