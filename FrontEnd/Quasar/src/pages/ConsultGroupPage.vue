@@ -22,6 +22,7 @@ let mounted = ref(false)
 let messageState = ref(false);
 let dialogModifyPp = ref(false);
 let newMessageNotification = ref(0);
+let isFavorite = ref(false);
 
 let isEditGroupName = ref(false);
 let isEditGroupDesc = ref(false);
@@ -36,17 +37,17 @@ async function getGroup() {
   try {
     const response = await api.get(`/group/${groupId}`);
     group.value = response.data;
+    isGroupFavorite();
   }
   catch (error) {
     console.error(error);
   }
 }
 
-const isGroupFavorite = computed(() => {
-  return (userId: number) => {
-    return group.value.Users.some(user => user.userId === userId && user.UserGroup.favorite);
-  };
-});
+function isGroupFavorite() {
+
+  isFavorite.value = group.value.Users.some(user => user.id === User.value.id && user.UserGroup.favorite);
+}
 
 function  openCloseMessageDrawer(){
   messageState.value = !messageState.value;
@@ -71,28 +72,16 @@ async function openDialogPP(){
   })
 }
 
-async function addOrRemoveFav(id) {
-  const isFavorite = isGroupFavorite(id);
-  const favoriteValue = !isFavorite;
-
-  group.value.Users.forEach(user => {
-    if (user.userId === id) {
-      user.UserGroup.favorite = favoriteValue;
-    }
-  });
-
+async function addOrRemoveFav() {
   try {
-    await api.put(`group/${groupId}/favorite`, { favorite: favoriteValue });
+    isFavorite.value = !isFavorite.value;
+    await api.put(`/group/${groupId}/favorite`, { favorite: isFavorite.value });
     $q.notify({
       type: 'positive',
-      message: 'Ajouté aux favoris'
+      message: 'Favoris mis à jour'
     })
   } catch (error) {
     console.error('Erreur lors de la mise à jour du favori :', error);
-    $q.notify({
-      type: 'negative',
-      message: 'Une erreur s\'est produite'
-    })
   }
 }
 
@@ -135,7 +124,7 @@ async function editGroup() {
               @mouseleave ="isPhotoHover=false"
               size="200px"
             >
-              <img :src="group.picture ? group.picture[1] : 'assets/defaults/group-default.webp'">
+              <img :src="group.picture ? group.picture[2] : 'assets/defaults/group-default.webp'">
               <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                    v-if="isPhotoHover">
                 Modifier
@@ -199,10 +188,10 @@ async function editGroup() {
                    no-caps
                    v-if="mounted"
                    color="secondary"
-                   :outline="isGroupFavorite(User.id)"
+                   :outline="isFavorite"
                    @click="addOrRemoveFav(User.id)"
                    rounded
-            >{{ isGroupFavorite(User.id)? 'Retirer des favoris' : 'Ajouter aux favoris' }}
+            >{{ isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
             </q-btn>
           </q-card-section>
         </q-card-section>

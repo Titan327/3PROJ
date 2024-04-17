@@ -101,6 +101,36 @@ const getTransaction = async (req, res) => {
     }
 }
 
+const getGroupTransactions = async (req, res) => {
+    console.log(`REST getGroupTransaction`);
+    try {
+        const groupId = req.params.groupId;
+        const userGroup = await UserGroup.findOne({
+            where: {
+                userId: req.authorization.userId,
+                groupId,
+                active: true
+            }
+        });
+        if (!userGroup) {
+            return res.status(404).send('User not found in group');
+        }
+        transactions = Transaction.findAll({
+            where: {
+                groupId
+            },
+            include: [{
+                model: TransactionUser,
+                attributes: ['userId', 'amount']
+            }]
+        });
+        return res.status(200).send(transactions);
+    } catch (e) {
+        return res.status(400).send(e);
+    }
+
+}
+
 const getUserTransactions = async (req, res) => {
     console.log(`REST getTransaction`);
     try {
@@ -152,6 +182,7 @@ const getXLastsUserTransactions = async (req, res) => {
 module.exports = {
     createTransaction,
     getTransaction,
+    getGroupTransactions,
     getUserTransactions,
     getXLastsUserTransactions
 }

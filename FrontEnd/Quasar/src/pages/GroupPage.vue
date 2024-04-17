@@ -89,9 +89,19 @@ async function openDialogInvite(id: number, name: string){
       type: 'negative',
       message: 'Une erreur s\'est produite lors de la création du groupe'
     })
-
   }
+}
 
+async function setFavorite(groupID, favorite){
+  try {
+    const response = await  api.put(`/group/${groupID}/favorite`,{
+      "favorite": favorite
+    })
+    await getGroups();
+  }
+  catch (error) {
+    console.error('Error')
+  }
 }
 </script>
 
@@ -146,9 +156,11 @@ async function openDialogInvite(id: number, name: string){
             <q-avatar text-color="white">
               <q-icon
                 name="star"
-                :color="1 ? 'yellow' : 'grey'"
-                @click="console.log('star')"
-                size="30px" />
+                :color="group.isFavorite ? 'yellow' : 'grey'"
+                @click="setFavorite(group.id, !group.isFavorite)"
+                style="cursor: pointer;"
+                size="30px"
+              />
             </q-avatar>
           </q-item-section>
         </q-item>
