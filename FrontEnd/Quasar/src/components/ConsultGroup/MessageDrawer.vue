@@ -27,7 +27,9 @@ socket.on('connect', () => {
 socket.on(`chat-group-${props.groupId}`, (msg, group) => {
   getMessages();
   scrollNewMsg();
-  emit('messages')
+  if(drawerOpen.value == false){
+    emit('messages')
+  }
 });
 
 const drawerOpen = ref(false);

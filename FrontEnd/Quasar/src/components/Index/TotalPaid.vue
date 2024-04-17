@@ -4,26 +4,27 @@ import { defineProps, onMounted, ref } from "vue";
 import { Group } from "src/interfaces/group.interface";
 import { getUser } from "stores/userStore";
 import { api } from "boot/axios";
+import {DefaultUser} from "src/interfaces/user.interface";
 
 const montantTotal = ref(0);
 const displayColor = ref('red');
 const titleText = ref('');
 const operations = ref(0);
 const icon = ref();
+const User = ref(DefaultUser());
 
 const props = defineProps<{
   etat: EtatTotalPaidComponent;
 }>();
 
-const userData = ref(getUser());
-
 onMounted(async () => {
+  User.value = await getUser()
   try {
     if (props.etat !== EtatTotalPaidComponent.Positive) {
       displayColor.value = 'red';
       titleText.value = 'Reste à payer';
       icon.value = 'north_east';
-      const response = await api.get(`user/${userData.value.id}/transactions/notRefunded`);
+      const response = await api.get(`user/${User.value.id}/transactions/notRefunded`);
       montantTotal.value = response.data.amount;
       operations.value = response.data.transactions;
     } else {
