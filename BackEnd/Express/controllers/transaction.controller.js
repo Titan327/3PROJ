@@ -2,7 +2,7 @@ const Transaction = require('../models/transaction.model');
 const TransactionUser = require('../models/transactionUser.model');
 const UserGroup = require('../models/userGroup.model');
 const Group = require('../models/group.model');
-const {where} = require("sequelize");
+const RefundController = require('./refund.controller');
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
@@ -73,6 +73,7 @@ const createTransaction = async (req, res) => {
                     );
                 }
             }
+            await RefundController.calculateMinimalRefunds(groupId)
             return res.status(201).send(transaction);
         } else {
             return res.status(400).send('The total amount of the transaction is not equal to the sum of the details');
@@ -115,7 +116,8 @@ const getGroupTransactions = async (req, res) => {
         if (!userGroup) {
             return res.status(404).send('User not found in group');
         }
-        transactions = Transaction.findAll({
+        console.log(`userInGroup`);
+        let transactions = await Transaction.findAll({
             where: {
                 groupId
             },
@@ -124,6 +126,7 @@ const getGroupTransactions = async (req, res) => {
                 attributes: ['userId', 'amount']
             }]
         });
+        console.log(transactions.length);
         return res.status(200).send(transactions);
     } catch (e) {
         return res.status(400).send(e);

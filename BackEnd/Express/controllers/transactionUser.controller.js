@@ -1,8 +1,8 @@
 const TransactionUser = require('../models/transactionUser.model');
 const {Op} = require("sequelize");
 
-const getAllNotRefoundedTransactionsByUser = async (userId) => {
-    console.log(`REST getAllNotRefoundedTransactionsByUser`);
+const getAllNotRefundedTransactionsByUser = async (userId) => {
+    console.log(`REST getAllNotRefundedTransactionsByUser`);
     try {
         const transactions = await TransactionUser.findAll({
             where: { refunded: false , userId: userId }
@@ -29,6 +29,6 @@ const getAllUserTransactionsThisMonth = async (userId) => {
 }
 
 module.exports = {
-    getAllNotRefoundedTransactionsByUser,
+    getAllNotRefundedTransactionsByUser,
     getAllUserTransactionsThisMonth
 }
