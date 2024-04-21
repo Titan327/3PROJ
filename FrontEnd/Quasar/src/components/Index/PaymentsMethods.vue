@@ -8,14 +8,15 @@ import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
-import {DefaultPaymentMethod} from "src/interfaces/paymentMethod.interface";
+import {DefaultPaymentMethod, DefaultRib} from "src/interfaces/paymentMethod.interface";
 
 const  slide = ref('slide-0');
-const paiementsMethod = ref([DefaultPaymentMethod(),DefaultPaymentMethod(),DefaultPaymentMethod()]);
+const paiementsMethod = ref();
 let dialogIsOpen = ref(false);
 let User = ref(DefaultUser());
 const $q = useQuasar();
 let mounted = ref(false);
+
 
 onMounted(async () => {
   User.value = await getUser();
@@ -26,8 +27,8 @@ onMounted(async () => {
 async function getMethod(){
   try {
     console.log(paiementsMethod.value)
-    //const response = await api.get(`/user/${User.value.id}/paymentMethode`)
-    //paiementsMethod.value = response.data
+    const response = await api.get(`/user/${User.value.id}/1/paymentMethode`)
+    paiementsMethod.value = response.data
   }
   catch(e){
     console.error(e)
@@ -54,6 +55,14 @@ async function openDialgAddPayment(type:string){
 const redirectToPaypal = (username:string) => {
   window.open(`https://paypal.me/${username}`, '_blank');
 };
+
+function convertIBAN(iban:string){
+  const firstFour = iban.substring(0, 4);
+  const lastFour = iban.substring(iban.length - 4);
+  const middleStars = '*'.repeat(iban.length - 8);
+  const maskedIBAN = firstFour + middleStars + lastFour;
+  return maskedIBAN.match(/.{1,4}/g).join(' ')
+}
 </script>
 
 
@@ -88,18 +97,32 @@ const redirectToPaypal = (username:string) => {
             :key="index"
             :name="`slide-${index}`"
           >
-            <q-card class="method rounded-borders">
+            <q-card class="method rounded-borders" v-if="paiement.type=='Paypal'">
               <q-img
-                :src="paiement.type === 'Paypal' ? '/assets/card/paypal-card.webp' : '/assets/card/rib-card.webp'"
+                src="/assets/card/paypal-card.webp"
                 class="rounded-borders"
               >
                 <div class="absolute-bottom text-subtitle2 row">
-                  <q-item-label class="q-pa-xs">@{{paiement.value}}</q-item-label>
+                  <q-item-label class="q-pa-xs">@{{paiement.value.user_paypal}}</q-item-label>
                   <q-space></q-space>
                   <q-item-label class="text-h6" v-if="paiement.type=='Paypal'">
-                    <q-icon name="open_in_new" @click="redirectToPaypal(paiement.value)" style="cursor: pointer;"
+                    <q-icon name="open_in_new" @click="redirectToPaypal(paiement.value.user_paypal)" style="cursor: pointer;"
                     />
                   </q-item-label>
+                </div>
+              </q-img>
+            </q-card>
+
+            <q-card class="method rounded-borders" v-if="paiement.type=='RIB'">
+              <q-img
+                src="/assets/card/rib-card.webp"
+                class="rounded-borders"
+              >
+                <div class="absolute-bottom text-subtitle2 row">
+                  <q-item-label class="q-pa-xs">{{paiement.value.bank_name}}: {{paiement.value.surname}} {{paiement.value.name}}</q-item-label>
+                  <q-item-label class="q-pa-xs"></q-item-label>
+                  <q-space></q-space>
+                  <q-item-label class="q-pa-xs">{{convertIBAN(paiement.value.IBAN)}}</q-item-label>
                 </div>
               </q-img>
             </q-card>
