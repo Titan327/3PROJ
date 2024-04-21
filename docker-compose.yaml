@@ -10,7 +10,8 @@ services:
     command: ${EXPRESS_CMD}
     depends_on:
       - Postgres
-      #- Storage-minio
+      - Minio-storage
+      - mongo
     volumes:
       - ${EXPRESS_VOLUME}
     networks:

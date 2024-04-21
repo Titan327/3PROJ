@@ -34,6 +34,7 @@ router.delete("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddl
 router.get("/:userId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.getPaymentMethode);
 //POST http://localhost:9002/api/user/{id}/paymentMethode
 router.post("/:userId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.createPaymentMethode);
+router.get("/:userId/:groupId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.getPaymentMethode);
 
 
 module.exports = router;
