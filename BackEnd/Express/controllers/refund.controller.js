@@ -125,5 +125,6 @@ const calculateMinimalRefunds = async (groupId) => {
 
 module.exports = {
     processRefund,
+    calculateMinimalRefunds,
     getGroupRefunds,
 }
