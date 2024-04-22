@@ -162,7 +162,6 @@ function calculateTotal(): number {
                     <q-item-section>{{user.username}}</q-item-section>
 
                     <q-input
-                      mask="#.##"
                       class="input"
                       outlined
                       fill-mask="0"
@@ -171,35 +170,6 @@ function calculateTotal(): number {
                       label="Montant"
                       dark
                       dense
-                      color="secondary"
-                      suffix="€"
-                      @update:model-value="calculateTotal()"
-                    />
-                  </q-item>
-                </div>
-              </q-scroll-area>
-            </q-list>
-          </div>
-          <div class="q-mx-auto" v-if="isPercent">
-            <q-list class="q-mx-auto q-pa-md">
-              <q-scroll-area style="height: 300px;">
-                <div v-for="(user) in group.Users"
-                     :key="user.id" class="q-py-xs">
-                  <q-item clickable v-ripple>
-                    <q-item-section avatar>
-                      <q-avatar>
-                        <img :src="user.profile_picture ? `${user.profile_picture[0]}` : 'assets/defaults/user-default.webp'"/>
-                      </q-avatar>
-                    </q-item-section>
-
-                    <q-item-section>{{user.username}}</q-item-section>
-
-                    <q-input
-                      mask="##.##"
-                      outlined
-                      v-model.number="_transaction.details.find(detail => detail.userId === user.id).amount"
-                      label="Montant"
-                      dark
                       color="secondary"
                       suffix="€"
                       @update:model-value="calculateTotal()"
