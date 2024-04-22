@@ -21,7 +21,7 @@ let mounted = ref(false);
 onMounted(async () => {
   User.value = await getUser();
   mounted.value=true;
-  getMethod();
+  await getMethod();
 });
 
 async function getMethod(){

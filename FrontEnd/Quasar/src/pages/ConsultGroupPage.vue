@@ -37,9 +37,12 @@ async function getGroup() {
   try {
     const response = await api.get(`/group/${groupId}`);
     group.value = response.data;
+    console.log(group.value)
+
     isGroupFavorite();
   }
   catch (error) {
+    router.push('/404')
     console.error(error);
   }
 }
