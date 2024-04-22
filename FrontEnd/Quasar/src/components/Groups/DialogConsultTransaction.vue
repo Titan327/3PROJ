@@ -110,10 +110,11 @@ function getCatText(catId: number) {
 
                   <q-item-section>{{user.username}}</q-item-section>
 
-                  <q-item-section>{{getUserAmount(user.id)}}€</q-item-section>
-
+                  <q-item-section avatar>
+                    {{getUserAmount(user.id)}}€
+                  </q-item-section>
                 </q-item>
-                <q-separator></q-separator>
+                <q-separator color="secondary"></q-separator>
               </div>
             </q-scroll-area>
           </q-list>
