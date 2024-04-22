@@ -6,6 +6,7 @@ import {api} from "boot/axios";
 import {DefaultTransactionCreated} from "src/interfaces/transactions.interface";
 import {getUser} from "stores/userStore";
 import {DefaultUser} from "src/interfaces/user.interface";
+import {formatNumber} from "stores/globalFunctionsStore";
 const $q = useQuasar();
 
 let isOpen = ref(false);
@@ -210,7 +211,7 @@ function calculateTotal(): number {
           </div>
           <div class="q-mx-auto div-total row">
             <q-space></q-space>
-         <q-item-label class="text-h6">   Total: {{_transaction.total_amount}} €</q-item-label>
+         <q-item-label class="text-h6">   Total: {{formatNumber(_transaction.total_amount)}} €</q-item-label>
           </div>
           <div class="inputs row">
             <div class="row q-mx-auto">
