@@ -26,6 +26,7 @@ const getPaymentMethode = async (req, res) => {
             paymentMethodes.forEach(
                 methode => {
                     obj = {
+                        id: methode._id,
                         type: methode.type,
                         value: {}
                     };
@@ -172,6 +173,7 @@ const getMyPaymentMethode = async (req,res) => {
         paymentMethodes.forEach(
             methode => {
                 obj = {
+                    id: methode._id,
                     type: methode.type,
                     value: {}
                 };
