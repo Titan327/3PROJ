@@ -10,6 +10,7 @@ let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
 let sortedTransactionList = ref<Transaction[]>([]);
 let dialogCreateTransaction = ref(false);
+let dialogConsultTransaction = ref(false);
 let currentSort = ref('date');
 const $q = useQuasar();
 
@@ -48,6 +49,27 @@ function openDialogCreateTransaction(){
   })
 }
 
+
+function openDialogConsultTransaction(transactionId:number){
+  dialogConsultTransaction.value = true;
+  $q.dialog({
+    component: DialogConsultTransaction,
+
+    componentProps: {
+      isOpen: dialogConsultTransaction,
+      groupId: props.groupId,
+      userId: props.userId,
+      transactionId: transactionId
+    }
+  }).onOk(() => {
+    console.log('OK')
+  }).onCancel(() => {
+    console.log('Cancel')
+  }).onDismiss(() => {
+    dialogConsultTransaction.value = false;
+  })
+}
+
 const sortTransaction = (type:string) => {
   if(type === 'date'){
     sortedTransactionList.value = transactionList.value.sort((a, b) => {
@@ -69,6 +91,7 @@ const sortTransaction = (type:string) => {
 
 import { computed } from 'vue';
 import {formatDate} from "stores/globalFunctionsStore";
+import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
 
 const currentFilterText = computed(() => {
   switch (currentSort.value) {
@@ -193,7 +216,7 @@ const currentFilterText = computed(() => {
                 </q-item-section>
 
                 <q-item-section>
-                  <q-btn outline color="secondary" rounded>Consulter</q-btn>
+                  <q-btn outline color="secondary" rounded @click="openDialogConsultTransaction(transaction.id)">Consulter</q-btn>
                 </q-item-section>
 
               </q-item>
