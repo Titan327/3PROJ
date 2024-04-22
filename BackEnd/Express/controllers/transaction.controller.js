@@ -37,6 +37,14 @@ const createTransaction = async (req, res) => {
                 }
             });
 
+            if (detail.amount.toString().split(".")[1].length > 2) {
+                return res.status(400).send('The amount of the transaction must have at most 2 decimal places');
+            }
+
+            if (detail.amount < 0) {
+                return res.status(400).send('The amount of the transaction must be greater than 0');
+            }
+
             if (!userInGroup) {
                 return res.status(400).send('User '+ detail.userId + ' is not part of the group');
             }
@@ -87,7 +95,7 @@ const createTransaction = async (req, res) => {
 const getTransaction = async (req, res) => {
     console.log(`REST getTransaction`);
     try {
-        const transaction = await Transaction.findByPk(req.params.id, {
+        const transaction = await Transaction.findByPk(req.params.transactionId, {
             include: [{
                 model: TransactionUser,
                 attributes: ['userId', 'amount']

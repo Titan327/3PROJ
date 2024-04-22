@@ -16,7 +16,7 @@ async function createGroup() {
 
   loading.value = true;
     try {
-      const response = await api.post("group", {
+      const response = await api.post("groups", {
 
         name: newGroup.value.name,
         description: newGroup.value.description

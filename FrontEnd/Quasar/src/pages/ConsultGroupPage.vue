@@ -35,7 +35,7 @@ onMounted(async () => {
 async function getGroup() {
   User.value = await getUser();
   try {
-    const response = await api.get(`/group/${groupId}`);
+    const response = await api.get(`/groups/${groupId}`);
     group.value = response.data;
     console.log(group.value)
 
@@ -78,7 +78,7 @@ async function openDialogPP(){
 async function addOrRemoveFav() {
   try {
     isFavorite.value = !isFavorite.value;
-    await api.put(`/group/${groupId}/favorite`, { favorite: isFavorite.value });
+    await api.put(`/groups/${groupId}/favorite`, { favorite: isFavorite.value });
     $q.notify({
       type: 'positive',
       message: 'Favoris mis à jour'
@@ -94,7 +94,7 @@ async function editGroup() {
   isEditGroupName.value = false;
 
   try {
-    await api.put(`group/${groupId}/`, {
+    await api.put(`groups/${groupId}/`, {
       name: group.value.name,
       description: group.value.description
     });

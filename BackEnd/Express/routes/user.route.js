@@ -8,23 +8,23 @@ const RefundController = require('../controllers/refund.controller');
 const PaymentMethodeController = require('../controllers/paymentMethode.controller');
 
 //PUBLIC
-//GET http://localhost:9002/api/user/{id}/groups
+//GET http://localhost:9002/api/users/{id}/groups
 router.get("/:userId/groups", securityMiddleware.verifyIsAuthAndActivUser, GroupController.getGroups);
-//GET http://localhost:9002/api/user/{id}/transactions
+//GET http://localhost:9002/api/users/{id}/transactions
 router.get("/:userId/transactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getUserTransactions);
-//GET http://localhost:9002/api/user/{id}/lastTransactions/limit={limit}
+//GET http://localhost:9002/api/users/{id}/lastTransactions/limit={limit}
 router.get("/:userId/lastTransactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getXLastsUserTransactions);
-//GET http://localhost:9002/api/user/{id}/trasnactions/thisMonth
+//GET http://localhost:9002/api/users/{id}/trasnactions/thisMonth
 router.get("/:userId/transactions/thisMonth", securityMiddleware.verifyIsAuthAndActivUser, UserController.getAmountOfAllUserTransactionsThisMonth);
 
 
-//GET http://localhost:9002/api/user/{id}
+//GET http://localhost:9002/api/users/{id}
 router.get("/:userId", securityMiddleware.verifyIsAuthAndActivUser, UserController.getUser);
-//PUT http://localhost:9002/api/user/{id}
+//PUT http://localhost:9002/api/users/{id}
 router.put("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyUserInfos, UserController.modifyUser);
-//PUT http://localhost:9002/api/user/{id}/password
+//PUT http://localhost:9002/api/users/{id}/password
 router.put("/:userId/password", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyPasswordForSensibleInfos, userMiddleware.verifyPasswordWhenCreatingOrUpdating, UserController.modifyPassword);
-//DELETE http://localhost:9002/api/user/{id}
+//DELETE http://localhost:9002/api/users/{id}
 router.delete("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyPasswordForSensibleInfos, UserController.deleteUser);
 //POST http://localhost:9002/api/user/{id}/paymentMethode
 router.post("/:userId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.createPaymentMethode);

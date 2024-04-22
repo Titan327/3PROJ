@@ -33,7 +33,7 @@ fun GroupScreen(groupId: String, httpClient: HttpClient, jwtToken: String) {
     LaunchedEffect(key1 = groupId) {
         CoroutineScope(Dispatchers.Main).launch {
             val groupInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/group/$groupId") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/$groupId") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }

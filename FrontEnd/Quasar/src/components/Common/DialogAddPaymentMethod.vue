@@ -44,7 +44,7 @@ async function postRib() {
     const formData = new FormData();
     //formData.append('image', file.value);
 
-    const response = await api.post(`/user/${props.userId}/paymentMethode`, {
+    const response = await api.post(`/users/${props.userId}/paymentMethode`, {
       "type": "RIB",
       "name": rib.value.name,
       "surname": rib.value.surname,
@@ -76,7 +76,7 @@ async function postRib() {
 async function postPayPal() {
   loading.value = true;
   try {
-    const response = await api.post(`/user/${props.userId}/paymentMethode`, {
+    const response = await api.post(`/users/${props.userId}/paymentMethode`, {
       "type": "Paypal",
       "paypal_username": paypalId.value,
     });

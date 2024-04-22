@@ -24,7 +24,7 @@ onMounted(async () => {
 
 async function getGroups() {
   const userData = await getUser();
-  const response = await api.get(`/user/${userData.id}/groups?limit=50`);
+  const response = await api.get(`/users/${userData.id}/groups?limit=50`);
   groupList.value = response.data;
 
   groupList.value.sort((a, b) => {
@@ -57,7 +57,7 @@ async function openDialogInvite(id: number, name: string){
     const expirationDate = new Date(today);
     expirationDate.setDate(today.getDate() + 7);
 
-    const response = await api.post(`group/${id}/createInvitation`, {
+    const response = await api.post(`groups/${id}/createInvitation`, {
 
       remaining_uses: 5,
       expiration_date:expirationDate
@@ -94,7 +94,7 @@ async function openDialogInvite(id: number, name: string){
 
 async function setFavorite(groupID, favorite){
   try {
-    const response = await  api.put(`/group/${groupID}/favorite`,{
+    const response = await  api.put(`/groups/${groupID}/favorite`,{
       "favorite": favorite
     })
     await getGroups();
@@ -148,7 +148,7 @@ async function setFavorite(groupID, favorite){
               rounded
               outline
               class="btn-consulter"
-              @click="router.push(`/group/${group.id}`)"
+              @click="router.push(`/groups/${group.id}`)"
             >
             </q-btn>
           </q-item-section>

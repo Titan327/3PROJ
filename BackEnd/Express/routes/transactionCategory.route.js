@@ -2,6 +2,8 @@ const router = require('express').Router();
 const TransactionCategory = require('../controllers/transactionCategory.controller');
 const securityMiddleware = require("../security/middleware.security");
 
-router.get("/",securityMiddleware.verifyIsAuth, TransactionCategory.getAllTrasactionCategory);
+//PUBLIC
+//GET http://localhost:9002/api/transactionCategories
+router.get("/",securityMiddleware.verifyIsAuth, TransactionCategory.getTrasactionCategories);
 
 module.exports = router;
