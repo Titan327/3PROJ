@@ -13,7 +13,7 @@ onMounted(async () => {
 
   const userData = await getUser();
 
-  const response = await api.get(`/user/${userData.id}/groups?limit=5`);
+  const response = await api.get(`/users/${userData.id}/groups?limit=5`);
 
   groupList.value = response.data;
   console.log(groupList.value);
@@ -32,7 +32,7 @@ onMounted(async () => {
         <q-avatar
             v-for="group in groupList" :key="group.id"
             size="100px"
-            @click="router.push(`/group/${group.id}`)"
+            @click="router.push(`/groups/${group.id}`)"
           >
             <img :src="group.picture ? group.picture+'/200' : 'assets/defaults/group-default.webp'">
             <q-badge color="red" rounded floating >{{group.id}}</q-badge>

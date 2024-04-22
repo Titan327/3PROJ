@@ -20,12 +20,11 @@ const props = defineProps({
 });
 
 onMounted(async () => {
-
   await getTransactionList()
 });
 
 async function getTransactionList(){
-  const response = await api.get(`group/${props.groupId}/transactions`);
+  const response = await api.get(`groups/${props.groupId}/transactions`);
   transactionList.value = response.data;
   sortTransaction('date');
 }

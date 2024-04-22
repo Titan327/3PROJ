@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const multer = require('multer');
-const pp = require('../controllers/pp.controller');
+const pp = require('../controllers/profilePicture.controller');
 const resize = require('../middlewares/resize.middleware');
 const securityMiddleware = require("../security/middleware.security");
 const upload = multer();

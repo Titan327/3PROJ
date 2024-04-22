@@ -75,7 +75,7 @@ async function changeUserPassword(){
       return
     }
     loading.value = true;
-    const response = await api.put(`user/${User.value.id}/password`, {
+    const response = await api.put(`users/${User.value.id}/password`, {
       "password": pass2.value,
       "userInfos": {
         "password": newPass.value,
@@ -110,7 +110,7 @@ async function changeUserPassword(){
 async function changeUserData(){
   try {
     loading.value = true;
-    const response = await api.put(`user/${User.value.id}`, {
+    const response = await api.put(`users/${User.value.id}`, {
       "userInfos":
         {
           "firstname": User.value.firstname,
