@@ -59,31 +59,31 @@ const calculateMinimalRefunds = async (groupId) => {
             attributes: ['userId', 'balance']
         });
 
-        let negatifUsers = users.filter(user => user.balance < 0);
-        let positifUsers = users.filter(user => user.balance > 0);
+        let negativeUsers = users.filter(user => user.balance < 0);
+        let positiveUsers = users.filter(user => user.balance > 0);
 
-        for (let negatifUser of negatifUsers) {
-            let positifUserExact = positifUsers.find(user => user.balance === -negatifUser.balance);
-            if (positifUserExact) {
+        for (let negativeUser of negativeUsers) {
+            let positUserExact = positiveUsers.find(user => user.balance === -negativeUser.balance);
+            if (positUserExact) {
                 await Refund.create({
                     groupId,
-                    refundingUserId: negatifUser.userId,
-                    refundedUserId: positifUserExact.userId,
-                    amount: -negatifUser.balance,
+                    refundingUserId: negativeUser.userId,
+                    refundedUserId: positUserExact.userId,
+                    amount: -negativeUser.balance,
                     processed: false
                 });
-                positifUserExact.balance = 0;
-                negatifUser.balance = 0;
-                negatifUsers = negatifUsers.filter(user => user.balance !== 0);
-                positifUsers = positifUsers.filter(user => user.balance !== 0);
+                positUserExact.balance = 0;
+                negativeUser.balance = 0;
+                negativeUsers = negativeUsers.filter(user => user.balance !== 0);
+                positiveUsers = positiveUsers.filter(user => user.balance !== 0);
             }
         }
 
-        negatifUsers.sort((a, b) => b.balance - a.balance);
-        positifUsers.sort((a, b) => b.balance - a.balance);
+        negativeUsers.sort((a, b) => b.balance - a.balance);
+        positiveUsers.sort((a, b) => b.balance - a.balance);
 
-        for (let negatifUser of negatifUsers) {
-            for (let positifUser of positifUsers) {
+        for (let negatifUser of negativeUsers) {
+            for (let positifUser of positiveUsers) {
                 if (-negatifUser.balance >= positifUser.balance) {
                     if (positifUser.balance !== 0) {
                         await Refund.create({
@@ -101,8 +101,8 @@ const calculateMinimalRefunds = async (groupId) => {
         }
 
         //Si il reste des négatifs et des positifs, on rembourse les plus gros possibles
-        for (let negatifUser of negatifUsers) {
-            for (let positifUser of positifUsers) {
+        for (let negatifUser of negativeUsers) {
+            for (let positifUser of positiveUsers) {
                 if (-negatifUser.balance !== 0) {
                     await Refund.create({
                         groupId,
