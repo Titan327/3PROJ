@@ -12,6 +12,14 @@ const TransactionCategoryModel = sequelize.define("TransactionCategory", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    icon: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    color: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }
 });
 
 async function syncDatabase() {
@@ -21,15 +29,15 @@ async function syncDatabase() {
         if (count === 0) {
 
             await TransactionCategoryModel.bulkCreate([
-                { label: 'Alimentation' },
-                { label: 'Divertissement' },
-                { label: 'Voyages' },
-                { label: 'Cadeaux' },
-                { label: 'Courses' },
-                { label: 'Activités sportives' },
-                { label: 'Sorties' },
-                { label: 'Soins personnels' },
-                { label: 'Événements spéciaux' }
+                { label: 'Alimentation', icon: 'ramen_dining', color: '#EBB734' },
+                { label: 'Divertissement', icon: 'attractions', color: '#0BA339' },
+                { label: 'Voyages', icon: 'luggage', color: '#0B61A3'},
+                { label: 'Cadeaux', icon: 'featured_seasonal_and_gifts', color: '#D90000' },
+                { label: 'Courses', icon: 'cart', color: '#9B989C' },
+                { label: 'Activités sportives', icon: 'sports_football', color: '#D67900' },
+                { label: 'Sorties', icon: 'sports_bar', color: '#C49F67' },
+                { label: 'Soins personnels', icon: 'healing', color: '#C47C67'},
+                { label: 'Événements spéciaux', icon: 'celebration', color: '#A114A3'}
 
             ]);
             console.log('Données de base ajoutées avec succès.');
