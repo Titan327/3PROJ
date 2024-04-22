@@ -38,7 +38,6 @@ const verifyUserInGroup = async (userId,groupId) => {
         console.error(e);
         return e;
     }
-
 }
 
 const setFavorite = async (req, res) => {

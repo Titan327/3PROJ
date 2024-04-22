@@ -15,7 +15,7 @@ const router = useRouter();
 onMounted(async () => {
 
   User.value = await getUser();
-  const response = await api.get(`user/${User.value.id}/lastTransactions?limit=5`);
+  const response = await api.get(`users/${User.value.id}/lastTransactions?limit=5`);
   transactionList.value = response.data;
 });
 
@@ -71,7 +71,7 @@ onMounted(async () => {
         </q-item-section>
 
         <q-item-section>
-         <q-btn outline color="secondary" rounded  @click="router.push(`/group/${transaction.Transaction.groupId}`)">Consulter</q-btn>
+         <q-btn outline color="secondary" rounded  @click="router.push(`/groups/${transaction.Transaction.groupId}`)">Consulter</q-btn>
         </q-item-section>
 
       </q-item>

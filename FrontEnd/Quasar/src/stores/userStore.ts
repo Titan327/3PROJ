@@ -20,7 +20,7 @@ async function getUserData(): Promise<void> {
     const payload = token.split('.')[1];
     const decodedPayload = JSON.parse(atob(payload));
 
-    const response = await api.get(`user/${decodedPayload.userId}`, {
+    const response = await api.get(`users/${decodedPayload.userId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

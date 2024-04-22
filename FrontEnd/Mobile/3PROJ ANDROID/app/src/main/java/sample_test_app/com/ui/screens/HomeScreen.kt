@@ -59,7 +59,7 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
             val userInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/user/$userId") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }
@@ -87,7 +87,7 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
             }
 
             val groupsResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/user/$userId/groups") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/groups") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }
@@ -108,7 +108,7 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
             }
 
             val transactionsResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/user/$userId/transactions") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/transactions") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }

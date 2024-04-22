@@ -27,7 +27,7 @@ onMounted(async () => {
 async function getMethod(){
   try {
     console.log(paiementsMethod.value)
-    const response = await api.get(`/user/${User.value.id}/1/paymentMethode`)
+    const response = await api.get(`/users/${User.value.id}/1/paymentMethode`)
     paiementsMethod.value = response.data
   }
   catch(e){

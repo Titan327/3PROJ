@@ -59,7 +59,7 @@ function scrollNewMsg () {
 
 async function getGroup() {
   try {
-    const response = await api.get(`/group/${props.groupId}`);
+    const response = await api.get(`/groups/${props.groupId}`);
     senders.value = response.data.Users;
     console.log(senders.value)
   }
@@ -82,7 +82,7 @@ function CloseDrawer() {
 
 async function getMessages() {
   try {
-    const response = await api.get(`/message/${props.groupId}?limit=50&page=${msgPage.value}`);
+    const response = await api.get(`/messages/${props.groupId}?limit=50&page=${msgPage.value}`);
     messages.value = response.data.messages
     messages.value.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
@@ -94,7 +94,7 @@ async function getMessages() {
 async function sendMessage() {
   if (writingMessage.value.trim() === '') return;
   try {
-    const response = await api.post(`/message/${props.groupId}`, {
+    const response = await api.post(`/messages/${props.groupId}`, {
         text: writingMessage.value,
     });
 
