@@ -37,7 +37,8 @@ const createTransaction = async (req, res) => {
                 }
             });
 
-            if (detail.amount.toString().split(".")[1].length > 2) {
+            const amountParts = detail.amount.toString().split(".");
+            if (amountParts.length > 1 && amountParts[1].length > 2) {
                 return res.status(400).send('The amount of the transaction must have at most 2 decimal places');
             }
 
@@ -134,7 +135,6 @@ const getGroupTransactions = async (req, res) => {
                 attributes: ['userId', 'amount']
             }]
         });
-        console.log(transactions.length);
         return res.status(200).send(transactions);
     } catch (e) {
         return res.status(400).send(e);
