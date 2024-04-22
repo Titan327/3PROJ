@@ -38,7 +38,7 @@ const senders = ref<Partial<IUser>[]>([]);
 let writingMessage = ref('');
 const scrollAreaRef = ref(null);
 
-const position = ref(10000);
+const position = ref(100000);
 const msgPage = ref(1);
 const User = ref(DefaultUser());
 
@@ -50,10 +50,12 @@ onMounted(async () => {
   await getGroup();
   await getMessages();
 
+  scrollNewMsg ();
+
 });
 
 function scrollNewMsg () {
-  scrollAreaRef.value.setScrollPosition('vertical', position.value, 300)
+  scrollAreaRef.value.setScrollPosition('vertical', position.value, 500)
   position.value = 100000
 }
 
@@ -154,12 +156,14 @@ function getDate(timestamp: string) {
   >
     <div class="content">
 
-      <div class="column">
+      <div class="row">
         <q-item-label class="text-h4 q-pa-md row">Messages</q-item-label>
+        <q-space></q-space>
         <q-btn
           color="secondary"
           class="q-ma-md"
           outline
+          round
           icon="close"
           @click="CloseDrawer">
         </q-btn>
@@ -182,7 +186,7 @@ function getDate(timestamp: string) {
             />
           </q-scroll-area>
         </div>
-        <div class="fixed-bottom bloc-send row items-center justify-evenly bg-primary">
+        <div class="bloc-send row items-center justify-evenly bg-primary">
           <q-input
             class="input-msg"
             v-model="writingMessage"
@@ -193,8 +197,9 @@ function getDate(timestamp: string) {
             dense
             color="secondary"
           />
-        <q-btn color="secondary" class="btn" outline @click="sendMessage" icon="send" > </q-btn>
+        <q-btn color="secondary" class="btn" outline @click="sendMessage" icon="send" round></q-btn>
         </div>
+        <q-space></q-space>
       </div>
     </div>
   </q-drawer>
@@ -209,7 +214,7 @@ function getDate(timestamp: string) {
 }
 .input-msg{
   border-radius: 10px;
-  width: 70%;
+  width: 80%;
 }
 .bloc-send{
   width: 100%;
