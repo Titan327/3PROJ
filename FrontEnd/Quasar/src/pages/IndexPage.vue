@@ -3,28 +3,49 @@ import TotalPaid from "components/Index/TotalPaid.vue";
 import LastPaiements from "components/Index/LastPaiements.vue";
 import LastGroups from "components/Index/LastGroups.vue";
 import { getUser } from "stores/userStore";
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import {EtatTotalPaidComponent} from "src/interfaces/types";
-import RightPannel from "components/Index/RightPannel.vue";
 import PaymentsMethods from "components/Index/PaymentsMethods.vue";
+import {DefaultUser} from "src/interfaces/user.interface";
+import {useRouter} from "vue-router";
+import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
+import DialogWarnAuth from "components/Index/DialogWarnAuth.vue";
+import {useQuasar} from "quasar";
 
-const user = ref(getUser());
+const User = ref(DefaultUser());
+const $q = useQuasar();
+let dialog0Auth = ref(false);
 
-const userFirstName = ref('');
+onMounted(async () => {
 
-(async () => {
-  const userData = await getUser();
-  if (userData.firstname != null) {
-    userFirstName.value = userData.firstname;
+  User.value = await getUser();
+  CheckIs0Auth();
+});
+
+function CheckIs0Auth(){
+  if (User.value.firstname == User.value.lastname){
+    dialog0Auth.value = true;
+      $q.dialog({
+        component: DialogWarnAuth,
+
+        componentProps: {
+          isOpen: dialog0Auth,
+        }
+      })
+    return true;
   }
-})();
+  else{
+    return false;
+  }
+}
+
 </script>
 
 <template>
   <q-page class="row items-center justify-evenly">
 
     <div class="full-width full-height justify-around">
-      <h3 class="text-h4">Bienvenue {{ userFirstName }} &#x1F44B;</h3>
+      <h3 class="text-h4">Bienvenue {{ User.firstname }} &#x1F44B;</h3>
 
       <div class="row justify-evenly full-height">
         <div  class="justify-center group-1">
