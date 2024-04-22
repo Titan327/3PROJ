@@ -54,6 +54,7 @@ const verifyPasswordForSensibleInfos = async (req, res, next) => {
     }
     const user = await User.findOne({ where: { id: req.params.userId } });
     if (!await compare(req.body.password, user.password)) {
+        console.log("5");
         return res.status(401).send({ message: "Unauthorized" });
     }
     next();
