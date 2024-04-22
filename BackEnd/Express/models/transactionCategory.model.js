@@ -24,7 +24,6 @@ const TransactionCategoryModel = sequelize.define("TransactionCategory", {
 
 async function syncDatabase() {
     try {
-        await sequelize.sync();
         const count = await TransactionCategoryModel.count();
         if (count === 0) {
 
@@ -49,6 +48,12 @@ async function syncDatabase() {
     }
 }
 
-syncDatabase();
+sequelize.sync().then(() => {
+    console.log('TransactionModel table created successfully!');
+    syncDatabase();
+}).catch((error) => {
+    console.error('Unable to create table UserModel : TransactionModel', error);
+});
+
 
 module.exports = TransactionCategoryModel;
