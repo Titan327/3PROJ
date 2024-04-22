@@ -1,18 +1,33 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {Transaction} from "src/interfaces/transactions.interface";
 import DialogCreateTransaction from "components/Groups/DialogCreateTransaction.vue";
 import {useQuasar} from "quasar";
+import {getUser} from "stores/userStore";
+import {api} from "boot/axios";
 
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
+let sortedTransactionList = ref<Transaction[]>([]);
 let dialogCreateTransaction = ref(false);
+let currentSort = ref('date');
 const $q = useQuasar();
 
 const props = defineProps({
   groupId: Number,
   userId: Boolean,
 });
+
+onMounted(async () => {
+
+  await getTransactionList()
+});
+
+async function getTransactionList(){
+  const response = await api.get(`group/${props.groupId}/transactions`);
+  transactionList.value = response.data;
+  sortTransaction('date');
+}
 
 function openDialogCreateTransaction(){
   dialogCreateTransaction.value = true;
@@ -32,6 +47,34 @@ function openDialogCreateTransaction(){
     dialogCreateTransaction.value = false;
   })
 }
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${day < 10 ? '0' : ''}${day}/${month < 10 ? '0' : ''}${month}/${year}`;
+};
+
+const sortTransaction = (type:string) => {
+  if(type === 'date'){
+    sortedTransactionList.value = transactionList.value.sort((a, b) => {
+      return new Date(b.date) - new Date(a.date);
+    });
+  }
+  else if(type === 'amount'){
+    sortedTransactionList.value = transactionList.value.sort((a, b) => {
+      return b.total_amount - a.total_amount;
+    });
+  }
+  else if(type === 'title'){
+    sortedTransactionList.value = transactionList.value.sort((a, b) => {
+      return a.label.localeCompare(b.label);
+    });
+  }
+  currentSort.value = type;
+}
+
 </script>
 
 <template>
@@ -64,25 +107,26 @@ function openDialogCreateTransaction(){
                 rounded
               >
                 <q-list>
-                  <q-item class="bg-primary" clickable v-close-popup @click="onItemClick">
+                  <q-item class="bg-primary" clickable v-close-popup @click="sortTransaction('date')">
                     <q-item-section>
                       <q-item-label>Date</q-item-label>
                     </q-item-section>
                   </q-item>
 
-                  <q-item class="bg-primary" clickable v-close-popup @click="onItemClick">
+                  <q-item class="bg-primary" clickable v-close-popup @click="sortTransaction('amount')">
                     <q-item-section>
                       <q-item-label>Montant</q-item-label>
                     </q-item-section>
                   </q-item>
 
-                  <q-item  class="bg-primary" clickable v-close-popup @click="onItemClick">
+                  <q-item  class="bg-primary" clickable v-close-popup @click="sortTransaction('title')">
                     <q-item-section>
                       <q-item-label>Titre A-Z</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
+
               <q-space>
 
               </q-space>
@@ -93,37 +137,58 @@ function openDialogCreateTransaction(){
                 @click="openDialogCreateTransaction"
                 no-caps/>
             </div>
-            <div class="row">
-              <q-card-section v-if="transactionList.length > 0">
-                <q-item v-for="transaction in transactionList" :key="transaction.id">
-                  <q-item-section avatar>
-                    <q-avatar rounded color="secondary" text-color="white">
-                      {{ transaction.Transaction.group.picture }}
-                    </q-avatar>
-                  </q-item-section>
-
-                  <q-item-section>
-                    <q-item-label class="text-h6">{{ transaction.Transaction.id}}</q-item-label>
-                  </q-item-section>
-
-                  <q-item-section>
-                    <q-item-label class="text-h6">{{ transaction.Transaction.date }}</q-item-label>
-                  </q-item-section>
-
-                  <q-item-section>
-                    <q-item-label class="text-h6">{{ transaction.Transaction.total_amount }}</q-item-label>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-chip class="chip-status" color="green" text-color="white">Payé</q-chip>
-                  </q-item-section>
-                </q-item>
-              </q-card-section>
-              <q-card-section v-if="transactionList.length == 0">
-                <q-item-section>
-                  <q-item-label class="text-h6 q-pa-lg">Rien à afficher</q-item-label>
+            <q-card-section>
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar round text-color="white" icon="group"/>
                 </q-item-section>
-              </q-card-section>
-            </div>
+
+                <q-item-section>
+                  <q-item-label class="">Nom</q-item-label>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="">Date</q-item-label>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="">Somme</q-item-label>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="">Action</q-item-label>
+                </q-item-section>
+
+              </q-item>
+            </q-card-section>
+            <q-separator/>
+            <q-card-section v-if="transactionList.length > 0">
+              <span class="q-pa-sm"><q-icon name="sort" />{{currentSort}}</span>
+              <q-item v-for="transaction in sortedTransactionList" :key="transaction.id">
+                <q-item-section avatar>
+                  <q-avatar round color="secondary" text-color="white">
+                    <img src="assets/defaults/group-default.webp"/>
+                  </q-avatar>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="">{{ transaction.label}}</q-item-label>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="">{{ formatDate(transaction.date) }}</q-item-label>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="">{{ transaction.total_amount }}€</q-item-label>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-btn outline color="secondary" rounded>Consulter</q-btn>
+                </q-item-section>
+
+              </q-item>
+            </q-card-section>
           </q-tab-panel>
 
           <q-tab-panel name="remboursements">

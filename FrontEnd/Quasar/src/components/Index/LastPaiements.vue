@@ -14,12 +14,8 @@ const router = useRouter();
 onMounted(async () => {
 
   User.value = await getUser();
-
   const response = await api.get(`user/${User.value.id}/lastTransactions?limit=5`);
-
   transactionList.value = response.data;
-
-  console.log(transactionList.value);
 });
 
 const formatDate = (dateString) => {
