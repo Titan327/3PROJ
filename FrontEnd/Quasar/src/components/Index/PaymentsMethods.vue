@@ -9,6 +9,7 @@ import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {DefaultPaymentMethod, DefaultRib} from "src/interfaces/paymentMethod.interface";
+import {convertIBAN, redirectToPaypal} from "stores/globalFunctionsStore";
 
 const  slide = ref('slide-0');
 const paiementsMethod = ref();
@@ -27,7 +28,7 @@ onMounted(async () => {
 async function getMethod(){
   try {
     console.log(paiementsMethod.value)
-    const response = await api.get(`/users/${User.value.id}/1/paymentMethode`)
+    const response = await api.get(`/users/me/paymentMethode`)
     paiementsMethod.value = response.data
   }
   catch(e){
@@ -50,18 +51,6 @@ async function openDialgAddPayment(type:string){
   }).onDismiss(() => {
     getMethod();
   })
-}
-
-const redirectToPaypal = (username:string) => {
-  window.open(`https://paypal.me/${username}`, '_blank');
-};
-
-function convertIBAN(iban:string){
-  const firstFour = iban.substring(0, 4);
-  const lastFour = iban.substring(iban.length - 4);
-  const middleStars = '*'.repeat(iban.length - 8);
-  const maskedIBAN = firstFour + middleStars + lastFour;
-  return maskedIBAN.match(/.{1,4}/g).join(' ')
 }
 </script>
 

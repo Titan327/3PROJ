@@ -1,20 +1,23 @@
 <script setup lang="ts">
 
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {disconnectUser, getUser} from "stores/userStore";
 import {useRouter} from "vue-router";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {api} from "boot/axios";
-import DialogInvitintoGroup from "components/Groups/DialogInvitintoGroup.vue";
+import {convertIBAN, redirectToPaypal} from "stores/globalFunctionsStore"
 import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
+import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue";
 
 const router = useRouter();
 let User = ref(DefaultUser());
 let modifiedUser = ref(DefaultUser());
 const $q = useQuasar();
+let PaymentisOpen = ref(false);
 
 let loading = ref(false);
+let mounted = ref(false);
 
 let isPhotoHover = ref(false);
 let expendUserDatas = ref(true);
@@ -33,9 +36,12 @@ let newPassConfirmation = ref();
 
 const paiementsMethod = ref();
 
-(async () => {
+onMounted(async () => {
+
   await getUserData();
-})();
+  await getMethod();
+  mounted.value=true;
+});
 
 async function getUserData() {
   const userData = await getUser();
@@ -151,6 +157,32 @@ async function changeUserData(){
   loading.value = false;
 }
 
+async function getMethod(){
+  try {
+    console.log(paiementsMethod.value)
+    const response = await api.get(`/users/me/paymentMethode`)
+    paiementsMethod.value = response.data
+  }
+  catch(e){
+    console.error(e)
+  }
+}
+
+async function openDialgAddPayment(){
+
+  PaymentisOpen.value = true;
+  $q.dialog({
+    component: DialogAddPaymentMethod,
+
+    componentProps: {
+      isOpen: PaymentisOpen,
+      userId: User.value.id,
+      type: "RIB"
+    }
+  }).onDismiss(() => {
+    getMethod();
+  })
+}
 </script>
 
 <template>
@@ -373,6 +405,7 @@ async function changeUserData(){
         <q-card-actions>
           <q-item-label class="text-h6 text-head-card q-pa-md" @click="expendPaymentMethod = !expendPaymentMethod">Moyens de paiement</q-item-label>
 
+          <q-btn round icon="add" class="text-h6 text-head-card q-pa-xs" size="12px" color="secondary" outline @click="openDialgAddPayment"></q-btn>
           <q-space />
 
           <q-btn
@@ -385,18 +418,50 @@ async function changeUserData(){
           />
         </q-card-actions>
 
-        <q-slide-transition>
+        <q-slide-transition >
           <div v-show="expendPaymentMethod">
             <q-separator />
-            <q-card-section class="text-subtitle2 row items-center justify-evenly">
-                <q-img src="assets/card/paypal-card.webp"
-                       class="rounded-borders paiement"
+            <div class="q-mx-auto q-pa-md wrap">
+            <div
+              v-for="(paiement, index) in paiementsMethod"
+              :key="index"
+            >
+            <q-card class="paiement rounded-borders" v-if="paiement.type=='Paypal'">
+              <q-img
+                src="/assets/card/paypal-card.webp"
+                class="rounded-borders"
               >
-                  <div class="absolute-bottom text-subtitle2 text-center">
-                    {{ 'test' }}
-                  </div>
-                </q-img>
-            </q-card-section>
+                <div class="absolute-bottom text-subtitle2 row">
+                  <q-item-label class="q-pa-xs">@{{paiement.value.user_paypal}}</q-item-label>
+                  <q-space></q-space>
+                  <q-item-label class="text-h6" v-if="paiement.type=='Paypal'">
+                    <q-icon name="open_in_new" @click="redirectToPaypal(paiement.value.user_paypal)" style="cursor: pointer;"
+                    />
+                  </q-item-label>
+                </div>
+              </q-img>
+            </q-card>
+
+            <q-card class="paiement rounded-borders" v-if="paiement.type=='RIB'">
+              <q-img
+                src="/assets/card/rib-card.webp"
+                class="rounded-borders"
+              >
+                <div class="absolute-bottom text-subtitle2 row">
+                  <q-item-label class="q-pa-xs">{{paiement.value.bank_name}}: {{paiement.value.surname}} {{paiement.value.name}}</q-item-label>
+                  <q-item-label class="q-pa-xs"></q-item-label>
+                  <q-space></q-space>
+                  <q-item-label class="q-pa-xs">{{convertIBAN(paiement.value.IBAN)}}</q-item-label>
+                </div>
+              </q-img>
+            </q-card>
+          </div>
+            </div>
+            <div class="row q-pa-md" v-if="mounted && paiementsMethod.length==0">
+              <q-item-label class="q-pa-md text-h6">Vous n'avez aucun moyen de paiement enregistré</q-item-label>
+              <q-space></q-space>
+              <q-btn class="q-pa-md" color="secondary rounded" @click="openDialgAddPayment">Ajouter</q-btn>
+            </div>
           </div>
         </q-slide-transition>
       </q-card>

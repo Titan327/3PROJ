@@ -7,10 +7,14 @@ import {Transaction} from "src/interfaces/transactions.interface";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useRouter} from "vue-router";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
+import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
+import {useQuasar} from "quasar";
 
 const transactionList = ref<Transaction[]>([]);
 const User = ref(DefaultUser());
 const router = useRouter();
+const $q = useQuasar();
+let dialogConsultTransaction = ref(false);
 
 onMounted(async () => {
 
@@ -18,6 +22,26 @@ onMounted(async () => {
   const response = await api.get(`users/${User.value.id}/lastTransactions?limit=5`);
   transactionList.value = response.data;
 });
+
+function openDialogConsultTransaction(transactionId:number, groupId:number){
+  dialogConsultTransaction.value = true;
+  $q.dialog({
+    component: DialogConsultTransaction,
+
+    componentProps: {
+      isOpen: dialogConsultTransaction,
+      groupId: groupId,
+      userId: User.value.id,
+      transactionId: transactionId
+    }
+  }).onOk(() => {
+    console.log('OK')
+  }).onCancel(() => {
+    console.log('Cancel')
+  }).onDismiss(() => {
+    dialogConsultTransaction.value = false;
+  })
+}
 
 </script>
 <template>
@@ -71,7 +95,7 @@ onMounted(async () => {
         </q-item-section>
 
         <q-item-section>
-         <q-btn outline color="secondary" rounded  @click="router.push(`/groups/${transaction.Transaction.groupId}`)">Consulter</q-btn>
+         <q-btn outline color="secondary" rounded @click="openDialogConsultTransaction(transaction.id,transaction.Transaction.groupId)">Consulter</q-btn>
         </q-item-section>
 
       </q-item>

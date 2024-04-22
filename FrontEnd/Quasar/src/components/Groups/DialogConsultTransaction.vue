@@ -72,7 +72,12 @@ function getUserAmount(userId: number) {
 function getCatText(catId: number) {
   return catList.value.find(cat => cat.id === catId)?.label;
 }
-
+function getCatIcon(catId: number) {
+  return catList.value.find(cat => cat.id === catId)?.icon;
+}
+function getCatColor(catId: number) {
+  return catList.value.find(cat => cat.id === catId)?.color;
+}
 
 </script>
 
@@ -89,10 +94,7 @@ function getCatText(catId: number) {
           <span>Créé le {{formatDate(_transaction.date)}}</span>
         </div>
         <div class="picture">
-          <q-avatar
-            size="128px">
-            <img src="assets/defaults/user-default.webp"/>
-          </q-avatar>
+          <q-avatar size="128px" font-size="52px" :style="{ 'background-color': getCatColor(_transaction.categoryId) }" text-color="white" :icon="getCatIcon(_transaction.categoryId)" />
         </div>
       </q-card-section>
       <q-card-section>
@@ -111,7 +113,7 @@ function getCatText(catId: number) {
                   <q-item-section>{{user.username}}</q-item-section>
 
                   <q-item-section avatar>
-                    {{getUserAmount(user.id)}}€
+                    {{formatNumber(getUserAmount(user.id))}}€
                   </q-item-section>
                 </q-item>
                 <q-separator color="secondary"></q-separator>
