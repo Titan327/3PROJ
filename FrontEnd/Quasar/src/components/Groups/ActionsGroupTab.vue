@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onMounted, ref, computed} from "vue";
 import {Transaction} from "src/interfaces/transactions.interface";
 import DialogCreateTransaction from "components/Groups/DialogCreateTransaction.vue";
 import {useQuasar} from "quasar";
 import {api} from "boot/axios";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
+import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
+
 
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
@@ -13,6 +15,8 @@ let dialogCreateTransaction = ref(false);
 let dialogConsultTransaction = ref(false);
 let currentSort = ref('date');
 const $q = useQuasar();
+let catList = ref([]);
+
 
 const props = defineProps({
   groupId: Number,
@@ -21,6 +25,7 @@ const props = defineProps({
 
 onMounted(async () => {
   await getTransactionList()
+  await getCat();
 });
 
 async function getTransactionList(){
@@ -89,10 +94,6 @@ const sortTransaction = (type:string) => {
   currentSort.value = type;
 }
 
-import { computed } from 'vue';
-import {formatDate} from "stores/globalFunctionsStore";
-import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
-
 const currentFilterText = computed(() => {
   switch (currentSort.value) {
     case 'title':
@@ -106,6 +107,22 @@ const currentFilterText = computed(() => {
   }
 });
 
+async function getCat(){
+  try {
+    const response = await api.get(`/transactionCategories/`);
+    catList.value = response.data;
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
+function getCatIcon(catId: number) {
+  return catList.value.find(cat => cat.id === catId)?.icon;
+}
+function getCatColor(catId: number) {
+  return catList.value.find(cat => cat.id === catId)?.color;
+}
 
 </script>
 
@@ -198,9 +215,7 @@ const currentFilterText = computed(() => {
               <span class="q-pa-sm"><q-icon class="q-mx-sm" name="swap_vert" />{{currentFilterText}}</span>
               <q-item v-for="transaction in sortedTransactionList" :key="transaction.id">
                 <q-item-section avatar>
-                  <q-avatar round color="secondary" text-color="white">
-                    <img src="assets/defaults/group-default.webp"/>
-                  </q-avatar>
+                  <q-avatar :style="{ 'background-color': getCatColor(transaction.categoryId) }" text-color="white" :icon="getCatIcon(transaction.categoryId)" />
                 </q-item-section>
 
                 <q-item-section>
