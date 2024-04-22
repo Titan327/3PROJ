@@ -46,7 +46,7 @@ function disconnect(){
           src="assets/logo-500.png"
           style="height: 140px; max-width: 150px"
         />
-        <q-item clickable v-ripple  @click="router.push('/#')">
+        <q-item clickable v-ripple  @click="router.push('../')">
           <q-item-section avatar>
             <q-icon color="secondary" name="dashboard" />
           </q-item-section>

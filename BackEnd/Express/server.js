@@ -94,3 +94,4 @@ app.use("/api/message", require("./routes/message.route"));
 
 initializeBucket("pp-user");
 initializeBucket("pp-group");
+TransactionCategory.syncDatabase;

@@ -31,6 +31,7 @@ router.get("/:userId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUse
 //POST http://localhost:9002/api/user/{id}/paymentMethode
 router.post("/:userId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.createPaymentMethode);
 router.get("/:userId/:groupId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.getPaymentMethode);
+router.get("/me/paymentMethode", securityMiddleware.verifyIsAuth, PaymentMethodeController.getMyPaymentMethode);
 
 
 module.exports = router;

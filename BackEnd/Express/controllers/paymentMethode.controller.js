@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const Joi = require('joi');
 
 const getPaymentMethode = async (req, res) => {
-    console.log(`REST getPaymentMethode`);
     const groupId = req.params.groupId;
     const userToSend = req.params.userId;
     const userAsking = req.authorization.userId;
@@ -48,7 +47,6 @@ const getPaymentMethode = async (req, res) => {
 }
 
 const createPaymentMethode = async (req, res) => {
-    console.log(`REST createPaymentMethode`);
     const userId = req.authorization.userId;
     let data = { type, paypal_username, name, surname, bank_name, box_code, bank_number, account_number, RIB_key, IBAN, BIC } = req.body;
     //value = value.replace(/\s/g, '');
@@ -158,6 +156,41 @@ const test = async (req, res) => {
     res.status(200).send("ok")
 }
 
+const getMyPaymentMethode = async (req,res) => {
+    const userId = req.authorization.userId;
+    try {
+        const paymentMethodes = await PaymentMethode.find({
+            userId: userId,
+        });
+        if (paymentMethodes === null) {
+            return res.status(404).send({ error: "Payment methode not found" });
+        }
+
+        let result = [];
+        let obj;
+
+        paymentMethodes.forEach(
+            methode => {
+                obj = {
+                    type: methode.type,
+                    value: {}
+                };
+                Object.keys(methode.value).forEach(
+                    val => {
+                        obj.value[val] = decrypt(process.env.AES_PAYEMENT_KEY,methode.value[val]);
+                    }
+                )
+                result.push(obj);
+            }
+        );
+
+        return res.status(200).send(result);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send(e);
+    }
+}
+
 function crypt(key,string){
     // creation de iv (comme le salt)
     const iv = crypto.randomBytes(16);
@@ -188,4 +221,5 @@ module.exports = {
     getPaymentMethode,
     createPaymentMethode,
     test,
+    getMyPaymentMethode
 }

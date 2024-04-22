@@ -41,6 +41,6 @@ async function syncDatabase() {
     }
 }
 
-syncDatabase();
+//syncDatabase();
 
 module.exports = TransactionCategoryModel;
