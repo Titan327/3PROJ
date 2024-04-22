@@ -8,10 +8,12 @@ import {DefaultUser} from "src/interfaces/user.interface";
 import {useRouter} from "vue-router";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
 import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
+import {useQuasar} from "quasar";
 
 const transactionList = ref<Transaction[]>([]);
 const User = ref(DefaultUser());
 const router = useRouter();
+const $q = useQuasar();
 let dialogConsultTransaction = ref(false);
 
 onMounted(async () => {

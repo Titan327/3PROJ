@@ -72,14 +72,15 @@ const Group = require('./models/group.model');
 const User = require('./models/user.model');
 const UserGroup = require('./models/userGroup.model');
 const Transaction = require('./models/transaction.model');
-const TransactionCategory = require('./models/transactionCategory.model');
 const TransactionUser = require('./models/transactionUser.model');
+const TransactionCategory = require('./models/transactionCategory.model');
 const Invitation = require('./models/invitation.model');
 const Refund = require('./models/refund.model');
-const PaymentMethode = require('./models/paymentMethode.model');
 
 require('./configurations/mongo.config');
 const Message = require('./models/message.model');
+const PaymentMethode = require('./models/paymentMethode.model');
+const BankInfo = require('./models/bankInfo.model');
 
 app.use("", require("./routes/invitation.route"));
 app.use("/api/auth", require("./routes/auth.route"));
@@ -89,6 +90,7 @@ app.use("/api/transactionCategories", require("./routes/transactionCategory.rout
 app.use("/api/oauth2", require("./routes/oauth2.route"));
 app.use("/api/img", require("./routes/image.route"));
 app.use("/api/messages", require("./routes/message.route"));
+app.use("/api/bankInfo", require("./routes/bankInfo.route"));
 
 initializeBucket("pp-user");
 initializeBucket("pp-group");

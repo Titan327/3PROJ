@@ -113,7 +113,7 @@ function getCatColor(catId: number) {
                   <q-item-section>{{user.username}}</q-item-section>
 
                   <q-item-section avatar>
-                    {{getUserAmount(user.id)}}€
+                    {{formatNumber(getUserAmount(user.id))}}€
                   </q-item-section>
                 </q-item>
                 <q-separator color="secondary"></q-separator>
