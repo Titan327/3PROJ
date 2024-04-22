@@ -16,8 +16,6 @@ const verifyIsAuth = (req, res, next) => {
     if (!verifyToken) {
         return res.status(403).send({ message: "Unauthorized"});
     }
-
-
     //Si il est bon
     req.authorization = verifyToken;
     next();
