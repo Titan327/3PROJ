@@ -3,8 +3,8 @@ import {onMounted, ref} from "vue";
 import {Transaction} from "src/interfaces/transactions.interface";
 import DialogCreateTransaction from "components/Groups/DialogCreateTransaction.vue";
 import {useQuasar} from "quasar";
-import {getUser} from "stores/userStore";
 import {api} from "boot/axios";
+import {formatDate, formatNumber} from "stores/globalFunctionsStore";
 
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
@@ -45,16 +45,9 @@ function openDialogCreateTransaction(){
     console.log('Cancel')
   }).onDismiss(() => {
     dialogCreateTransaction.value = false;
+    getTransactionList();
   })
 }
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  return `${day < 10 ? '0' : ''}${day}/${month < 10 ? '0' : ''}${month}/${year}`;
-};
 
 const sortTransaction = (type:string) => {
   if(type === 'date'){
@@ -74,6 +67,23 @@ const sortTransaction = (type:string) => {
   }
   currentSort.value = type;
 }
+
+import { computed } from 'vue';
+import {formatDate} from "stores/globalFunctionsStore";
+
+const currentFilterText = computed(() => {
+  switch (currentSort.value) {
+    case 'title':
+      return 'Titre A-Z';
+    case 'amount':
+      return 'Montant';
+    case 'date':
+      return 'Date';
+    default:
+      return '';
+  }
+});
+
 
 </script>
 
@@ -144,7 +154,7 @@ const sortTransaction = (type:string) => {
                 </q-item-section>
 
                 <q-item-section>
-                  <q-item-label class="">Nom</q-item-label>
+                  <q-item-label class="">Titre</q-item-label>
                 </q-item-section>
 
                 <q-item-section>
@@ -163,7 +173,7 @@ const sortTransaction = (type:string) => {
             </q-card-section>
             <q-separator/>
             <q-card-section v-if="transactionList.length > 0">
-              <span class="q-pa-sm"><q-icon name="sort" />{{currentSort}}</span>
+              <span class="q-pa-sm"><q-icon class="q-mx-sm" name="swap_vert" />{{currentFilterText}}</span>
               <q-item v-for="transaction in sortedTransactionList" :key="transaction.id">
                 <q-item-section avatar>
                   <q-avatar round color="secondary" text-color="white">
@@ -180,7 +190,7 @@ const sortTransaction = (type:string) => {
                 </q-item-section>
 
                 <q-item-section>
-                  <q-item-label class="">{{ transaction.total_amount }}€</q-item-label>
+                  <q-item-label class="">{{formatNumber(transaction.total_amount)}}€</q-item-label>
                 </q-item-section>
 
                 <q-item-section>

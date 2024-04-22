@@ -6,6 +6,7 @@ import {getUser} from "stores/userStore";
 import {Transaction} from "src/interfaces/transactions.interface";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useRouter} from "vue-router";
+import {formatDate, formatNumber} from "stores/globalFunctionsStore";
 
 const transactionList = ref<Transaction[]>([]);
 const User = ref(DefaultUser());
@@ -17,14 +18,6 @@ onMounted(async () => {
   const response = await api.get(`user/${User.value.id}/lastTransactions?limit=5`);
   transactionList.value = response.data;
 });
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  return `${day < 10 ? '0' : ''}${day}/${month < 10 ? '0' : ''}${month}/${year}`;
-};
 
 </script>
 <template>
@@ -74,7 +67,7 @@ const formatDate = (dateString) => {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="">{{ transaction.amount }}€</q-item-label>
+          <q-item-label class="">{{ formatNumber(transaction.amount) }}€</q-item-label>
         </q-item-section>
 
         <q-item-section>
