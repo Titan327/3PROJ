@@ -26,6 +26,11 @@ const RefundModel = sequelize.define("Refund", {
         type: DataTypes.FLOAT,
         allowNull: false
     },
+    processed: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
 });
 
 // Relation avec les users & userTransaction & group

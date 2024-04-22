@@ -2,6 +2,7 @@
 import { useQuasar } from 'quasar'
 import {onMounted, ref} from "vue";
 import { api } from "boot/axios";
+import {DefaultRib} from "src/interfaces/paymentMethod.interface";
 const $q = useQuasar();
 
 let isOpen = ref(false);
@@ -10,6 +11,7 @@ const optn = ref(["RIB","PayPal"]);
 let paymentType = ref("RIB")
 
 let paypalId = ref("");
+let rib = ref(DefaultRib());
 let file = ref(null);
 
 const props = defineProps({
@@ -36,25 +38,28 @@ function chackHasFile(): boolean {
 async function postRib() {
   loading.value = true;
   try {
-    if (!chackHasFile()) {
-      return;
-    }
+    //if (!chackHasFile()) {
+      //return;
+    //}
     const formData = new FormData();
-    formData.append('image', file.value);
+    //formData.append('image', file.value);
 
-    let response = null;
-
-    if(props.groupId){
-      response = await api.post(`/img/upload/group-picture/${props.groupId}`, formData);
-    }
-    else{
-      response = await api.post("/img/upload/profile-picture", formData);
-    }
+    const response = await api.post(`/user/${props.userId}/paymentMethode`, {
+      "type": "RIB",
+      "name": rib.value.name,
+      "surname": rib.value.surname,
+      "bank_name":rib.value.bank_name,
+      "bank_number": rib.value.bank_number,
+      "box_code": rib.value.box_code,
+      "account_number": rib.value.account_number,
+      "RIB_key": rib.value.RIB_key,
+      "IBAN": rib.value.IBAN,
+    });
 
     if (response.data) {
       $q.notify({
         type: 'positive',
-        message: 'Moyen de paiement ajouté avec succès'
+        message: 'RIB ajouté avec succès'
       })
       isOpen.value= false;
     }
@@ -72,8 +77,8 @@ async function postPayPal() {
   loading.value = true;
   try {
     const response = await api.post(`/user/${props.userId}/paymentMethode`, {
-      "type": "Paypal email",
-      "value": paypalId,
+      "type": "Paypal",
+      "paypal_username": paypalId.value,
     });
 
     if (response.data) {
@@ -109,12 +114,13 @@ const redirectToPaypal = () => {
 
 <template>
   <q-dialog v-model="isOpen">
-    <q-card class="bg-primary" style="width: 500px; max-width: 80vw;">
+    <q-card class="bg-primary" style="width: 600px; max-width: 80vw;">
       <q-card-section>
         <div class="text-h5">Ajouter un moyen de paiement</div>
       </q-card-section>
       <q-card-section>
           <q-select
+            class="input"
             outlined
             v-model="paymentType"
             :options="optn"
@@ -129,10 +135,98 @@ const redirectToPaypal = () => {
       <!-- RIB -->
       <q-card-section v-if="paymentType=='RIB'">
         <div class="column">
+
+          <div class="row justify-evenly">
+            <q-input
+              dark
+              class="input-2"
+              outlined
+              label="Nom du tilulaire"
+              color="secondary"
+              stack-label
+              v-model="rib.name">
+            </q-input>
+
+            <q-input
+              dark
+              class="input-2"
+              outlined
+              label="Prénom du tilulaire"
+              color="secondary"
+              stack-label
+              v-model="rib.surname">
+            </q-input>
+
+          </div>
+
+          <div class="row justify-center">
+            <q-input
+              dark
+              outlined
+              class="input"
+              label="Banque
+"
+              color="secondary"
+              stack-label
+              v-model="rib.bank_name">
+            </q-input>
+          </div>
+
+          <span>R.I.B</span>
+
+          <div class="row justify-evenly">
+            <q-input
+              dark
+              outlined
+              class="input-4"
+              label="Code Banque"
+              color="secondary"
+              stack-label
+              v-model="rib.bank_number">
+            </q-input>
+            <q-input
+              dark
+              outlined
+              class="input-4"
+              label="Code Guichet"
+              color="secondary"
+              stack-label
+              v-model="rib.box_code">
+            </q-input>
+            <q-input
+              class="input-4"
+              dark
+              outlined
+              label="Numéro de compte"
+              color="secondary"
+              stack-label
+              v-model="rib.account_number">
+            </q-input>
+            <q-input
+              class="input-4"
+              dark
+              outlined
+              label="Clé RIB"
+              color="secondary"
+              stack-label
+              v-model="rib.RIB_key">
+            </q-input>
+          </div>
+          <q-input
+            class="input"
+            dark
+            outlined
+            label="IBAN"
+            color="secondary"
+            stack-label
+            v-model="rib.IBAN">
+          </q-input>
+
             <q-file
               outlined
+              class="input"
               v-model="file"
-              label="Choisir un document"
+              label="Justificatif"
               dark
               color="secondary"
               hint="Format accepté : PDF, JPEG, PNG"
@@ -159,6 +253,7 @@ const redirectToPaypal = () => {
           <q-input
             dark
             outlined
+            class="input"
             label="Pseudo PayPal"
             prefix="@"
             color="secondary"
@@ -190,5 +285,19 @@ const redirectToPaypal = () => {
 .btn{
   width: 50%;
   margin: 10px auto;
+}
+.input{
+  margin: 10px auto;
+  width: 95%;
+}
+
+.input-2{
+  margin: 10px auto;
+  width: 45%;
+}
+
+.input-4{
+  margin: 10px 0;
+  width: 22%;
 }
 </style>
