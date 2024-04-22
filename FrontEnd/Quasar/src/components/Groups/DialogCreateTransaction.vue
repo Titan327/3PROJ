@@ -30,7 +30,7 @@ onMounted(async () => {
 
 async function getCatOptn(){
   try {
-    const response = await api.get(`/transactionCategory/`);
+    const response = await api.get(`/transactionCategories/`);
     catOptn.value = response.data;
   }
   catch (error) {
@@ -45,7 +45,7 @@ async function createTransaction() {
 
   loading.value = true;
     try {
-      const response = await api.post("transaction", {
+      const response = await api.post(`groups/${props.groupId}/transactions`, {
         "groupId": props.groupId,
         "label": _transaction.value.label,
         "total_amount": _transaction.value.total_amount,
@@ -87,7 +87,7 @@ function createDetail() {
 async function getGroup() {
   User.value = await getUser();
   try {
-    const response = await api.get(`/group/${props.groupId}`);
+    const response = await api.get(`/groups/${props.groupId}`);
     group.value = response.data;
     createDetail();
     mounted.value = true;

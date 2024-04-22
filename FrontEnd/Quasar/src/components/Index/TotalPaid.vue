@@ -24,14 +24,14 @@ onMounted(async () => {
       displayColor.value = 'red';
       titleText.value = 'Reste à payer';
       icon.value = 'north_east';
-      const response = await api.get(`user/${User.value.id}/transactions/notRefunded`);
+      const response = await api.get(`users/${User.value.id}/transactions/notRefunded`);
       montantTotal.value = response.data.amount;
       operations.value = response.data.transactions;
     } else {
       displayColor.value = 'green';
       titleText.value = 'Total payé ce mois-ci';
       icon.value = 'south_west';
-      const response = await api.get(`user/${User.value.id}/transactions/thisMonth`);
+      const response = await api.get(`users/${User.value.id}/transactions/thisMonth`);
       montantTotal.value = response.data.amount;
       operations.value = response.data.transactions;
     }

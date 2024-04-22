@@ -1,6 +1,6 @@
 const TransactionCategory = require('../models/transactionCategory.model');
 
-const getAllTrasactionCategory = async (req, res) => {
+const getTrasactionCategories = async (req, res) => {
     try {
         const Category = await TransactionCategory.findAll({
             attributes: ['id','label']
@@ -14,5 +14,5 @@ const getAllTrasactionCategory = async (req, res) => {
 
 
 module.exports = {
-    getAllTrasactionCategory
+    getTrasactionCategories
 }
