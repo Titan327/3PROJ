@@ -212,6 +212,7 @@ function getCatColor(catId: number) {
             </q-card-section>
             <q-separator/>
             <q-card-section v-if="transactionList.length > 0">
+              <q-scroll-area style="height: 300px">
               <span class="q-pa-sm"><q-icon class="q-mx-sm" name="swap_vert" />{{currentFilterText}}</span>
               <q-item v-for="transaction in sortedTransactionList" :key="transaction.id">
                 <q-item-section avatar>
@@ -235,6 +236,7 @@ function getCatColor(catId: number) {
                 </q-item-section>
 
               </q-item>
+              </q-scroll-area>
             </q-card-section>
           </q-tab-panel>
 
