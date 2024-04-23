@@ -1,3 +1,5 @@
+import {api} from "boot/axios";
+
 export const formatDate = (dateString) => {
   const date = new Date(dateString);
   const day = date.getDate();
@@ -22,4 +24,8 @@ export function convertIBAN(iban:string){
   const middleStars = '*'.repeat(iban.length - 8);
   const maskedIBAN = firstFour + middleStars + lastFour;
   return maskedIBAN.match(/.{1,4}/g).join(' ')
+}
+
+export function redirectBankWebSite(link:string){
+  window.open(link, '_blank');
 }
