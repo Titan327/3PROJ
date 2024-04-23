@@ -12,7 +12,6 @@ export function formatNumber(num) {
   return formattedNum;
 }
 
-
 export const redirectToPaypal = (username:string) => {
   window.open(`https://paypal.me/${username}`, '_blank');
 };

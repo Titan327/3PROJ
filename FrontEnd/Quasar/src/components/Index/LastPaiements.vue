@@ -21,6 +21,7 @@ onMounted(async () => {
   User.value = await getUser();
   const response = await api.get(`users/${User.value.id}/lastTransactions?limit=5`);
   transactionList.value = response.data;
+  console.log(transactionList.value);
 });
 
 function openDialogConsultTransaction(transactionId:number, groupId:number){
@@ -95,7 +96,7 @@ function openDialogConsultTransaction(transactionId:number, groupId:number){
         </q-item-section>
 
         <q-item-section>
-         <q-btn outline color="secondary" rounded @click="openDialogConsultTransaction(transaction.id,transaction.Transaction.groupId)">Consulter</q-btn>
+         <q-btn outline color="secondary" rounded @click="openDialogConsultTransaction(transaction.Transaction.id,transaction.Transaction.groupId)">Consulter</q-btn>
         </q-item-section>
 
       </q-item>
