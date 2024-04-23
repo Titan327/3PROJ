@@ -6,7 +6,9 @@ const RefundController = require('./refund.controller');
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
-    const {groupId, label, total_amount, date, receipt, senderId, categoryId, details} = req.body;
+    let groupId = req.params.groupId;
+    let senderId = req.authorization.userId;
+    const {label, total_amount, date, receipt, categoryId, details} = req.body;
     if (total_amount <= 0) {
         return res.status(400).send('The total amount of the transaction must be greater than 0');
     }
@@ -51,13 +53,13 @@ const createTransaction = async (req, res) => {
             }
         }
 
-        if (totalDetailAmount === total_amount) {
+        if (parseFloat(totalDetailAmount).toFixed(2) === parseFloat(total_amount).toFixed(2)) {
             for (const detail of detailsArray) {
-                if (detail.amount > 0) {
+                if (detail.amount > 0 || parseInt(detail.userId) === parseInt(senderId)) {
                     await TransactionUser.create({
                         transactionId: transaction.id,
                         userId: detail.userId,
-                        amount: detail.amount
+                        amount: parseInt(detail.amount).toFixed(2)
                     });
                     let userGroup = await UserGroup.findOne({
                         where: {
@@ -66,10 +68,11 @@ const createTransaction = async (req, res) => {
                         }
                     });
                     let newBalance = userGroup.balance;
+
                     if (parseInt(detail.userId) !== parseInt(senderId)) {
-                        newBalance = userGroup.balance - detail.amount;
+                        newBalance = userGroup.balance - parseInt(detail.amount).toFixed(2);
                     } else {
-                        newBalance = userGroup.balance + total_amount - detail.amount;
+                        newBalance = userGroup.balance + total_amount - parseInt(detail.amount).toFixed(2);
                     }
                     await UserGroup.update(
                         { balance: newBalance },

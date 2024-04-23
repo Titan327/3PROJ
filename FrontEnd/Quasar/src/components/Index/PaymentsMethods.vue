@@ -9,7 +9,7 @@ import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {DefaultPaymentMethod, DefaultRib} from "src/interfaces/paymentMethod.interface";
-import {convertIBAN, redirectToPaypal} from "stores/globalFunctionsStore";
+import {convertIBAN, redirectBankWebSite, redirectToPaypal} from "stores/globalFunctionsStore";
 
 const  slide = ref('slide-0');
 const paiementsMethod = ref();
@@ -51,11 +51,6 @@ async function openDialgAddPayment(type:string){
   }).onDismiss(() => {
     getMethod();
   })
-}
-
-async function redirectBankWebSite(code:number){
-  const bank = await api.get(`bankInfo/${{code}}`);
-  window.open(bank.data.site_internet, '_blank');
 }
 
 </script>
@@ -120,7 +115,7 @@ async function redirectBankWebSite(code:number){
                   <q-item-label class="q-pa-xs">{{convertIBAN(paiement.value.IBAN)}}</q-item-label>
                   <q-space></q-space>
                   <q-item-label class="text-h6" v-if="paiement.type=='RIB'">
-                    <q-icon name="open_in_new" @click="redirectBankWebSite(paiement.value.bank_number)" style="cursor: pointer;"
+                    <q-icon name="open_in_new" @click="redirectBankWebSite(paiement.bank_link)" style="cursor: pointer;"
                     />
                   </q-item-label>
                 </div>
@@ -138,7 +133,6 @@ async function redirectBankWebSite(code:number){
         <q-item-label class="btn-no-payment text-h6">
           Vous n'avez aucun moyen de paiement enregistré
         </q-item-label>
-
         <q-btn
           class="btn-no-payment q-pa-md"
           rounded
@@ -156,7 +150,6 @@ async function redirectBankWebSite(code:number){
           Ajouter RIB
         </q-btn>
       </div>
-
     </q-card-section>
   </q-card>
 </template>

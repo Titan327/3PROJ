@@ -6,7 +6,7 @@ import {useRouter} from "vue-router";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {api} from "boot/axios";
-import {convertIBAN, redirectToPaypal} from "stores/globalFunctionsStore"
+import {convertIBAN, redirectBankWebSite, redirectToPaypal} from "stores/globalFunctionsStore"
 import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue";
 
@@ -185,10 +185,6 @@ async function openDialgAddPayment(){
   })
 }
 
-function redirectBankWebSite(code:number){
-  //const bank = api.get(`bankInfo/${{code}}`);
-  window.open(bankWebsite.value, '_blank');
-}
 </script>
 
 <template>
@@ -460,7 +456,7 @@ function redirectBankWebSite(code:number){
                   <q-item-label class="q-pa-xs">{{convertIBAN(paiement.value.IBAN)}}</q-item-label>
                   <q-space></q-space>
                   <q-item-label class="text-h6">
-                    <q-icon name="open_in_new" @click="redirectBankWebSite(paiement.value.bank_number)" style="cursor: pointer;"
+                    <q-icon name="open_in_new" @click="redirectBankWebSite(paiement.bank_link)" style="cursor: pointer;"
                     />
                   </q-item-label>
                 </div>
