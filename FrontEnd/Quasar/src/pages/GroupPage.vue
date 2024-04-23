@@ -87,7 +87,7 @@ async function openDialogInvite(id: number, name: string){
   catch (error) {
     $q.notify({
       type: 'negative',
-      message: 'Une erreur s\'est produite lors de la création du groupe'
+      message: 'Une erreur s\'est produite lors de la création de l\'invitation'
     })
   }
 }

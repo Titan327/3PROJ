@@ -10,6 +10,7 @@ import MessageDrawer from "components/ConsultGroup/MessageDrawer.vue";
 import {DefaultGroup} from "src/interfaces/group.interface";
 import ActionsGroupTab from "components/Groups/ActionsGroupTab.vue";
 import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
+import DialogCustomInvitintoGroup from "src/components/Groups/DialogCustomInvitintoGroup.vue";
 
 const router = useRouter();
 let User = ref(DefaultUser());
@@ -26,6 +27,8 @@ let isFavorite = ref(false);
 
 let isEditGroupName = ref(false);
 let isEditGroupDesc = ref(false);
+
+let isOpenDialogInvite = ref(false);
 
 onMounted(async () => {
   await getGroup()
@@ -73,6 +76,26 @@ async function openDialogPP(){
   }).onDismiss(() => {
     window.location.reload();
   })
+}
+
+async function openDialogInvite(){
+
+  isOpenDialogInvite.value = true;
+      $q.dialog({
+        component: DialogCustomInvitintoGroup,
+
+        componentProps: {
+          isOpen: isOpenDialogInvite,
+          groupName: group.value.name,
+          groupId: group.value.id
+        }
+      }).onOk(() => {
+        console.log('OK')
+      }).onCancel(() => {
+        console.log('Cancel')
+      }).onDismiss(() => {
+        console.log('Dismiss')
+      })
 }
 
 async function addOrRemoveFav() {
@@ -203,6 +226,15 @@ async function editGroup() {
     <div class="q-pa-md q-gutter-sm" style="height: 80px">
       <q-item-label class="text-h6">
         {{group.activeUsersCount}} {{ group.activeUsersCount === 1 ? 'Membre' : 'Membres' }}
+        <q-btn class="q-mx-auto q-pa-xs"
+               no-caps
+               icon="person_add"
+               v-if="mounted"
+               color="secondary"
+               @click="openDialogInvite"
+               flat
+               outline
+        ></q-btn>
       </q-item-label>
       <q-avatar
         v-for="(user, index) in group.Users"
