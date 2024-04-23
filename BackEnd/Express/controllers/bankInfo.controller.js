@@ -1,4 +1,4 @@
-const BankInfo = require("../models/bankInfo.model")
+const BankInfo = require("../models/bankInfo.model");
 
 const Get = async (req,res) => {
     try {
