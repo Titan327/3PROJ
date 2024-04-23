@@ -24,12 +24,11 @@ const getPaymentMethode = async (req, res) => {
             let result = [];
             let obj;
 
-            paymentMethodes.forEach(
-                methode => {
-
-                    const exist = BankInfo.find({code_banque: methode.value.bank_number });
+            for (const methode of paymentMethodes) {
+                try {
+                    const exist = await BankInfo.findOne({code_banque: decrypt(process.env.AES_PAYEMENT_KEY, methode.value.bank_number)});
                     let bank_link = null;
-                    if (exist){
+                    if (exist) {
                         bank_link = exist.site_internet;
                     }
 
@@ -46,8 +45,10 @@ const getPaymentMethode = async (req, res) => {
                     )
 
                     result.push(obj);
+                } catch (error) {
+                    console.error(error);
                 }
-            );
+            }
 
             return res.status(200).send(result);
         }
@@ -187,8 +188,6 @@ const getMyPaymentMethode = async (req,res) => {
                 if (exist) {
                     bank_link = exist.site_internet;
                 }
-
-                console.log(exist);
 
                 obj = {
                     id: methode._id,
