@@ -116,7 +116,7 @@ function getCatColor(catId: number) {
                     {{formatNumber(getUserAmount(user.id))}}€
                   </q-item-section>
                 </q-item>
-                <q-separator color="secondary"></q-separator>
+                <q-separator v-if="getUserAmount(user.id)" color="secondary"></q-separator>
               </div>
             </q-scroll-area>
           </q-list>
