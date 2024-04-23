@@ -61,7 +61,7 @@ const calculateMinimalRefunds = async (groupId) => {
 
         let negativeUsers = users.filter(user => user.balance < 0);
         let positiveUsers = users.filter(user => user.balance > 0);
-        
+
         negativeUsers.sort((a, b) => b.balance - a.balance);
         positiveUsers.sort((a, b) => b.balance - a.balance);
 

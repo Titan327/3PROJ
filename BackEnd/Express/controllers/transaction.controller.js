@@ -7,7 +7,8 @@ const RefundController = require('./refund.controller');
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
     let groupId = req.params.groupId;
-    const {label, total_amount, date, receipt, senderId, categoryId, details} = req.body;
+    let senderId = req.authorization.userId;
+    const {label, total_amount, date, receipt, categoryId, details} = req.body;
     if (total_amount <= 0) {
         return res.status(400).send('The total amount of the transaction must be greater than 0');
     }
