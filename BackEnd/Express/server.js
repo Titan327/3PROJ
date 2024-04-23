@@ -91,6 +91,7 @@ app.use("/api/oauth2", require("./routes/oauth2.route"));
 app.use("/api/img", require("./routes/image.route"));
 app.use("/api/messages", require("./routes/message.route"));
 app.use("/api/bankInfo", require("./routes/bankInfo.route"));
+app.use("/api/notifs", require("./routes/notif.route"));
 
 initializeBucket("pp-user");
 initializeBucket("pp-group");
