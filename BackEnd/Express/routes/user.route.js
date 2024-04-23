@@ -14,8 +14,10 @@ router.get("/:userId/groups", securityMiddleware.verifyIsAuthAndActivUser, Group
 router.get("/:userId/transactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getUserTransactions);
 //GET http://localhost:9002/api/users/{id}/lastTransactions/limit={limit}
 router.get("/:userId/lastTransactions", securityMiddleware.verifyIsAuthAndActivUser, TransactionController.getXLastsUserTransactions);
-//GET http://localhost:9002/api/users/{id}/trasnactions/thisMonth
+//GET http://localhost:9002/api/users/{id}/transnactions/thisMonth
 router.get("/:userId/transactions/thisMonth", securityMiddleware.verifyIsAuthAndActivUser, UserController.getAmountOfAllUserTransactionsThisMonth);
+//GET http://localhost:9002/api/users/{id}/transnactions/averageBalance
+router.get("/:userId/transactions/totalBalance", securityMiddleware.verifyIsAuthAndActivUser, UserController.totalBalance);
 
 
 //GET http://localhost:9002/api/users/{id}
