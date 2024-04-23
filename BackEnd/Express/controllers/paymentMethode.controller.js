@@ -1,5 +1,6 @@
 const PaymentMethode = require('../models/paymentMethode.model');
 const UserGroup = require('../models/userGroup.model');
+const BankInfo = require("../models/bankInfo.model");
 const crypto = require('crypto');
 const Joi = require('joi');
 
@@ -23,21 +24,31 @@ const getPaymentMethode = async (req, res) => {
             let result = [];
             let obj;
 
-            paymentMethodes.forEach(
-                methode => {
+            for (const methode of paymentMethodes) {
+                try {
+                    const exist = await BankInfo.findOne({code_banque: decrypt(process.env.AES_PAYEMENT_KEY, methode.value.bank_number)});
+                    let bank_link = null;
+                    if (exist) {
+                        bank_link = exist.site_internet;
+                    }
+
                     obj = {
                         id: methode._id,
                         type: methode.type,
-                        value: {}
+                        value: {},
+                        bank_link: bank_link
                     };
                     Object.keys(methode.value).forEach(
                         val => {
                             obj.value[val] = decrypt(process.env.AES_PAYEMENT_KEY,methode.value[val]);
                         }
                     )
+
                     result.push(obj);
+                } catch (error) {
+                    console.error(error);
                 }
-            );
+            }
 
             return res.status(200).send(result);
         }
@@ -170,21 +181,30 @@ const getMyPaymentMethode = async (req,res) => {
         let result = [];
         let obj;
 
-        paymentMethodes.forEach(
-            methode => {
+        for (const methode of paymentMethodes) {
+            try {
+                const exist = await BankInfo.findOne({code_banque: decrypt(process.env.AES_PAYEMENT_KEY, methode.value.bank_number)});
+                let bank_link = null;
+                if (exist) {
+                    bank_link = exist.site_internet;
+                }
+
                 obj = {
                     id: methode._id,
                     type: methode.type,
-                    value: {}
+                    value: {},
+                    bank_link: bank_link
                 };
                 Object.keys(methode.value).forEach(
                     val => {
-                        obj.value[val] = decrypt(process.env.AES_PAYEMENT_KEY,methode.value[val]);
+                        obj.value[val] = decrypt(process.env.AES_PAYEMENT_KEY, methode.value[val]);
                     }
                 )
                 result.push(obj);
+            } catch (error) {
+                console.error(error);
             }
-        );
+        }
 
         return res.status(200).send(result);
     } catch (e) {
