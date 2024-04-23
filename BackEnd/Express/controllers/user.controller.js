@@ -1,10 +1,13 @@
 const {genSalt, hash} = require("bcrypt");
 const User = require('../models/user.model');
+const UserGroup = require('../models/userGroup.model');
 const UserController = require('./userGroup.controller');
 const UserGroupController = require('./userGroup.controller');
 const TransactionUserController = require('./transactionUser.controller');
 const Joi = require("joi");
 const UserMiddleware = require('../middlewares/user.middleware');
+const GroupController = require('./group.controller');
+const {where} = require("sequelize");
 
 const getUser = async (req, res) => {
     try {
@@ -15,9 +18,9 @@ const getUser = async (req, res) => {
             return res.status(404).send('User not found');
         }
         const base_url = user.profile_picture;
-        if (base_url){
+        if (base_url) {
             user.profile_picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
-        }else {
+        } else {
             user.profile_picture = null;
         }
         return res.status(200).send(user);
@@ -127,6 +130,7 @@ const deleteUser = async (req, res) => {
         });
         await UserController.deleteUserGroupRelationsWhenDeletingUser(req.params.userId);
         await UserGroupController.deleteUserGroupRelationsWhenDeletingUser(req.params.userId);
+        await GroupController.switchGroupOwnerWhenDeletingUser(req.params.userId);
         res.status(200).send({ message: "User deleted successfully"});
     } catch (e) {
         console.error(e);
@@ -149,11 +153,30 @@ const getAmountOfAllUserTransactionsThisMonth = async (req, res) => {
     }
 }
 
+const totalBalance = async (req, res) => {
+    console.log(`REST getAverageBalance`);
+    try {
+        const userGroups = await UserGroup.findAll({
+            where: { userId: req.params.userId },
+            attributes: ['balance']
+        });
+        let amount = 0;
+        for (let i = 0; i < userGroups.length; i++) {
+            amount += userGroups[i].balance;
+        }
+        return req.res.status(200).send({ amount: amount });
+    } catch (e) {
+        console.error(e);
+        res.status(500).send(e);
+    }
+}
+
 module.exports = {
     getUser,
     createUser,
     modifyUser,
     modifyPassword,
     deleteUser,
-    getAmountOfAllUserTransactionsThisMonth
+    getAmountOfAllUserTransactionsThisMonth,
+    totalBalance
 }

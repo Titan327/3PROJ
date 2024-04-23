@@ -189,5 +189,6 @@ module.exports = {
     createGroup,
     modifyGroup,
     getGroups,
-    modifyGroupPicture
+    modifyGroupPicture,
+    switchGroupOwnerWhenDeletingUser
 }
