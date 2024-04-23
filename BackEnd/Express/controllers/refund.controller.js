@@ -61,6 +61,9 @@ const calculateMinimalRefunds = async (groupId) => {
 
         let negativeUsers = users.filter(user => user.balance < 0);
         let positiveUsers = users.filter(user => user.balance > 0);
+        
+        negativeUsers.sort((a, b) => b.balance - a.balance);
+        positiveUsers.sort((a, b) => b.balance - a.balance);
 
         for (let negativeUser of negativeUsers) {
             let positUserExact = positiveUsers.find(user => user.balance === -negativeUser.balance);
@@ -79,40 +82,37 @@ const calculateMinimalRefunds = async (groupId) => {
             }
         }
 
-        negativeUsers.sort((a, b) => b.balance - a.balance);
-        positiveUsers.sort((a, b) => b.balance - a.balance);
-
-        for (let negatifUser of negativeUsers) {
-            for (let positifUser of positiveUsers) {
-                if (-negatifUser.balance >= positifUser.balance) {
-                    if (positifUser.balance !== 0) {
+        for (let negativeUser of negativeUsers) {
+            for (let positUser of positiveUsers) {
+                if (-negativeUser.balance >= positUser.balance) {
+                    if (positUser.balance !== 0) {
                         await Refund.create({
                             groupId,
-                            refundingUserId: negatifUser.userId,
-                            refundedUserId: positifUser.userId,
-                            amount: positifUser.balance,
+                            refundingUserId: negativeUser.userId,
+                            refundedUserId: positUser.userId,
+                            amount: positUser.balance,
                             processed: false
                         });
-                        negatifUser.balance += positifUser.balance;
-                        positifUser.balance = 0;
+                        negativeUser.balance += positUser.balance;
+                        positUser.balance = 0;
                     }
                 }
             }
         }
 
         //Si il reste des négatifs et des positifs, on rembourse les plus gros possibles
-        for (let negatifUser of negativeUsers) {
-            for (let positifUser of positiveUsers) {
-                if (-negatifUser.balance !== 0) {
+        for (let negativeUser of negativeUsers) {
+            for (let positUser of positiveUsers) {
+                if (-negativeUser.balance !== 0) {
                     await Refund.create({
                         groupId,
-                        refundingUserId: negatifUser.userId,
-                        refundedUserId: positifUser.userId,
-                        amount: -negatifUser.balance,
+                        refundingUserId: negativeUser.userId,
+                        refundedUserId: positUser.userId,
+                        amount: -negativeUser.balance,
                         processed: false
                     });
-                    positifUser.balance += negatifUser.balance;
-                    negatifUser.balance = 0;
+                    positUser.balance += negativeUser.balance;
+                    negativeUser.balance = 0;
                 }
             }
         }
