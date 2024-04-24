@@ -456,7 +456,7 @@ async function openDialgAddPayment(){
                   <q-item-label class="q-pa-xs">{{convertIBAN(paiement.value.IBAN)}}</q-item-label>
                   <q-space></q-space>
                   <q-item-label class="text-h6">
-                    <q-icon name="open_in_new" @click="redirectBankWebSite(paiement.bank_link)" style="cursor: pointer;"
+                    <q-icon name="open_in_new" v-if="paiement.type=='RIB'" @click="redirectBankWebSite(paiement.bank_link)" style="cursor: pointer;"
                     />
                   </q-item-label>
                 </div>
