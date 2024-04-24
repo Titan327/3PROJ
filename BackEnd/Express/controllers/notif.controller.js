@@ -1,4 +1,4 @@
-const Notif = require('../models/Notif.model');
+const Notif = require('../models/notif.model');
 const UserGroup = require("../models/userGroup.model");
 const Message = require("../models/message.model");
 
