@@ -5,7 +5,7 @@ import {DefaultUser, IUser} from "src/interfaces/user.interface";
 const user: Ref<IUser> = ref(DefaultUser());
 function updateUser(token: string): void {
   user.value.token = token;
-  localStorage.setItem('userToken', token);
+  sessionStorage.setItem('userToken', token);
 }
 
 async function getUserData(): Promise<void> {

@@ -111,6 +111,21 @@ async function register() {
   loading.value = false;
 }
 
+
+async function loginGoogle() {
+
+  const authWindow = window.open('https://3proj-back.tristan-tourbier.com/api/oauth2/google', '_blank', 'height=600,width=600');
+
+  window.addEventListener('message', (event) => {
+
+    if (event.data.token){
+      console.log('Message reçu de la fenêtre enfant :', event.data.token);
+      localStorage.setItem('userToken', event.data.token);
+      window.location.href = '/';
+    }
+
+  });
+}
 </script>
 
 <template>
@@ -212,7 +227,7 @@ async function register() {
 
             <div class="btns">
               <q-btn
-                @click="console.log('Google')"
+                @click="loginGoogle()"
                 class="btn-log shadow-6 bg-white">
                 <img src="assets/icons/googleIcon.svg" alt="Google"/>
               </q-btn>
