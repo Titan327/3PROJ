@@ -21,7 +21,7 @@ const router = useRouter();
 
 onMounted(() => {
 
-  const token = localStorage.getItem('userToken');
+  const token = sessionStorage.getItem('userToken');
   if (!token){
     router.push('/login');
   }
