@@ -164,8 +164,7 @@ const redirectToPaypal = () => {
               dark
               outlined
               class="input"
-              label="Banque
-"
+              label="Banque"
               color="secondary"
               stack-label
               v-model="rib.bank_name">

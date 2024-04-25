@@ -9,7 +9,7 @@ function updateUser(token: string): void {
 }
 
 async function getUserData(): Promise<void> {
-  const token = localStorage.getItem('userToken');
+  const token = sessionStorage.getItem('userToken');
 
   if (!token) {
     console.error("Pas de token");
