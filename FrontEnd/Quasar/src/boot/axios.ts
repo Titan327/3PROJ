@@ -17,7 +17,7 @@ declare module '@vue/runtime-core' {
 const api = axios.create({ baseURL: 'https://3proj-back.tristan-tourbier.com/api/' }); //localhost:9002 docker
 api.interceptors.request.use(
   (config) => {
-    const userToken = localStorage.getItem('userToken');
+    const userToken = sessionStorage.getItem('userToken');
     if (userToken) {
       config.headers.Authorization = `Bearer ${userToken}`;
     }
@@ -31,7 +31,7 @@ api.interceptors.request.use(
 const back = axios.create({ baseURL: 'https://3proj-back.tristan-tourbier.com/' }); //localhost:9002 docker
 back.interceptors.request.use(
   (config) => {
-    const userToken = localStorage.getItem('userToken');
+    const userToken = sessionStorage.getItem('userToken');
     if (userToken) {
       config.headers.Authorization = `Bearer ${userToken}`;
     }

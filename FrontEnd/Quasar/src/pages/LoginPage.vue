@@ -83,7 +83,7 @@ async function loginGoogle() {
 
     if (event.data.token){
       console.log('Message reçu de la fenêtre enfant :', event.data.token);
-      localStorage.setItem('userToken', event.data.token);
+      sessionStorage.setItem('userToken', event.data.token);
       window.location.href = '/';
     }
 
