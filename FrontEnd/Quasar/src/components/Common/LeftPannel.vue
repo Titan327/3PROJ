@@ -4,7 +4,7 @@ import { disconnectUser, getUser } from "stores/userStore";
 import { useRouter } from "vue-router";
 import { api } from "boot/axios";
 
-const drawer = ref(true);
+const drawer = ref(false);
 const miniState = ref(true);
 const router = useRouter();
 const userString = ref('');
@@ -22,12 +22,27 @@ onMounted(async () => {
     }
     await getNotifications();
   }
+
+  function setDrawerState() {
+    if (window.innerWidth < 1000) {
+      miniState.value = true;
+    } else {
+      miniState.value = false;
+    }
+  }
+
+  setDrawerState();
+
+  window.addEventListener('resize', setDrawerState);
 });
+
 
 function disconnect() {
   disconnectUser();
   router.push('/login');
 }
+
+
 
 async function getNotifications() {
   try {
@@ -45,7 +60,8 @@ async function getNotifications() {
     :width="width"
     :mini="miniState"
     show-if-above
-    elevated
+    :breakpoint="300"
+
     class="bg-primary text-white border-radius">
       <q-list>
         <q-img
