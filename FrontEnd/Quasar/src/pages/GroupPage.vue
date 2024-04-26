@@ -12,6 +12,7 @@ import {useRouter} from "vue-router";
 let groupList = ref<Group[]>([]);
 const $q = useQuasar()
 const router = useRouter();
+const width = ref(0);
 
 let DialogCreate = ref(false);
 let DialogInvite = ref(false);
@@ -19,6 +20,16 @@ let DialogInvite = ref(false);
 onMounted(async () => {
 
   await getGroups()
+
+  function getWidth() {
+
+    width.value = window.innerWidth;
+    console.log(width.value);
+  }
+
+  getWidth();
+
+  window.addEventListener('resize', getWidth);
 
 });
 
@@ -110,11 +121,11 @@ async function setFavorite(groupID, favorite){
 
     <h3 class="text-h4 q-pa-md">Mes Groupes  <q-btn color="secondary" round outline @click="openDialogCreate">+</q-btn></h3>
 
-    <q-card class="bloc-groupe bg-accent"
+    <q-card class="bloc-groupe bg-accent" clickable
             v-for="group in groupList" :key="group.id">
       <q-separator/>
       <q-card-section>
-        <q-item>
+        <q-item clickable @click="router.push(`/groups/${group.id}`)">
           <q-item-section avatar>
             <q-avatar rounded color="secondary" text-color="white">
               <img :src="group.picture ?  group.picture+'/200' : 'assets/defaults/group-default.webp'">
@@ -128,7 +139,7 @@ async function setFavorite(groupID, favorite){
           </q-item-section>
 
           <q-space></q-space>
-          <q-item-section avatar>
+          <q-item-section avatar v-if="width>400">
             <q-btn
               color="secondary"
               unelevated
@@ -140,7 +151,7 @@ async function setFavorite(groupID, favorite){
             >
             </q-btn>
           </q-item-section>
-          <q-item-section avatar>
+          <q-item-section avatar  v-if="width>500">
             <q-btn
               color="secondary"
               label="Afficher"
