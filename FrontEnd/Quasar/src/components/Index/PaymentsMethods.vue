@@ -163,7 +163,6 @@ async function openDialgAddPayment(type:string){
   display: flex;
   flex-direction: column;
   margin-top: 50px;
-  min-width: 350px;
 }
 
 .caroussel{

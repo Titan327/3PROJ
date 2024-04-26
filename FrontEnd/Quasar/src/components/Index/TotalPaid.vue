@@ -12,6 +12,7 @@ const titleText = ref('');
 const operations = ref(0);
 const icon = ref();
 const User = ref(DefaultUser());
+const width = ref(0);
 
 const props = defineProps<{
   etat: EtatTotalPaidComponent;
@@ -38,6 +39,16 @@ onMounted(async () => {
   } catch (error) {
     console.error("Une erreur s'est produite lors de la récupération des données :", error);
   }
+
+  function getWidth() {
+
+    width.value = window.innerWidth;
+    console.log(width.value);
+  }
+
+  getWidth();
+
+  window.addEventListener('resize', getWidth);
 });
 </script>
 
@@ -56,8 +67,8 @@ onMounted(async () => {
           <q-item-label class="text-white text-subtitle1" caption lines="2">{{montantTotal}}€</q-item-label>
         </q-item-section>
 
-        <q-chip v-if="operations>0" class="chip-status" :color="displayColor" text-color="white">{{operations}} Opérations</q-chip>
-        <q-chip v-if="operations==0" class="chip-status" :color="displayColor" text-color="white">Pas d'opération</q-chip>
+        <q-chip v-if="operations>0 && width>500" class="chip-status" :color="displayColor" text-color="white">{{operations}} Opérations</q-chip>
+        <q-chip v-if="operations==0 && width>500" class="chip-status" :color="displayColor" text-color="white">Pas d'opération</q-chip>
       </q-item>
     </q-card-section>
   </q-card>
@@ -68,7 +79,6 @@ onMounted(async () => {
 .bloc-paye{
   width: 100%;
   height: 100px;
-  min-width: 350px;
   border-radius: 15px;
   margin-top: 50px;
 }

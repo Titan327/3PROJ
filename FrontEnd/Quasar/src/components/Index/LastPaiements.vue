@@ -14,6 +14,7 @@ const transactionList = ref<Transaction[]>([]);
 const User = ref(DefaultUser());
 const router = useRouter();
 const $q = useQuasar();
+const width = ref(0);
 let dialogConsultTransaction = ref(false);
 
 onMounted(async () => {
@@ -22,6 +23,16 @@ onMounted(async () => {
   const response = await api.get(`users/${User.value.id}/lastTransactions?limit=5`);
   transactionList.value = response.data;
   console.log(transactionList.value);
+
+  function getWidth() {
+
+    width.value = window.innerWidth;
+    console.log(width.value);
+  }
+
+  getWidth();
+
+  window.addEventListener('resize', getWidth);
 });
 
 function openDialogConsultTransaction(transactionId:number, groupId:number){
@@ -51,7 +62,7 @@ function openDialogConsultTransaction(transactionId:number, groupId:number){
       <h3 class="text-h6">Dernieres dépenses</h3>
     </q-card-section>
     <q-card-section>
-      <q-item>
+      <q-item class="row justify-between full-width">
         <q-item-section avatar>
           <q-avatar round text-color="white" icon="group" />
         </q-item-section>
@@ -60,15 +71,15 @@ function openDialogConsultTransaction(transactionId:number, groupId:number){
           <q-item-label class="">Nom</q-item-label>
         </q-item-section>
 
-        <q-item-section>
+        <q-item-section  v-if="width>500">
           <q-item-label class="">Date</q-item-label>
         </q-item-section>
 
-        <q-item-section>
+        <q-item-section v-if="width>500">
           <q-item-label class="">Somme</q-item-label>
         </q-item-section>
 
-        <q-item-section>
+        <q-item-section  v-if="width>500">
           <q-item-label class="">Action</q-item-label>
         </q-item-section>
 
@@ -76,7 +87,7 @@ function openDialogConsultTransaction(transactionId:number, groupId:number){
     </q-card-section>
     <q-separator/>
     <q-card-section v-if="transactionList.length > 0">
-      <q-item v-for="transaction in transactionList" :key="transaction.id">
+      <q-item v-for="transaction in transactionList" :key="transaction.id" clickable @click="openDialogConsultTransaction(transaction.Transaction.id,transaction.Transaction.groupId)">
         <q-item-section avatar>
           <q-avatar round color="secondary" text-color="white">
             <img :src="transaction.Transaction.Group.picture ? `${transaction.Transaction.Group.picture}/100` : 'assets/defaults/group-default.webp'"/>
@@ -87,15 +98,15 @@ function openDialogConsultTransaction(transactionId:number, groupId:number){
           <q-item-label class="">{{ transaction.Transaction.label}}</q-item-label>
         </q-item-section>
 
-        <q-item-section>
+        <q-item-section  v-if="width>500">
           <q-item-label class="">{{ formatDate(transaction.Transaction.date) }}</q-item-label>
         </q-item-section>
 
-        <q-item-section>
+        <q-item-section v-if="width>500">
           <q-item-label class="">{{ formatNumber(transaction.amount) }}€</q-item-label>
         </q-item-section>
 
-        <q-item-section>
+        <q-item-section v-if="width>500">
          <q-btn outline color="secondary" rounded @click="openDialogConsultTransaction(transaction.Transaction.id,transaction.Transaction.groupId)">Consulter</q-btn>
         </q-item-section>
 
