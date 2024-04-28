@@ -7,8 +7,6 @@ import {onMounted, ref} from "vue";
 import {EtatTotalPaidComponent} from "src/interfaces/types";
 import PaymentsMethods from "components/Index/PaymentsMethods.vue";
 import {DefaultUser} from "src/interfaces/user.interface";
-import {useRouter} from "vue-router";
-import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 import DialogWarnAuth from "components/Index/DialogWarnAuth.vue";
 import {useQuasar} from "quasar";
 
