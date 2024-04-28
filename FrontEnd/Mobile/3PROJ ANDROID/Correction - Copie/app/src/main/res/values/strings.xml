@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">Sample Test App</string>
-    <string name="toto">Toto</string>
-    <string name="jetpack_compose">Jetpack Compose</string>
-</resources>

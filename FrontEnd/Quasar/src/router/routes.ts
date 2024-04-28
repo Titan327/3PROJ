@@ -29,7 +29,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/groups',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/GroupPage.vue') }],
+    children: [{ path: '', component: () => import('pages/GroupListPage.vue') }],
+  },
+  {
+    path: '/notifications',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/NotificationsPage.vue') }],
   },
   {
     path: '/groups/:id',

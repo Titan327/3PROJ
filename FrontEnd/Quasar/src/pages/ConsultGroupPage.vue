@@ -19,6 +19,7 @@ const route = useRoute();
 const groupId = route.params.id;
 let group = ref(DefaultGroup());
 let isPhotoHover = ref(false);
+const width = ref(0);
 let mounted = ref(false)
 let messageState = ref(false);
 let dialogModifyPp = ref(false);
@@ -33,6 +34,15 @@ let isOpenDialogInvite = ref(false);
 onMounted(async () => {
   await getGroup()
   mounted.value=true;
+
+  function getWidth() {
+
+    width.value = window.innerWidth;
+  }
+
+  getWidth();
+
+  window.addEventListener('resize', getWidth);
 });
 
 async function getGroup() {
@@ -142,7 +152,7 @@ async function editGroup() {
   <q-page class="q-pa-md">
     <div class="div-first-last-name">
       <q-card class="transparent no-box-shadow">
-        <q-card-section horizontal>
+        <q-card-section :horizontal="width<500? false:true">
           <div class="q-pa-md q-gutter-sm">
             <q-avatar
               @click="openDialogPP"
@@ -157,8 +167,8 @@ async function editGroup() {
               </div>
             </q-avatar>
           </div>
-          <q-card-section class="q-pa-xl" style="min-width: 600px">
-            <q-input
+          <q-card-section class="q-pa-xl" :style="'min-width: ' + width/2+ 'px'">
+          <q-input
               class="input-group-name text-h4"
               v-if="isEditGroupName"
               v-model="group.name"
