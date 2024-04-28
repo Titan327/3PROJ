@@ -3,14 +3,11 @@ import { useQuasar } from 'quasar'
 import {onMounted, ref} from "vue";
 import {DefaultGroup} from "src/interfaces/group.interface";
 import {api} from "boot/axios";
-import {DefaultTransactionCreated} from "src/interfaces/transactions.interface";
 import {getUser} from "stores/userStore";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
-const $q = useQuasar();
 
 let isOpen = ref(false);
-let loading = ref(false);
 let mounted = ref(false);
 let catList = ref([]);
 
@@ -30,7 +27,6 @@ onMounted(async () => {
   await getGroup();
   await getCat();
   mounted.value=true;
-
 });
 
 async function getGroup() {
@@ -68,7 +64,6 @@ async function getCat(){
 function getUserAmount(userId: number) {
   return _transaction.value.TransactionUsers.find(user => user.userId === userId)?.amount;
 }
-
 function getCatText(catId: number) {
   return catList.value.find(cat => cat.id === catId)?.label;
 }

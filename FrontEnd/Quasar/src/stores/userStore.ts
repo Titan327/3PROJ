@@ -50,7 +50,7 @@ async function getUser(): Promise<IUser> {
 
 function disconnectUser(): void {
   user.value = DefaultUser();
-  localStorage.removeItem('userToken');
+  sessionStorage.removeItem('userToken');
 }
 
 export { updateUser, getUser, disconnectUser };

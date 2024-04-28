@@ -18,6 +18,7 @@ let PaymentisOpen = ref(false);
 
 let loading = ref(false);
 let mounted = ref(false);
+const width = ref(0);
 
 let isPhotoHover = ref(false);
 let expendUserDatas = ref(true);
@@ -35,13 +36,22 @@ let newPass = ref();
 let newPassConfirmation = ref();
 
 const paiementsMethod = ref();
-const bankWebsite = ref('https://particuliers.societegenerale.fr');
 
 onMounted(async () => {
 
   await getUserData();
   await getMethod();
   mounted.value=true;
+
+  function getWidth() {
+
+    width.value = window.innerWidth;
+    console.log(width.value);
+  }
+
+  getWidth();
+
+  window.addEventListener('resize', getWidth);
 });
 
 async function getUserData() {
@@ -191,7 +201,7 @@ async function openDialgAddPayment(){
   <q-page class="q-pa-md">
     <div class="div-first-last-name">
       <q-card class="transparent no-box-shadow">
-        <q-card-section horizontal>
+        <q-card-section :horizontal="width<500? false:true">
             <div class="q-pa-md q-gutter-sm">
               <q-avatar
                 @click="openDialogPP"

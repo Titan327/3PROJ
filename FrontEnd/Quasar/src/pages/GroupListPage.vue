@@ -24,13 +24,9 @@ onMounted(async () => {
   function getWidth() {
 
     width.value = window.innerWidth;
-    console.log(width.value);
   }
-
   getWidth();
-
   window.addEventListener('resize', getWidth);
-
 });
 
 async function getGroups() {
@@ -52,10 +48,6 @@ function openDialogCreate(){
     isOpen: openDialogCreate,
 
   }
-}).onOk(() => {
-  console.log('OK')
-}).onCancel(() => {
-  console.log('Cancel')
 }).onDismiss(() => {
     getGroups()
 })
@@ -72,7 +64,6 @@ async function openDialogInvite(id: number, name: string){
 
       remaining_uses: 5,
       expiration_date:expirationDate
-
     });
 
     if (response.data) {
@@ -86,12 +77,6 @@ async function openDialogInvite(id: number, name: string){
           link: response.data.invitation.token,
           name: name
         }
-      }).onOk(() => {
-        console.log('OK')
-      }).onCancel(() => {
-        console.log('Cancel')
-      }).onDismiss(() => {
-        console.log('Dismiss')
       })
     }
   }
@@ -103,9 +88,9 @@ async function openDialogInvite(id: number, name: string){
   }
 }
 
-async function setFavorite(groupID, favorite){
+async function setFavorite(groupID:number, favorite:boolean){
   try {
-    const response = await  api.put(`/groups/${groupID}/favorite`,{
+    await api.put(`/groups/${groupID}/favorite`,{
       "favorite": favorite
     })
     await getGroups();
@@ -176,13 +161,12 @@ async function setFavorite(groupID, favorite){
           </q-item-section>
         </q-item>
       </q-card-section>
-      <q-card-section v-if="groupList.length == 0">
-        <q-item-section>
-          <q-item-label class="text-h6">Rien à afficher</q-item-label>
-        </q-item-section>
-      </q-card-section>
     </q-card>
-
+    <q-card-section v-if="groupList.length == 0">
+      <q-item-section>
+        <q-item-label class="text-h6">Rien à afficher</q-item-label>
+      </q-item-section>
+    </q-card-section>
   </q-page>
 </template>
 <style scoped>

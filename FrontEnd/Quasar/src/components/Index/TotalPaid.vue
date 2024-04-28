@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { EtatTotalPaidComponent } from "src/interfaces/types";
 import { defineProps, onMounted, ref } from "vue";
-import { Group } from "src/interfaces/group.interface";
 import { getUser } from "stores/userStore";
 import { api } from "boot/axios";
 import {DefaultUser} from "src/interfaces/user.interface";
@@ -43,11 +42,8 @@ onMounted(async () => {
   function getWidth() {
 
     width.value = window.innerWidth;
-    console.log(width.value);
   }
-
   getWidth();
-
   window.addEventListener('resize', getWidth);
 });
 </script>

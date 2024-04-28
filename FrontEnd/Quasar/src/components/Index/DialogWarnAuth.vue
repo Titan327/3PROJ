@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useQuasar } from 'quasar'
 import { ref } from "vue";
 import {useRouter} from "vue-router";
-const $q = useQuasar();
 
 let isOpen = ref(false);
 const router = useRouter();

@@ -77,7 +77,7 @@ async function getNotifications() {
           <q-item-section>Accueil</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple>
+        <q-item clickable v-ripple @click="router.push('/notifications')">
           <q-item-section avatar>
             <q-icon color="secondary" name="notifications"></q-icon>
           </q-item-section>
@@ -85,14 +85,6 @@ async function getNotifications() {
           <q-item-section>
             <span>Notifications <q-badge v-if="notifCount>0" rounded color="red">{{ notifCount }}</q-badge></span>
           </q-item-section>
-        </q-item>
-
-        <q-item clickable v-ripple>
-          <q-item-section avatar>
-            <q-icon color="secondary" name="send" />
-          </q-item-section>
-
-          <q-item-section>Messagerie</q-item-section>
         </q-item>
 
         <q-item clickable v-ripple @click="router.push('/groups')">
@@ -111,7 +103,7 @@ async function getNotifications() {
           <q-item-section>Compte</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple>
+        <q-item clickable v-ripple  @click="router.push('/user-data')">
           <q-item-section avatar>
             <q-icon color="secondary" name="settings" />
           </q-item-section>
