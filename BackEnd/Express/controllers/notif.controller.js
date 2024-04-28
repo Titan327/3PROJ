@@ -19,7 +19,7 @@ const GetAllNotifByUser = async (req,res) => {
     try {
         const userId = req.authorization.userId;
 
-        const allNotif = await Notif.find({user_id: userId,seen: 0});
+        const allNotif = await Notif.find({user_id: userId});
 
         await Notif.updateMany({user_id: userId,seen: 0},{seen: true});
 
