@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
-import {ref, defineProps, onMounted} from "vue";
+import {ref, defineProps} from "vue";
 import {api} from "boot/axios";
 const $q = useQuasar();
 
