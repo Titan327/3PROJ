@@ -3,6 +3,7 @@ const TransactionUser = require('../models/transactionUser.model');
 const UserGroup = require('../models/userGroup.model');
 const Group = require('../models/group.model');
 const RefundController = require('./refund.controller');
+const {CreateNotif} = require("./notif.controller");
 
 const createTransaction = async (req, res) => {
     console.log(`REST createTransaction`);
@@ -83,6 +84,7 @@ const createTransaction = async (req, res) => {
                             }
                         }
                     );
+                    CreateNotif(detail.userId,`Vous avez été affécté a la dépense ${label}`,`groups/${groupId}`);
                 }
             }
             await RefundController.calculateMinimalRefunds(groupId)
