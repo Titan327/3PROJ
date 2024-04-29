@@ -8,6 +8,7 @@ const Joi = require("joi");
 const UserMiddleware = require('../middlewares/user.middleware');
 const GroupController = require('./group.controller');
 const {where} = require("sequelize");
+const {CreateNotif} = require("./notif.controller");
 
 const getUser = async (req, res) => {
     try {
@@ -45,6 +46,7 @@ const createUser = async (req, res) => {
             birth_date,
             password: passwordHash
         });
+        await CreateNotif(User.id, `Bienvenue sur Bill-Cutting !`, `/`);
         res.status(201).send({ message: "User creates successfully"});
     } catch (e) {
         console.error(e);

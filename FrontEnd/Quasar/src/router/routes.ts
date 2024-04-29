@@ -42,6 +42,11 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/ConsultGroupPage.vue') }],
   },
   {
+    path: '/groups/:id/transactions/:transactionId',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/ConsultGroupPage.vue') }],
+  },
+  {
     path: '/user-data',
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/UserDataPage.vue') }],
