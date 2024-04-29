@@ -6,6 +6,7 @@ const securityMiddleware = require('../security/middleware.security');
 const userMiddleware = require('../middlewares/user.middleware');
 const RefundController = require('../controllers/refund.controller');
 const PaymentMethodeController = require('../controllers/paymentMethode.controller');
+const StatisticsController = require('../controllers/statistics.controller');
 
 //PUBLIC
 //GET http://localhost:9002/api/users/{id}/groups
@@ -31,6 +32,9 @@ router.delete("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddl
 router.post("/:userId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.createPaymentMethode);
 router.get("/:userId/:groupId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.getPaymentMethode);
 router.get("/me/paymentMethode", securityMiddleware.verifyIsAuth, PaymentMethodeController.getMyPaymentMethode);
+
+//GET http://localhost:9002/api/users/{id}/statistics
+router.get("/:userId/statistics", securityMiddleware.verifyIsAuthAndActivUser, StatisticsController.getAllStatistics);
 
 
 module.exports = router;
