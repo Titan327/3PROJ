@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useQuasar } from 'quasar'
 import {onMounted, ref} from "vue";
 import {DefaultGroup} from "src/interfaces/group.interface";
 import {api} from "boot/axios";

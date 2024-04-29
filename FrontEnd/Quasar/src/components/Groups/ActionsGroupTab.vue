@@ -6,6 +6,7 @@ import {useQuasar} from "quasar";
 import {api} from "boot/axios";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
 import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
+import {useRouter} from "vue-router";
 
 
 let  tab = ref('transactions')
@@ -16,6 +17,7 @@ let dialogConsultTransaction = ref(false);
 let currentSort = ref('date');
 const $q = useQuasar();
 let catList = ref([]);
+const router = useRouter();
 
 
 const props = defineProps({
@@ -66,11 +68,8 @@ function openDialogConsultTransaction(transactionId:number){
       userId: props.userId,
       transactionId: transactionId
     }
-  }).onOk(() => {
-    console.log('OK')
-  }).onCancel(() => {
-    console.log('Cancel')
   }).onDismiss(() => {
+    router.push(`/groups/${props.groupId}`);
     dialogConsultTransaction.value = false;
   })
 }

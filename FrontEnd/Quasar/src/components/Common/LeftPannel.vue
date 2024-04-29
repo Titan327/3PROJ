@@ -69,7 +69,7 @@ async function getNotifications() {
           src="assets/logo-500.png"
           style="max-width: 150px"
         />
-        <q-item clickable v-ripple  @click="router.push('../')">
+        <q-item clickable v-ripple  @click="router.push('../');getNotifications()">
           <q-item-section avatar>
             <q-icon color="secondary" name="dashboard" />
           </q-item-section>
@@ -77,7 +77,7 @@ async function getNotifications() {
           <q-item-section>Accueil</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/notifications')">
+        <q-item clickable v-ripple @click="router.push('/notifications');getNotifications()">
           <q-item-section avatar>
             <q-icon color="secondary" name="notifications"></q-icon>
           </q-item-section>
@@ -87,7 +87,7 @@ async function getNotifications() {
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/groups')">
+        <q-item clickable v-ripple @click="router.push('/groups');getNotifications()">
           <q-item-section avatar>
             <q-icon color="secondary" name="group" />
           </q-item-section>
@@ -95,7 +95,7 @@ async function getNotifications() {
           <q-item-section>Groupes</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/user-data')">
+        <q-item clickable v-ripple @click="router.push('/user-data');getNotifications()">
           <q-item-section avatar>
             <q-icon color="secondary" name="person" />
           </q-item-section>
@@ -103,7 +103,7 @@ async function getNotifications() {
           <q-item-section>Compte</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple  @click="router.push('/user-data')">
+        <q-item clickable v-ripple  @click="router.push('/user-data');getNotifications()">
           <q-item-section avatar>
             <q-icon color="secondary" name="settings" />
           </q-item-section>

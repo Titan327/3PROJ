@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {disconnectUser, getUser} from "stores/userStore";
 import {useRoute, useRouter} from "vue-router";
 import {DefaultUser} from "src/interfaces/user.interface";
@@ -11,12 +11,14 @@ import {DefaultGroup} from "src/interfaces/group.interface";
 import ActionsGroupTab from "components/Groups/ActionsGroupTab.vue";
 import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 import DialogCustomInvitintoGroup from "src/components/Groups/DialogCustomInvitintoGroup.vue";
+import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
 
 const router = useRouter();
 let User = ref(DefaultUser());
 const $q = useQuasar();
 const route = useRoute();
 const groupId = route.params.id;
+const openedTransactionId = route.params.transactionId;
 let group = ref(DefaultGroup());
 let isPhotoHover = ref(false);
 const width = ref(0);
@@ -25,6 +27,7 @@ let messageState = ref(false);
 let dialogModifyPp = ref(false);
 let newMessageNotification = ref(0);
 let isFavorite = ref(false);
+const dialogConsultTransaction = ref(false);
 
 let isEditGroupName = ref(false);
 let isEditGroupDesc = ref(false);
@@ -35,6 +38,10 @@ onMounted(async () => {
   await getGroup()
   mounted.value=true;
 
+  if(openedTransactionId >= 0){
+    openDialogConsultTransaction(openedTransactionId);
+  }
+
   function getWidth() {
 
     width.value = window.innerWidth;
@@ -43,6 +50,12 @@ onMounted(async () => {
   getWidth();
 
   window.addEventListener('resize', getWidth);
+});
+
+watch(dialogConsultTransaction, (newValue, oldValue) => {
+  if(newValue == false){
+    router.push(`/groups/${groupId}`);
+  }
 });
 
 async function getGroup() {
@@ -144,6 +157,21 @@ async function editGroup() {
   }
 }
 
+function openDialogConsultTransaction(transactionId:number){
+  dialogConsultTransaction.value = true;
+  $q.dialog({
+    component: DialogConsultTransaction,
+
+    componentProps: {
+      isOpen: dialogConsultTransaction,
+      groupId: groupId,
+      userId: User.value.id,
+      transactionId: transactionId
+    }
+  }).onDismiss(() => {
+    dialogConsultTransaction.value = false;
+  })
+}
 
 </script>
 

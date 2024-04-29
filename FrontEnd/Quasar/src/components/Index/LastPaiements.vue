@@ -7,7 +7,6 @@ import {Transaction} from "src/interfaces/transactions.interface";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useRouter} from "vue-router";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
-import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
 import {useQuasar} from "quasar";
 
 const transactionList = ref<Transaction[]>([]);
@@ -15,44 +14,22 @@ const User = ref(DefaultUser());
 const router = useRouter();
 const $q = useQuasar();
 const width = ref(0);
-let dialogConsultTransaction = ref(false);
 
 onMounted(async () => {
 
   User.value = await getUser();
   const response = await api.get(`users/${User.value.id}/lastTransactions?limit=5`);
   transactionList.value = response.data;
-  console.log(transactionList.value);
 
   function getWidth() {
-
     width.value = window.innerWidth;
-    console.log(width.value);
   }
-
   getWidth();
-
   window.addEventListener('resize', getWidth);
 });
 
-function openDialogConsultTransaction(transactionId:number, groupId:number){
-  dialogConsultTransaction.value = true;
-  $q.dialog({
-    component: DialogConsultTransaction,
-
-    componentProps: {
-      isOpen: dialogConsultTransaction,
-      groupId: groupId,
-      userId: User.value.id,
-      transactionId: transactionId
-    }
-  }).onOk(() => {
-    console.log('OK')
-  }).onCancel(() => {
-    console.log('Cancel')
-  }).onDismiss(() => {
-    dialogConsultTransaction.value = false;
-  })
+function goToTransaction(groupId, transactionId) {
+  router.push(`/groups/${groupId}/transactions/${transactionId}`);
 }
 
 </script>
@@ -87,7 +64,7 @@ function openDialogConsultTransaction(transactionId:number, groupId:number){
     </q-card-section>
     <q-separator/>
     <q-card-section v-if="transactionList.length > 0">
-      <q-item v-for="transaction in transactionList" :key="transaction.id" clickable @click="openDialogConsultTransaction(transaction.Transaction.id,transaction.Transaction.groupId)">
+      <q-item v-for="transaction in transactionList" :key="transaction.id" clickable @click="goToTransaction(transaction.Transaction.groupId, transaction.Transaction.id)">
         <q-item-section avatar>
           <q-avatar round color="secondary" text-color="white">
             <img :src="transaction.Transaction.Group.picture ? `${transaction.Transaction.Group.picture}/100` : 'assets/defaults/group-default.webp'"/>
@@ -107,7 +84,7 @@ function openDialogConsultTransaction(transactionId:number, groupId:number){
         </q-item-section>
 
         <q-item-section v-if="width>500">
-         <q-btn outline color="secondary" rounded @click="openDialogConsultTransaction(transaction.Transaction.id,transaction.Transaction.groupId)">Consulter</q-btn>
+         <q-btn outline color="secondary" rounded @click="goToTransaction(transaction.Transaction.groupId, transaction.Transaction.id)">Consulter</q-btn>
         </q-item-section>
 
       </q-item>
