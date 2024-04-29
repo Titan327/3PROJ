@@ -46,7 +46,6 @@ const createUser = async (req, res) => {
             birth_date,
             password: passwordHash
         });
-        await CreateNotif(User.id, `Bienvenue sur Bill-Cutting !`, `/`);
         res.status(201).send({ message: "User creates successfully"});
     } catch (e) {
         console.error(e);
@@ -108,6 +107,7 @@ const modifyPassword = async (req, res) => {
         await user.update({
             password: passwordHash
         });
+        await CreateNotif(req.authorization.userId,`Votre mot de passe à été modifié le ${new Date().getUTCDate()}`,`user-data`);
         res.status(201).send({ message: "Password modified successfully"});
     } catch (e) {
         console.error(e);
