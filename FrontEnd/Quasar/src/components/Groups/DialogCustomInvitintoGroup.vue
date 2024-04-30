@@ -2,6 +2,7 @@
 import { useQuasar } from 'quasar';
 import {ref, defineProps} from "vue";
 import {api} from "boot/axios";
+import process from "node:process";
 const $q = useQuasar();
 
 let isOpen = ref(false);
@@ -31,7 +32,7 @@ async function generateLink() {
       expiration_date:expirationDate
 
     });
-    inviteLink.value = `https://3proj-front.tristan-tourbier.com/#/join-group/${response.data.invitation.token}`;
+    inviteLink.value = `${process.env.URL_PROD}#/join-group/${response.data.invitation.token}`;
     linkGenerated.value = true;
   }
   catch (e) {

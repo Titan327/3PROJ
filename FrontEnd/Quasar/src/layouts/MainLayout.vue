@@ -28,11 +28,6 @@
 import {onMounted,ref} from "vue";
 import {useRouter} from "vue-router";
 import LeftPannel from "components/Common/LeftPannel.vue";
-import {EtatTotalPaidComponent} from "src/interfaces/types";
-import TotalPaid from "components/Index/TotalPaid.vue";
-import PaymentsMethods from "components/Index/PaymentsMethods.vue";
-import LastPaiements from "components/Index/LastPaiements.vue";
-import LastGroups from "components/Index/LastGroups.vue";
 const router = useRouter();
 const isLog= ref(false);
 
@@ -41,13 +36,13 @@ onMounted(() => {
   try {
     const token = sessionStorage.getItem('userToken');
     if (!token){
-      router.push('login');
+      router.push('/login');
     }
     else {
       isLog.value = true;
     }
   } catch (error) {
-    router.push('login');
+    router.push('/login');
     console.error(error);
   }
 });
