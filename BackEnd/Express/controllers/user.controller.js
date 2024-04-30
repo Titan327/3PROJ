@@ -107,7 +107,7 @@ const modifyPassword = async (req, res) => {
         await user.update({
             password: passwordHash
         });
-        await CreateNotif(req.authorization.userId,`Votre mot de passe à été modifié le ${new Date().getUTCDate()}`,`user-data`);
+        await CreateNotif(req.authorization.userId,`Votre mot de passe à été modifié`,`user-data`);
         res.status(201).send({ message: "Password modified successfully"});
     } catch (e) {
         console.error(e);

@@ -4,6 +4,7 @@ import {api} from "boot/axios";
 import {LocalStorage, useQuasar} from 'quasar'
 import {useRouter} from "vue-router";
 import {getUser, updateUser} from "stores/userStore";
+import process from "node:process";
 
 const $q = useQuasar();
 let loading = ref(false)
@@ -77,7 +78,7 @@ async function login() {
 
 async function loginGoogle() {
 
-  const authWindow = window.open('https://3proj-back.tristan-tourbier.com/api/oauth2/google', '_blank', 'height=600,width=600');
+  const authWindow = window.open(`${process.env.URL_BACKEND}api/oauth2/google`, '_blank', 'height=600,width=600');
 
   window.addEventListener('message', (event) => {
 
