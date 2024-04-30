@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
+import * as process from "node:process";
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -14,7 +15,7 @@ declare module '@vue/runtime-core' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'https://3proj-back.tristan-tourbier.com/api/' }); //localhost:9002 docker
+const api = axios.create({ baseURL: `${process.env.URL_BACKEND}api/` }); //localhost:9002 docker
 api.interceptors.request.use(
   (config) => {
     const userToken = sessionStorage.getItem('userToken');
@@ -28,7 +29,7 @@ api.interceptors.request.use(
   }
 );
 
-const back = axios.create({ baseURL: 'https://3proj-back.tristan-tourbier.com/' }); //localhost:9002 docker
+const back = axios.create({ baseURL: process.env.URL_BACKEND}); //localhost:9002 docker
 back.interceptors.request.use(
   (config) => {
     const userToken = sessionStorage.getItem('userToken');
