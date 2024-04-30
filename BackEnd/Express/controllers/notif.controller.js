@@ -3,7 +3,6 @@ const UserGroup = require("../models/userGroup.model");
 const Message = require("../models/message.model");
 
 async function CreateNotif (user_id,message,link) {
-
     await Notif.create(
         {
             user_id: user_id,
@@ -12,7 +11,6 @@ async function CreateNotif (user_id,message,link) {
             seen: false
         }
     )
-
 }
 
 const GetAllNotifByUser = async (req,res) => {
@@ -33,16 +31,33 @@ const GetNumNotifByUser = async (req,res) => {
     try {
         const userId = req.authorization.userId;
 
-        const num = await Notif.countDocuments({user_id: userId,seen: 0});
+        const count = await Notif.countDocuments({user_id: userId,seen: 0});
 
-        return res.status(200).json({num});
+        return res.status(200).json({count});
     }catch (e){
-        return res.status(500).json({e});
+        return res.status(500).json({ message: 'Internal server error' });
     }
+}
+
+const DeleteNotifById = async (req,res) => {
+    try{
+        const {id} = res.body;
+
+        console.log(id);
+        console.log(req.authorization.userId);
+
+        Notif.deleteOne({_id: id,user_id: req.authorization.userId});
+
+        return res.status(200).json({ message: 'Notification deleted' });
+    }catch (e){
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+
 }
 
 module.exports={
     CreateNotif,
     GetAllNotifByUser,
-    GetNumNotifByUser
+    GetNumNotifByUser,
+    DeleteNotifById
 }
