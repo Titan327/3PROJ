@@ -95,7 +95,7 @@ async function getNotifications() {
           <q-item-section>Groupes</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/user-data');getNotifications()">
+        <q-item clickable v-ripple @click="router.push('/statistics');getNotifications()">
           <q-item-section avatar>
             <q-icon color="secondary" name="person" />
           </q-item-section>

@@ -52,6 +52,11 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/UserDataPage.vue') }],
   },
   {
+    path: '/statistics',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/UserStatisticsPage.vue') }],
+  },
+  {
     path: '/join-group/:token',
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/JoinGroupPage.vue') }],
