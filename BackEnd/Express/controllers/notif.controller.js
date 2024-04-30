@@ -42,9 +42,13 @@ const GetNumNotifByUser = async (req,res) => {
 const DeleteNotifById = async (req,res) => {
     try{
         const {id_notif} = req.body;
-        await Notif.deleteOne({_id: id_notif,user_id: req.authorization.userId });
+        const notifExist =  await Notif.findOneAndDelete({_id: id_notif,user_id: req.authorization.userId });
+        if (notifExist){
+            return res.status(200).json({ message: 'Notification deleted' });
+        }else {
+            return res.status(449).json({ error: "This notification is not linked to your account or has already been deleted." });
+        }
 
-        return res.status(200).json({ message: 'Notification deleted' });
     }catch (e){
         console.log(e);
         return res.status(500).json({ message: 'Internal error server' });
