@@ -1,6 +1,5 @@
 package sample_test_app.com
 import SplashScreen
-import UserScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,9 +23,6 @@ import sample_test_app.com.ui.screens.InformationScreen
 import sample_test_app.com.ui.screens.LoginScreen
 import sample_test_app.com.ui.screens.RegisterScreen
 import sample_test_app.com.ui.screens.HomeScreen
-import sample_test_app.com.ui.screens.TaskListScreen
-import sample_test_app.com.ui.screens.TaskScreen
-import sample_test_app.com.ui.screens.WeatherScreen
 import sample_test_app.com.ui.theme.SampleTestAppTheme
 import io.ktor.client.*
 import io.ktor.http.*
