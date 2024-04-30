@@ -41,16 +41,13 @@ const GetNumNotifByUser = async (req,res) => {
 
 const DeleteNotifById = async (req,res) => {
     try{
-        const {id} = res.body;
-
-        console.log(id);
-        console.log(req.authorization.userId);
-
-        Notif.deleteOne({_id: id,user_id: req.authorization.userId});
+        const {id_notif} = req.body;
+        await Notif.deleteOne({_id: id_notif,user_id: req.authorization.userId });
 
         return res.status(200).json({ message: 'Notification deleted' });
     }catch (e){
-        return res.status(500).json({ message: 'Internal server error' });
+        console.log(e);
+        return res.status(500).json({ message: 'Internal error server' });
     }
 
 }
