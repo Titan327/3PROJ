@@ -1,37 +1,23 @@
 package sample_test_app.com
 import SplashScreen
-import UserScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ktor.client.HttpClient
-import sample_test_app.com.ui.screens.InformationScreen
-import sample_test_app.com.ui.screens.LoginScreen
-import sample_test_app.com.ui.screens.RegisterScreen
-import sample_test_app.com.ui.screens.HomeScreen
-import sample_test_app.com.ui.screens.TaskListScreen
-import sample_test_app.com.ui.screens.TaskScreen
-import sample_test_app.com.ui.screens.WeatherScreen
-import sample_test_app.com.ui.theme.SampleTestAppTheme
-import io.ktor.client.*
-import io.ktor.http.*
 import sample_test_app.com.ui.screens.GroupScreen
+import sample_test_app.com.ui.screens.HomeScreen
+import sample_test_app.com.ui.screens.LoginScreen
 import sample_test_app.com.ui.screens.ProfilScreen
+import sample_test_app.com.ui.screens.RegisterScreen
+import sample_test_app.com.ui.theme.SampleTestAppTheme
 
 
 class MainActivity : ComponentActivity() {
