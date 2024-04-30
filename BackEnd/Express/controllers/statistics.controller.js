@@ -12,11 +12,16 @@ const getAllStatistics = async (req, res) => {
         const averageTransactionPrice = await getAverageTransactionPrice(userId);
         const statistics = [
             averageTransactionPrice,
-            ...categoryStats,
-            ...monthlyStats
+            {amountByCategories: categoryStats.amountByCategories},
+            {numberByCategories: categoryStats.numberByCategories},
+            {averageByCategories: categoryStats.averageByCategories},
+            {amountByMonth: monthlyStats.amountByMonth},
+            {numberByMonth: monthlyStats.numberByMonth},
+            {averageByMonth: monthlyStats.averageByMonth}
         ];
         return res.status(200).send(statistics);
     } catch (e) {
+        console.log(e);
         return res.status(500).send(e);
     }
 }
@@ -97,6 +102,7 @@ const getAllMonthlyTransactionsOnAYear = async (userId) => {
         });
         let amountByMonth = {};
         let numberByMonth = {};
+        let averageByMonth = {};
         for (let i = 0; i < transactions.length; i++) {
             let month = transactions[i].createdAt.getMonth().toString() + "/" + transactions[i].createdAt.getFullYear().toString();
             if (!amountByMonth[month]) {
@@ -106,9 +112,13 @@ const getAllMonthlyTransactionsOnAYear = async (userId) => {
             amountByMonth[month] += transactions[i].amount;
             numberByMonth[month]++;
         }
+        for (let month in amountByMonth) {
+            averageByMonth[month] = parseFloat(amountByMonth[month] / numberByMonth[month]).toFixed(2);
+        }
         return {
             amountByMonth,
-            numberByMonth
+            numberByMonth,
+            averageByMonth
         };
     } catch (e) {
         return e;
