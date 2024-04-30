@@ -7,10 +7,13 @@ const getAllStatistics = async (req, res) => {
     console.log(`REST getAllStatistics`);
     const userId = req.params.userId;
     try {
+        const categoryStats = await getAllCategorystats(userId);
+        const monthlyStats = await getAllMonthlyTransactionsOnAYear(userId);
+        const averageTransactionPrice = await getAverageTransactionPrice(userId);
         const statistics = [
-            await getAverageTransactionPrice(userId),
-            await getAllTransactionsAmountByCategory(userId),
-            await getAllUserTransactionsByMonthOnLastYear(userId),
+            averageTransactionPrice,
+            ...categoryStats,
+            ...monthlyStats
         ];
         return res.status(200).send(statistics);
     } catch (e) {
@@ -33,7 +36,6 @@ const getAverageTransactionPrice = async (userId) => {
         }
         const average = parseFloat(total / transactions.length).toFixed(2);
         return {
-            statistic: "Average transaction price",
             average: average,
             transactions: transactions.length
         };
@@ -42,7 +44,7 @@ const getAverageTransactionPrice = async (userId) => {
     }
 }
 
-const getAllTransactionsAmountByCategory = async (userId) => {
+const getAllCategorystats = async (userId) => {
     console.log(`REST getAllTransactionsAmountByCategory`);
     try {
         const transactions = await TransactionUser.findAll({
@@ -72,7 +74,6 @@ const getAllTransactionsAmountByCategory = async (userId) => {
             averageByCategories[category] = parseFloat(amountByCategories[category] / numberByCategories[category]).toFixed(2);
         }
         return {
-            statistic: "All transactions amount and number by category",
             amountByCategories,
             numberByCategories,
             averageByCategories
@@ -83,7 +84,7 @@ const getAllTransactionsAmountByCategory = async (userId) => {
     }
 }
 
-const getAllUserTransactionsByMonthOnLastYear = async (userId) => {
+const getAllMonthlyTransactionsOnAYear = async (userId) => {
     console.log(`REST getAmountOfAllUserTransactionsByMonthOnLastYear`);
     try {
         const transactions = await TransactionUser.findAll({
@@ -106,7 +107,6 @@ const getAllUserTransactionsByMonthOnLastYear = async (userId) => {
             numberByMonth[month]++;
         }
         return {
-            statistic: "Amount and number of all user transactions by month on last year",
             amountByMonth,
             numberByMonth
         };
