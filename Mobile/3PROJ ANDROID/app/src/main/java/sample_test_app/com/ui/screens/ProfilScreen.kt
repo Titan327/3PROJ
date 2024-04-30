@@ -89,7 +89,7 @@ fun ProfilScreen(httpClient: HttpClient, userId: String, jwtToken: String) {
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
             val userInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/user/$userId") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }
@@ -240,7 +240,7 @@ fun ProfilScreen(httpClient: HttpClient, userId: String, jwtToken: String) {
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val response: HttpResponse = withContext(Dispatchers.IO) {
-                        httpClient.put("https://3proj-back.tristan-tourbier.com/api/user/$userId") {
+                        httpClient.put("https://3proj-back.tristan-tourbier.com/api/users/$userId") {
                             contentType(ContentType.Application.Json)
                             header("Authorization", "Bearer $jwtToken")
                             body = userInfoJson

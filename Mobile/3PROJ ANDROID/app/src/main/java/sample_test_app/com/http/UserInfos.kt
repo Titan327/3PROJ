@@ -26,7 +26,7 @@ class AuthRepository {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(userInfo))
         }
-
+    
         // Vérifier la réponse ici si nécessaire
         if (!response.status.isSuccess()) {
             val errorMessage = response.body<String>()

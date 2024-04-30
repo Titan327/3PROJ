@@ -43,14 +43,19 @@ fun GroupScreen(backStackEntry: NavBackStackEntry, httpClient: HttpClient) {
     val arguments = backStackEntry.arguments
     val groupId = arguments?.getString("groupId") ?: ""
     val jwtToken = arguments?.getString("jwtToken") ?: ""
+    var lastTransactionsState = remember { mutableStateOf(listOf<Map<String, String>>()) } // New state for last transactions
+
 
     val groupInfoState = remember { mutableStateOf("") }
     val errorState = remember { mutableStateOf("") }
 
+
+
+
     LaunchedEffect(key1 = groupId) {
         CoroutineScope(Dispatchers.Main).launch {
             val groupInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/group/$groupId") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/$groupId") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }
