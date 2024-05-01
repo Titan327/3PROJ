@@ -137,8 +137,6 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
                     withContext(Dispatchers.Main) {
                         println("An error occurred while sending the request: ${e.message}")
                     }
-                } finally {
-                    httpClient.close()
                 }
             }
         }) {
