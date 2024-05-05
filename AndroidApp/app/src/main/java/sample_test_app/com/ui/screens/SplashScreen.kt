@@ -19,8 +19,6 @@ import sample_test_app.com.R
 
 @Composable
 fun SplashScreen(navController: NavHostController) {
-    val backgroundColor = Color(0xFF141332) // Couleur de fond de l'application
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -29,7 +27,7 @@ fun SplashScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally // Centrage horizontal des éléments dans la colonne
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logomille),
+            painter = painterResource(id = R.drawable.logomid),
             contentDescription = null,
             modifier = Modifier
                 .padding(bottom = 20.dp)

@@ -77,7 +77,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     @Serializable
     data class UserInfosWrapper(val userInfos: UserInfos)
 
-
     // État pour suivre si le champ "Password" a été soumis
     val isPasswordSubmitted = remember { mutableStateOf(false) }
 

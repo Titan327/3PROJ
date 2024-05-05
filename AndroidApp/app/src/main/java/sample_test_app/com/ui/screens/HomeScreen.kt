@@ -1,13 +1,22 @@
 package sample_test_app.com.ui.screens
 
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.rememberImagePainter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -19,9 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -35,23 +49,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import sample_test_app.com.LocalJwtToken
+import sample_test_app.com.LocalUser
 import sample_test_app.com.R
-import androidx.navigation.NavController
-import coil.transform.CircleCropTransformation
-import kotlinx.serialization.json.JsonArray
 
 
 @Composable
-fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navController: NavController) {
+fun HomeScreen(httpClient: HttpClient, navController: NavController) {
+    val jwtToken = LocalJwtToken.current
+    val userId = LocalUser.current.id
     var usernameState = remember { mutableStateOf("") }
     var profilePictureState = remember { mutableStateOf("") }
     var groupsState = remember { mutableStateOf(listOf<Pair<String, String>>()) }
     var transactionsState = remember { mutableStateOf(listOf<Map<String, String>>()) } // New state for transactions
-    var lastTransactionsState = remember { mutableStateOf(listOf<Map<String, String>>()) } // New state for last transactions
-
 
 
     LaunchedEffect(key1 = userId) {
@@ -89,7 +103,7 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
             }
 
             val groupsResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/groups") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/groups?favorite=true") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }
@@ -109,7 +123,7 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                             } else {
                                 null
                             }
-                        }
+                        }.take(3)
                     groupsState.value = groups
                 }
             } else {
@@ -160,93 +174,64 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo250),
-            contentDescription = "Logo",
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-
-        if (profilePictureState.value.isNotBlank() && profilePictureState.value != "null") {
-            Image(
-                painter = rememberImagePainter(
-                    data = profilePictureState.value,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                    }
-                ),
-                contentDescription = "User Profile Picture",
-                modifier = Modifier
-                    .size(80.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(top = 16.dp)
-                    .clickable {
-                        navController.navigate("ProfilScreen/$userId/$jwtToken")
-                    }
-            )
-        } else {
-            Image(
-                painter = rememberImagePainter(
-                    data = R.drawable.userdefault,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                    }
-                ),
-                contentDescription = "User Profile Picture",
-                modifier = Modifier
-                    .size(80.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(top = 16.dp)
-                    .clickable {
-                        navController.navigate("ProfilScreen/$userId/$jwtToken")
-                    }
-            )
-        }
-
         LazyColumn(
             modifier = Modifier.align(Alignment.Center)
         ) {
-            items(groupsState.value) { group ->
-                Card(
+            item {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .clickable {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                val groupInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/${group.first}") {
-                                        contentType(ContentType.Application.Json)
-                                        header("Authorization", "Bearer $jwtToken")
-                                    }
-                                }
-                                if (groupInfoResponse.status == HttpStatusCode.OK) {
-                                    val groupInfoResponseBody = groupInfoResponse.bodyAsText()
-                                    withContext(Dispatchers.Main) {
-                                        println("Group info request succeeded. Response: $groupInfoResponseBody")
-                                        navController.navigate("GroupScreen/${group.first}/$jwtToken")
-                                    }
-                                } else {
-                                    withContext(Dispatchers.Main) {
-                                        println("Group info request failed. Error code: ${groupInfoResponse.status.value}")
-                                    }
-                                }
-                            }
-                        },
-                    elevation = 4.dp
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.grouplogo),
-                            contentDescription = "Group Logo",
+                    groupsState.value.forEach { group ->
+                        Card(
                             modifier = Modifier
-                                .size(50.dp)
-                                .padding(end = 16.dp)
-                        )
-                        Text(text = group.second)                    }
+                                .padding(vertical = 8.dp)
+                                .background(color = Color.Transparent)
+                                .clickable {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        val groupInfoResponse: HttpResponse =
+                                            withContext(Dispatchers.IO) {
+                                                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/${group.first}") {
+                                                    contentType(ContentType.Application.Json)
+                                                    header("Authorization", "Bearer $jwtToken")
+                                                }
+                                            }
+                                        if (groupInfoResponse.status == HttpStatusCode.OK) {
+                                            val groupInfoResponseBody = groupInfoResponse.bodyAsText()
+                                            withContext(Dispatchers.Main) {
+                                                println("Group info request succeeded. Response: $groupInfoResponseBody")
+                                                navController.navigate("GroupScreen/${group.first}/$jwtToken")
+                                            }
+                                        } else {
+                                            withContext(Dispatchers.Main) {
+                                                println("Group info request failed. Error code: ${groupInfoResponse.status.value}")
+                                            }
+                                        }
+                                    }
+                                },
+                            elevation = 4.dp
+                        ) {
+                            val painter = rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = "https://3proj-back.tristan-tourbier.com/api/img/group-picture/${group.first}/200")
+                                    .transformations(CircleCropTransformation())
+                                    .apply(block = fun ImageRequest.Builder.() {
+                                        error(R.drawable.groupslogo)
+                                    }).build()
+                            )
+
+                            Image(
+                                painter = painter,
+                                contentDescription = "Group Picture",
+                                modifier = Modifier.size(80.dp)
+                            )
+                        }
+                    }
                 }
             }
+
 
             item {
                 Card(
@@ -293,40 +278,5 @@ fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navCont
                 }
             }
         }
-
-
-
-
-        Image(
-            painter = painterResource(id = R.drawable.notificationbellhome),
-            contentDescription = "Notification Icon",
-            modifier = Modifier
-                .size(40.dp)
-                .align(Alignment.BottomStart)
-                .offset(x = 26.dp)
-                .offset(y = -20.dp)
-                .clickable { /* Ajoutez votre action de clic ici */ }
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.homepage),
-            contentDescription = "Home Icon",
-            modifier = Modifier
-                .size(40.dp)
-                .align(Alignment.BottomCenter)
-                .offset(y = -20.dp)
-                .clickable { /* Ajoutez votre action de clic ici */ }
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.messsagecircular),
-            contentDescription = "Settings Icon",
-            modifier = Modifier
-                .size(30.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = -26.dp)
-                .offset(y = -20.dp)
-                .clickable { /* Ajoutez votre action de clic ici */ }
-        )
     }
 }

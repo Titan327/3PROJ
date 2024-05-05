@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
@@ -43,16 +44,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import sample_test_app.com.LocalJwtToken
 
 import sample_test_app.com.http.Security.JwtUtils.JwtUtils
+import sample_test_app.com.models.User
 
 @OptIn(InternalAPI::class)
 @Composable
-fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
+fun LoginScreen(navController: NavHostController, httpClient: HttpClient, jwtToken: MutableState<String>, user: MutableState<User>) {
     // État pour stocker la valeur du champ de texte "Username"
     val usernameState = remember { mutableStateOf("") }
 
@@ -109,20 +113,29 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient) {
                     if (response.status == HttpStatusCode.OK) {
                         val responseBody = response.bodyAsText()
                         withContext(Dispatchers.Main) {
-                            println("Request succeeded. Response: $responseBody")
 
                             val jwtPayload = JwtUtils.decodeJWT(responseBody)
-                            println("JWT Payload: $jwtPayload")
+                            jwtToken.value = responseBody
 
-                            // Print the JWT token
-                            println("JWT Token: $responseBody")
 
                             val jwtPayloadJson = Json.parseToJsonElement(jwtPayload).jsonObject
                             val userId = jwtPayloadJson["userId"]?.jsonPrimitive?.content
 
                             if (userId != null) {
-                                // Navigate to the home screen with the userId
-                                navController.navigate("home/$userId/$responseBody")
+
+                                val userResponse: HttpResponse = withContext(Dispatchers.IO) {
+                                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}") {
+                                        contentType(ContentType.Application.Json)
+                                        header("Authorization", "Bearer ${jwtToken.value}")
+                                    }
+                                }
+                                if (userResponse.status == HttpStatusCode.OK) {
+                                    val userResponseBody = userResponse.bodyAsText()
+                                    val userToAssign = Json.decodeFromString<User>(userResponseBody)
+                                    user.value = userToAssign
+                                }
+
+                                navController.navigate("home")
                             } else {
                                 println("Error: userId is null")
                             }
