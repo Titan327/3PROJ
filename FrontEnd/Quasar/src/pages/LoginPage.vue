@@ -4,7 +4,7 @@ import {api} from "boot/axios";
 import {LocalStorage, useQuasar} from 'quasar'
 import {useRouter} from "vue-router";
 import {getUser, updateUser} from "stores/userStore";
-import process from "node:process";
+import * as process from "node:process";
 
 const $q = useQuasar();
 let loading = ref(false)
@@ -65,6 +65,7 @@ async function login() {
           message: 'Une erreur s\'est produite lors de la connexion'
         })
       }
+      loading.value = false;
     }
   }
   else {
