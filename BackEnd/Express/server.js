@@ -95,3 +95,4 @@ app.use("/api/notifs", require("./routes/notif.route"));
 
 initializeBucket("pp-user");
 initializeBucket("pp-group");
+initializeBucket("ticket");

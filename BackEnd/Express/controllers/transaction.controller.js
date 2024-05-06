@@ -88,7 +88,7 @@ const createTransaction = async (req, res) => {
                 }
             }
             await RefundController.calculateMinimalRefunds(groupId)
-            return res.status(201).send(transaction);
+            return res.status(201).send({message: transaction});
         } else {
             return res.status(400).send('The total amount of the transaction is not equal to the sum of the details');
         }

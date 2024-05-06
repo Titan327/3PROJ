@@ -71,6 +71,14 @@ const getGroups = async (req, res) => {
             console.log(`groupIds: ${groupIds}`);
             let groups = await Promise.all(groupIds.map(async (id) => {
                 let group = await Group.findOne({where: {id: id}});
+
+                const base_url = group.picture;
+                if (base_url){
+                    group.picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
+                }else {
+                    group.picture = null;
+                }
+
                 let activeUsersCount = await UserGroup.count({where: {groupId: id, active: true}});
                 let isFavorite = await UserGroup.findOne({where: {groupId: id, userId: userId, favorite: true}});
                 return {...group.toJSON(), activeUsersCount: activeUsersCount, isFavorite: !!isFavorite};
