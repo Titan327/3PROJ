@@ -13,8 +13,9 @@ router.get("/profile-picture/:userId/:size",pp.GetUserPic);
 router.post("/upload/group-picture/:groupId", securityMiddleware.verifyIsAuth, upload.single('image'),resize,pp.uploadGroupPic);
 router.get("/group-picture/:groupId/:size",pp.GetGroupPic);
 
-router.post("/upload/test", ticket.postTicket );
 router.get("/group-picture/:groupId/:size",pp.GetGroupPic);
 
+router.post("/ticket/:groupId/:transactionId",securityMiddleware.verifyIsAuth,upload.single('file'), ticket.postTicket );
+router.get("/ticket/:groupId/:transactionId",securityMiddleware.verifyIsAuth, ticket.getTicketByName );
 
 module.exports = router;
