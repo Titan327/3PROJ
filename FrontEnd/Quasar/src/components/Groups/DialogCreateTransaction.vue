@@ -164,10 +164,11 @@ function calculateTotal(): number {
                     <q-input
                       class="input"
                       outlined
-                      fill-mask="0"
+                      type="number"
                       reverse-fill-mask
                       v-model.number="_transaction.details.find(detail => detail.userId === user.id).amount"
                       label="Montant"
+                      step="0.01"
                       dark
                       dense
                       color="secondary"

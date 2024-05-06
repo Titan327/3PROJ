@@ -62,7 +62,8 @@ const getGroups = async (req, res) => {
     try {
         const userId = req.params.userId;
         const limit = parseInt(req.query.limit) || 5;
-        let whereCondition = {userId: userId};
+        const favorite = req.query.favorite === 'true';
+        let whereCondition = favorite ? {userId: userId, favorite: favorite} : {userId: userId};
 
         const groupsID = await UserGroup.findAll({where: whereCondition});
         if (groupsID.length > 0) {

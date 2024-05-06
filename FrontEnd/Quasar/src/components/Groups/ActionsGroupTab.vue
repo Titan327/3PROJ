@@ -7,33 +7,49 @@ import {api} from "boot/axios";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
 import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
 import {useRouter} from "vue-router";
+import { Refund } from 'src/interfaces/refund.interface';
+import { DefaultGroup } from 'src/interfaces/group.interface';
+import { getGroup, getUserGroupData } from 'stores/groupStore';
+import DialogRefund from 'components/Groups/DialogRefund.vue';
 
 
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
+let refundsList = ref<Refund[]>([]);
 let sortedTransactionList = ref<Transaction[]>([]);
 let dialogCreateTransaction = ref(false);
 let dialogConsultTransaction = ref(false);
+let dialogRefundTransaction = ref(false);
 let currentSort = ref('date');
 const $q = useQuasar();
 let catList = ref([]);
 const router = useRouter();
+let group = ref(DefaultGroup());
 
 
 const props = defineProps({
   groupId: Number,
-  userId: Boolean,
+  userId: Number,
 });
 
 onMounted(async () => {
   await getTransactionList()
+  await getOptimalRefundList();
   await getCat();
+  group.value = await getGroup(props.groupId);
+
+  //openDialogRefund(1, 2);
 });
 
 async function getTransactionList(){
   const response = await api.get(`groups/${props.groupId}/transactions`);
   transactionList.value = response.data;
   sortTransaction('date');
+}
+
+async function getOptimalRefundList(){
+  const response = await api.get(`groups/${props.groupId}/refunds`);
+  refundsList.value = response.data;
 }
 
 function openDialogCreateTransaction(){
@@ -71,6 +87,25 @@ function openDialogConsultTransaction(transactionId:number){
   }).onDismiss(() => {
     router.push(`/groups/${props.groupId}`);
     dialogConsultTransaction.value = false;
+  })
+}
+
+function openDialogRefund(refundId:number, refundedUserId:number, amount:0){
+  dialogRefundTransaction.value = true;
+  $q.dialog({
+    component: DialogRefund,
+
+    componentProps: {
+      isOpen: dialogRefundTransaction,
+      groupId: props.groupId,
+      userId: props.userId,
+      refundId: refundId,
+      userToPaidID: refundedUserId,
+      amount: amount
+    }
+  }).onDismiss(() => {
+    getOptimalRefundList();
+    dialogRefundTransaction.value = false;
   })
 }
 
@@ -140,12 +175,14 @@ function getCatColor(catId: number) {
         >
           <q-tab name="transactions" label="Transactions" />
           <q-tab name="remboursements" label="Remboursements" />
-          <q-tab name="statistiques" label="Statistiques" />
+          <q-tab name="soldes" label="Soldes" />
         </q-tabs>
 
         <q-separator />
 
         <q-tab-panels v-model="tab" class="bg-accent" animated>
+
+          <!-- ----------------------------------TRANSACTIONS--------------------------------------------- -->
           <q-tab-panel name="transactions">
             <div class="row">
               <q-btn-dropdown
@@ -239,14 +276,101 @@ function getCatColor(catId: number) {
             </q-card-section>
           </q-tab-panel>
 
+          <!-- ----------------------------------REMBOURSEMENTS--------------------------------------------- -->
           <q-tab-panel name="remboursements">
-            <div class="text-h6">Alarms</div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            <q-card-section>
+              <q-item-label class="text-h6 q-pa-lg">Liste des remboursements optimisés : </q-item-label>
+              <q-item v-if="refundsList.length>0">
+                <q-item-section avatar>
+                  <q-avatar round text-color="white" icon="group"/>
+                </q-item-section>
+                  <q-space></q-space>
+                <q-item-section>
+                  <q-item-label class="q-mx-xl">Payeur
+                    <q-icon
+                    size="xs"
+                    name="arrow_forward"
+                  /> Receveur</q-item-label>
+                </q-item-section>
+                  <q-space></q-space>
+                <q-item-section>
+                  <q-item-label class="">Montant</q-item-label>
+                </q-item-section>
+                <q-space></q-space>
+                <q-item-section>
+                  <q-item-label class="q-mx-auto">Statut</q-item-label>
+                </q-item-section>
+                  <q-space></q-space>
+                <q-item-section>
+                  <q-item-label class="q-mx-auto">Action</q-item-label>
+                </q-item-section>
+
+              </q-item>
+              <q-item v-if="refundsList.length==0">
+                <q-item-section>
+                  <q-item-label class="q-mx-auto text-h6">Rien à afficher</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-card-section>
+            <q-separator/>
+            <q-card-section v-if="refundsList.length > 0">
+              <q-scroll-area style="height: 300px">
+                <q-item v-for="refund in refundsList" :key="refund.id">
+                  <q-item-section avatar>
+                    <q-avatar
+                      size="40px"
+                      class="overlapping"
+                      :style="`left: ${1 * 20}px`"
+                    >
+                      <img :src="getUserGroupData(refund.refundingUserId)?.profile_picture ? getUserGroupData(refund.refundingUserId)?.profile_picture[2] : 'assets/defaults/user-default.webp'">
+                    </q-avatar>
+                    <q-avatar
+                      size="40px"
+                      class="overlapping"
+                      :style="`left: ${2 * 20}px`"
+                    >
+                      <img :src="getUserGroupData(refund.refundedUserId)?.profile_picture ? getUserGroupData(refund.refundedUserId)?.profile_picture[2] : 'assets/defaults/user-default.webp'">
+                    </q-avatar>
+                   </q-item-section>
+                  <q-space></q-space>
+                  <q-item-section>
+                    <q-item-label class="q-mx-xl">{{getUserGroupData(refund.refundingUserId)?.username}}
+                      <q-icon
+                      size="xs"
+                      name="arrow_forward"
+                    />
+                      {{getUserGroupData(refund.refundedUserId)?.username}}</q-item-label>
+                  </q-item-section>
+                  <q-space></q-space>
+                  <q-item-section>
+                    <q-item-label class="">{{formatNumber(refund.amount)}}€</q-item-label>
+                  </q-item-section>
+                  <q-space></q-space>
+                  <q-item-section>
+                    <span color="red" class="q-pa-s text-secondary q-mx-auto">À rembourser</span>
+                  </q-item-section>
+                  <q-space></q-space>
+                  <q-item-section class="q-mx-auto">
+                  <q-btn outline color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogConsultTransaction(1)">Effectuer le remboursement</q-btn>
+                  <span v-else class="q-mx-auto">Rien à effectuer</span>
+                  </q-item-section>
+
+                </q-item>
+              </q-scroll-area>
+            </q-card-section>
           </q-tab-panel>
 
-          <q-tab-panel name="statistiques">
-            <div class="text-h6">Movies</div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          <q-tab-panel name="soldes">
+            <div class="container row">
+                <q-card class="card-user-balance" flat dark  bordered v-for="user in group.Users" :key="user.id">
+                  <img :src="user.profile_picture ? user.profile_picture[2] :   'assets/defaults/user-default.webp'">
+
+                  <q-card-section>
+                    <div class="text-h6"> {{user.username}}</div>
+                    <div class="text-subtitle2"> {{formatNumber(user.UserGroup.balance)}}€</div>
+                  </q-card-section>
+                </q-card>
+            </div>
           </q-tab-panel>
         </q-tab-panels>
       </q-card>
@@ -264,4 +388,40 @@ function getCatColor(catId: number) {
   border-radius: 15px;
   margin-top: 50px;
 }
+
+.overlapping {
+  position: absolute;
+}
+
+.card-user-balance{
+  width: calc(25% - 10px);
+  margin: 5px;
+}
+
+container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  flex-direction: row;
+}
+
+@media screen and (max-width: 1500px) {
+  .card-user-balance{
+    width: calc(33% - 10px);
+    margin: 5px;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .card-user-balance{
+    width: calc(50% - 10px);
+    margin: 5px;
+  }
+}
+@media screen and (max-width: 600px) {
+  .card-user-balance{
+    width: calc(100% - 10px);
+    margin: 5px;
+  }
+}
+
 </style>
