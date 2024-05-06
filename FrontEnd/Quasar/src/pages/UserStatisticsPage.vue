@@ -6,10 +6,10 @@ import {useRouter} from "vue-router";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {api} from "boot/axios";
-import {convertIBAN, redirectBankWebSite, redirectToPaypal} from "stores/globalFunctionsStore"
+import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title} from 'chart.js'
+import { Doughnut, Bar } from 'vue-chartjs'
 import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
-import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue";
-import {UserStatistics} from "src/interfaces/userStatistics.interface";
+import {UserTransactionsStatistics} from "src/interfaces/userStatistics.interface";
 
 const router = useRouter();
 let User = ref(DefaultUser());
@@ -23,18 +23,63 @@ const width = ref(0);
 let isPhotoHover = ref(false);
 let expendGlobalStats = ref(true);
 let dialogModifyPp = ref(false);
+const chartCatdata= ref();
+const chartCountCatdata= ref();
+const chartAverageCatdata= ref();
+const chartDepenssePerMonth= ref();
+const chartTotalDepenssePerMonth= ref();
 
-const stats = ref<UserStatistics[]>([]);
+const stats = ref<UserTransactionsStatistics[]>([]);
+
+const options = {
+  responsive: false,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'left',
+      labels: {
+        font: {
+          size: 14
+        }
+      }
+    }
+  }
+}
+const colors = [
+    '#FF5733', '#FFC300', '#8d5d51', '#C70039', '#900C3F',
+    '#581845', '#f59a0a', '#3498DB', '#1ABC9C', '#16A085',
+    '#27AE60', '#1b898d', '#7D3C98', '#ad448c', '#D4AC0D'
+]
+
+const optionsBar = {
+  responsive: false,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+    scales: {
+      x: {
+        ticks: {
+          display: false,
+        },
+      },
+    },
+  },
+}
 
 
 onMounted(async () => {
 
   await getUserData();
-  await getStats()
+  await getStats();
+  await getChart();
+
   mounted.value=true;
 
   function getWidth() {
     width.value = window.innerWidth;
+    getChart();
   }
   getWidth();
   window.addEventListener('resize', getWidth);
@@ -61,12 +106,68 @@ async function openDialogPP(){
         window.location.reload();
       })
 }
+async function getChart(){
+  ChartJS.register(ArcElement, Tooltip, Legend);
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+
+  chartCatdata.value = {
+    labels: Object.keys(stats.value.amountByCategories),
+    datasets: [
+      {
+        backgroundColor: colors,
+        data: Object.values(stats.value.amountByCategories)
+      }
+    ]
+  };
+
+  chartCountCatdata.value = {
+    labels: Object.keys(stats.value.numberByCategories),
+    datasets: [
+      {
+        backgroundColor: colors,
+        data: Object.values(stats.value.numberByCategories)
+      }
+    ]
+  };
+
+  chartAverageCatdata.value = {
+    labels: Object.keys(stats.value.averageByCategories),
+    datasets: [
+      {
+        backgroundColor: colors,
+        data: Object.values(stats.value.averageByCategories)
+      }
+    ]
+  };
+
+  chartDepenssePerMonth.value = {
+    labels: Object.keys(stats.value.numberByMonth),
+    datasets: [
+      {
+        label: null,
+        backgroundColor: colors,
+        data: Object.values(stats.value.numberByMonth)
+      }
+    ]
+  }
+
+  chartTotalDepenssePerMonth.value = {
+    labels: Object.keys(stats.value.amountByMonth),
+    datasets: [
+      {
+        label: null,
+        backgroundColor: colors,
+        data: Object.values(stats.value.amountByMonth)
+      }
+    ]
+  }
+
+}
 
 async function getStats(){
   try {
     const response = await api.get(`/users/${User.value.id}/statistics`)
     stats.value = response.data
-    console.log(stats.value)
   }
   catch(e){
     console.error(e)
@@ -122,28 +223,45 @@ async function getStats(){
         <q-slide-transition>
           <div v-show="expendGlobalStats">
             <q-separator />
-            <q-card-section class="text-subtitle2" v-for="stat in stats" :key="stat.statistic">
-              <div class="column" v-if="stat.statistic=='Average transaction price'">
-                <q-item-label class="text-h6">{{stat.transactions}} transactions au total</q-item-label>
-                <q-item-label class="text-h6">Prix moyen des transactions : {{stat.average}}€</q-item-label>
-              </div>
-              <div class="row" v-else-if="stat.statistic=='All transactions amount and number by category'">
-                <q-knob
-                  v-for="cat in stat.amountByCategories"
-                  :key="cat"
-                  show-value
-                  font-size="12px"
-                  size="150px"
-                  :v-model="cat"
-                  rounded
-                  :thickness="0.22"
-                  color="teal"
-                  track-color="grey-3"
-                  class="q-ma-md"
-                >
-                  {{50}}%
-                </q-knob>
-              </div>
+            <q-card-section v-if="mounted">
+              <q-item-label class="text-h6">{{ stats.transactions }} Transactions au total</q-item-label>
+              <q-item-label class="text-h6">Dépense moyenne {{ stats.average }}€</q-item-label>
+            </q-card-section>
+            <q-card-section  v-if="mounted" class="row chart-container">
+              <q-card  flat dark  bordered class="card-chart">
+                <div class="q-pa-md q-mx-auto">
+                  <q-item-label class="text-h6">Dépenses totale par catégorie (€) :</q-item-label>
+                  <Doughnut class="q-mx-auto chart" :data="chartCatdata" :options="options"/>
+                </div>
+              </q-card>
+
+              <q-card  flat dark  bordered class="card-chart">
+                <div class="q-pa-md q-mx-auto">
+                  <q-item-label class="text-h6">Quantité de dépenses par catégorie :</q-item-label>
+                  <Doughnut class="q-mx-auto chart" :data="chartCountCatdata" :options="options"/>
+                </div>
+              </q-card>
+
+              <q-card  flat dark  bordered class="card-chart">
+                <div class="q-pa-md q-mx-auto">
+                  <q-item-label class="text-h6">Dépenses moyennes par catégorie (€)  :</q-item-label>
+                  <Doughnut class="q-mx-auto chart" :data="chartAverageCatdata" :options="options"/>
+                </div>
+              </q-card>
+
+              <q-card  flat dark  bordered class="card-chart">
+                <div class="q-pa-md q-mx-auto">
+                  <q-item-label class="text-h6">Total des dépenses par mois (€):</q-item-label>
+                  <Bar class="q-mx-auto w-70 chart chart-center" :data="chartTotalDepenssePerMonth" :options="optionsBar"/>
+                </div>
+              </q-card>
+
+              <q-card  flat dark  bordered class="card-chart">
+                <div class="q-pa-md q-mx-auto">
+                  <q-item-label class="text-h6">Nombre de dépenses par mois :</q-item-label>
+                  <Bar class="q-mx-auto w-70 chart chart-center" :data="chartDepenssePerMonth" :options="optionsBar"/>
+                </div>
+              </q-card>
             </q-card-section>
           </div>
         </q-slide-transition>
@@ -158,5 +276,31 @@ async function getStats(){
 }
 .text-head-card{
   margin-bottom: 15px;
+}
+.card-chart{
+  margin:20px;
+  width: calc(50% - 40px);
+}
+.chart-center{
+  margin-top: calc(50% - 150px);;
+}
+.chart{
+  width: 70%;
+}
+
+@media screen and (max-width: 1000px) {
+  .card-chart{
+    margin:20px;
+    width: calc(100% - 40px);
+  }
+  .chart{
+    width: 50%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .chart{
+    width: 30%;
+  }
 }
 </style>
