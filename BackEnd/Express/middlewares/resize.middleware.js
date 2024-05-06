@@ -5,7 +5,6 @@ module.exports = async (req,res,next) => {
         return res.status(400).json({ error: 'Aucun fichier trouvé' });
     }
 
-
     const sizes = [100, 200, 500];
     const imagePromises = sizes.map(size => {
         return sharp(req.file.buffer)
