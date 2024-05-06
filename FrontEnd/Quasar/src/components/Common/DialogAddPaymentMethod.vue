@@ -44,7 +44,7 @@ async function postRib() {
     const formData = new FormData();
     //formData.append('image', file.value);
 
-    const response = await api.post(`/users/${props.userId}/paymentMethode`, {
+    const response = await api.post(`/users/paymentMethode`, {
       "type": "RIB",
       "name": rib.value.name,
       "surname": rib.value.surname,
@@ -65,10 +65,17 @@ async function postRib() {
     }
   }
   catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Une erreur s\'est produite'
-    })
+    if(error.code === 409){
+      $q.notify({
+        type: 'negative',
+        message: 'Un moyen de paiement similaire existe déjà'
+      })}
+      else {
+        $q.notify({
+          type: 'negative',
+          message: 'Une erreur s\'est produite'
+        })
+      }
   }
   loading.value = false;
 }
