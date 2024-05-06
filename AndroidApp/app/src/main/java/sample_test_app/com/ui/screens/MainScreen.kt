@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -43,11 +42,11 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
             modifier = Modifier.align(Alignment.TopCenter)
         )
 
-        if (LocalUser.current.profile_picture[0].isNotBlank() && LocalUser.current.profile_picture[0] != "null") {
+        if (LocalUser.current.profile_picture?.get(0)?.isNotBlank() == true && LocalUser.current.profile_picture!![0] != "null") {
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = LocalUser.current.profile_picture[0]).apply(block = fun ImageRequest.Builder.() {
+                        .data(data = LocalUser.current.profile_picture!![0]).apply(block = fun ImageRequest.Builder.() {
                             transformations(CircleCropTransformation())
                         }).build()
                 ),
@@ -95,9 +94,9 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
         ) {
             Image(
                 painter = if (currentRoute == "/groups") {
-                    painterResource(id = R.drawable.groupslogo)
-                } else {
                     painterResource(id = R.drawable.groupslogofull)
+                } else {
+                    painterResource(id = R.drawable.groupslogo)
                 },
                 contentDescription = "Settings Icon",
                 modifier = Modifier
@@ -119,9 +118,9 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
 
             Image(
                 painter = if (currentRoute == "/notifications") {
-                    painterResource(id = R.drawable.notificationbell200)
-                } else {
                     painterResource(id = R.drawable.notificationlogofull)
+                } else {
+                    painterResource(id = R.drawable.notificationbell200)
                 },
                 contentDescription = "Notification Icon",
                 modifier = Modifier
