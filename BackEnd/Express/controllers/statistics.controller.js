@@ -7,21 +7,16 @@ const getAllStatistics = async (req, res) => {
     console.log(`REST getAllStatistics`);
     const userId = req.params.userId;
     try {
-        const categoryStats = await getAllCategorystats(userId);
-        const monthlyStats = await getAllMonthlyTransactionsOnAYear(userId);
         const averageTransactionPrice = await getAverageTransactionPrice(userId);
-        const statistics = [
-            averageTransactionPrice,
-            {amountByCategories: categoryStats.amountByCategories},
-            {numberByCategories: categoryStats.numberByCategories},
-            {averageByCategories: categoryStats.averageByCategories},
-            {amountByMonth: monthlyStats.amountByMonth},
-            {numberByMonth: monthlyStats.numberByMonth},
-            {averageByMonth: monthlyStats.averageByMonth}
-        ];
+        const transactionsByCategory = await getAllTransactionsAmountByCategory(userId);
+        const transactionsByMonth = await getAllUserTransactionsByMonthOnLastYear(userId);
+        const statistics = {
+            ...averageTransactionPrice,
+            ...transactionsByCategory,
+            ...transactionsByMonth
+        };
         return res.status(200).send(statistics);
     } catch (e) {
-        console.log(e);
         return res.status(500).send(e);
     }
 }
@@ -41,6 +36,7 @@ const getAverageTransactionPrice = async (userId) => {
         }
         const average = parseFloat(total / transactions.length).toFixed(2);
         return {
+            statistic: "Average transaction price",
             average: average,
             transactions: transactions.length
         };
@@ -49,7 +45,7 @@ const getAverageTransactionPrice = async (userId) => {
     }
 }
 
-const getAllCategorystats = async (userId) => {
+const getAllTransactionsAmountByCategory = async (userId) => {
     console.log(`REST getAllTransactionsAmountByCategory`);
     try {
         const transactions = await TransactionUser.findAll({
@@ -79,6 +75,7 @@ const getAllCategorystats = async (userId) => {
             averageByCategories[category] = parseFloat(amountByCategories[category] / numberByCategories[category]).toFixed(2);
         }
         return {
+            statistic: "All transactions amount and number by category",
             amountByCategories,
             numberByCategories,
             averageByCategories
@@ -89,7 +86,7 @@ const getAllCategorystats = async (userId) => {
     }
 }
 
-const getAllMonthlyTransactionsOnAYear = async (userId) => {
+const getAllUserTransactionsByMonthOnLastYear = async (userId) => {
     console.log(`REST getAmountOfAllUserTransactionsByMonthOnLastYear`);
     try {
         const transactions = await TransactionUser.findAll({
@@ -102,7 +99,6 @@ const getAllMonthlyTransactionsOnAYear = async (userId) => {
         });
         let amountByMonth = {};
         let numberByMonth = {};
-        let averageByMonth = {};
         for (let i = 0; i < transactions.length; i++) {
             let month = transactions[i].createdAt.getMonth().toString() + "/" + transactions[i].createdAt.getFullYear().toString();
             if (!amountByMonth[month]) {
@@ -112,13 +108,10 @@ const getAllMonthlyTransactionsOnAYear = async (userId) => {
             amountByMonth[month] += transactions[i].amount;
             numberByMonth[month]++;
         }
-        for (let month in amountByMonth) {
-            averageByMonth[month] = parseFloat(amountByMonth[month] / numberByMonth[month]).toFixed(2);
-        }
         return {
+            statistic: "Amount and number of all user transactions by month on last year",
             amountByMonth,
-            numberByMonth,
-            averageByMonth
+            numberByMonth
         };
     } catch (e) {
         return e;
