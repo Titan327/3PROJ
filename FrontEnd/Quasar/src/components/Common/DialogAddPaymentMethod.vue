@@ -83,7 +83,7 @@ async function postRib() {
 async function postPayPal() {
   loading.value = true;
   try {
-    const response = await api.post(`/users/${props.userId}/paymentMethode`, {
+    const response = await api.post(`/users/paymentMethode`, {
       "type": "Paypal",
       "paypal_username": paypalId.value,
     });
