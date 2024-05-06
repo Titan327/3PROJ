@@ -37,8 +37,6 @@ onMounted(async () => {
   await getOptimalRefundList();
   await getCat();
   group.value = await getGroup(props.groupId);
-
-  //openDialogRefund(1, 2);
 });
 
 async function getTransactionList(){
@@ -351,7 +349,7 @@ function getCatColor(catId: number) {
                   </q-item-section>
                   <q-space></q-space>
                   <q-item-section class="q-mx-auto">
-                  <q-btn outline color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogConsultTransaction(1)">Effectuer le remboursement</q-btn>
+                  <q-btn outline color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
                   <span v-else class="q-mx-auto">Rien à effectuer</span>
                   </q-item-section>
 
