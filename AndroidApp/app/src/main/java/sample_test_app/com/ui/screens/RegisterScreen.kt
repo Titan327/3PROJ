@@ -18,6 +18,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import android.util.Patterns
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import io.ktor.client.*
 import androidx.compose.material.Button
@@ -53,40 +56,25 @@ data class UserInfos(
 fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
 
     val firstnameState = remember { mutableStateOf("") }
-
     val lastnameState = remember { mutableStateOf("") }
-
     val usernameState = remember { mutableStateOf("") }
-
     val emailState = remember { mutableStateOf("") }
-
     val passwordState = remember { mutableStateOf("") }
-
     val passwordConfirmationState = remember { mutableStateOf("") }
-
     val isFirstnameSubmitted = remember { mutableStateOf(false) }
-
     val isLastnameSubmitted = remember { mutableStateOf(false) }
-
     val isUsernameSubmitted = remember { mutableStateOf(false) }
-
     val isEmailSubmitted = remember { mutableStateOf(false) }
-
     val emailErrorState = remember { mutableStateOf(false) }
-
     val showDateOfBirthField = remember { mutableStateOf(false) }
-
     val dateOfBirthState = remember { mutableStateOf("") }
 
     @Serializable
     data class UserInfosWrapper(val userInfos: UserInfos)
-
     // État pour suivre si le champ "Password" a été soumis
     val isPasswordSubmitted = remember { mutableStateOf(false) }
-
     // État pour suivre si le champ "Password Confirmation" a été soumis
     val isPasswordConfirmationSubmitted = remember { mutableStateOf(false) }
-
     // État pour contrôler la visibilité des champs de texte
     val showFirstnameField = remember { mutableStateOf(true) }
     val showLastnameField = remember { mutableStateOf(false) }
@@ -94,9 +82,7 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     val showEmailField = remember { mutableStateOf(false) }
     val showPasswordField = remember { mutableStateOf(false) }
     val showPasswordConfirmationField = remember { mutableStateOf(false) }
-
     val isEmailValid = remember { mutableStateOf(false) }
-
     fun isFieldSubmitted(value: String): Boolean {
         return value.contains('\n')
     }
@@ -113,7 +99,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
             birth_date = dateOfBirthState.value,
             password = passwordState.value
         )
-
         CoroutineScope(Dispatchers.IO).launch {
             val response: HttpResponse = httpClient.post("http://10.128.173.52:9002/api/auth/register") {
                 contentType(ContentType.Application.Json)
@@ -141,71 +126,127 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
             painter = painterResource(id = sample_test_app.com.R.drawable.logobig),
             contentDescription = null
         )
-
         Text(text = "Register")
-
         if (showFirstnameField.value) {
-            Text(
-                color = Color.White,
-                text = "Firstname"
-            )
-            TextField(
-                value = firstnameState.value,
-                onValueChange = { newValue ->
-                    firstnameState.value = newValue
-                    isFirstnameSubmitted.value = isFieldSubmitted(newValue)
-                    if (isFirstnameSubmitted.value) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextField(
+                    value = firstnameState.value,
+                    onValueChange = { newValue ->
+                        firstnameState.value = newValue
+                        isFirstnameSubmitted.value = isFieldSubmitted(newValue)
+                        if (isFirstnameSubmitted.value) {
+                            showFirstnameField.value = false
+                            showLastnameField.value = true
+                        }
+                    },
+                    placeholder = { Text("Enter your firstname") },
+                    colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Text("Précédent")
+                    }
+
+                    Button(onClick = {
                         showFirstnameField.value = false
                         showLastnameField.value = true
+                    }) {
+                        Text("Suivant")
                     }
-                },
-                placeholder = { Text("Enter your firstname") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+                }
+            }
         }
 
         if (showLastnameField.value) {
-            Text(
-                color = Color.White,
-                text = "Lastname"
-            )
-            TextField(
-                value = lastnameState.value,
-                onValueChange = { newValue ->
-                    lastnameState.value = newValue
-                    isLastnameSubmitted.value = isFieldSubmitted(newValue)
-                    if (isLastnameSubmitted.value) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextField(
+                    value = lastnameState.value,
+                    onValueChange = { newValue ->
+                        lastnameState.value = newValue
+                        isLastnameSubmitted.value = isFieldSubmitted(newValue)
+                        if (isLastnameSubmitted.value) {
+                            showLastnameField.value = false
+                            showEmailField.value = true                        }
+                    },
+                    placeholder = { Text("Enter your lastname") },
+                    colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(onClick = {
+                        showLastnameField.value = false
+                        showFirstnameField.value = true
+                    }) {
+                        Text("Précédent")
+                    }
+
+                    Button(onClick = {
                         showLastnameField.value = false
                         showUsernameField.value = true
+                    }) {
+                        Text("Suivant")
                     }
-                },
-                placeholder = { Text("Enter your lastname") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+                }
+            }
         }
 
         if (showUsernameField.value) {
-            Text(
-                color = Color.White,
-                text = "Username"
-            )
-            TextField(
-                value = usernameState.value,
-                onValueChange = { newValue ->
-                    usernameState.value = newValue
-                    isUsernameSubmitted.value = isFieldSubmitted(newValue)
-                    if (isUsernameSubmitted.value) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextField(
+                    value = usernameState.value,
+                    onValueChange = { newValue ->
+                        usernameState.value = newValue
+                        isUsernameSubmitted.value = isFieldSubmitted(newValue)
+                        if (isUsernameSubmitted.value) {
+                            showUsernameField.value = false
+                            // Mettez à jour le champ suivant à afficher ici
+                        }
+                    },
+                    placeholder = { Text("Enter your username") },
+                    colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(onClick = {
+                        showUsernameField.value = false
+                        showLastnameField.value = true}) {
+                        Text("Précédent")
+                    }
+
+                    Button(onClick = {
                         showUsernameField.value = false
                         showEmailField.value = true
+                    }) {
+                        Text("Suivant")
                     }
-                },
-                placeholder = { Text("Enter your username") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
-                modifier = Modifier.padding(vertical= 8.dp)
-            )
+                }
+            }
         }
+
 
         if (showEmailField.value) {
             Text(
@@ -239,61 +280,126 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     text = "Invalid email format",
                     modifier = Modifier.padding(top = 4.dp)
                 )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(onClick = {
+                        showPasswordField.value = false
+                        showEmailField.value = true
+                    }) {
+                        Text("Précédent")
+                    }
+
+                    Button(onClick = {
+                        if (!emailErrorState.value) {
+                            showEmailField.value = false
+                            showPasswordField.value = true
+                        }
+                    }) {
+                        Text("Suivant")
+                    }
+                }
             }
         }
 
         if (showPasswordField.value) {
-            Text(
-                color = Color.White,
-                text = "Password"
-            )
-            TextField(
-                value = passwordState.value,
-                onValueChange = { newValue ->
-                    passwordState.value = newValue
-                    if (!newValue.contains('\n')) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextField(
+                    value = passwordState.value,
+                    onValueChange = { newValue ->
                         passwordState.value = newValue
+                        isPasswordSubmitted.value = isFieldSubmitted(newValue)
+                        if (isPasswordSubmitted.value) {
+                            showPasswordField.value = false
+                            showPasswordConfirmationField.value = true
+                        }
+                    },
+                    placeholder = { Text("Enter your password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(onClick = {
+                        showPasswordField.value = false
+                        showEmailField.value = true
+                    }) {
+                        Text("Précédent")
                     }
-                    if (newValue.endsWith("\n")) {
+
+                    Button(onClick = {
                         showPasswordField.value = false
                         showPasswordConfirmationField.value = true
+                    }) {
+                        Text("Suivant")
                     }
-                },
-                placeholder = { Text("Enter your password") },
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+                }
+            }
         }
 
+
+
         if (showPasswordConfirmationField.value) {
-            Text(
-                color = Color.White,
-                text = "Confirm Password"
-            )
-            TextField(
-                value = passwordConfirmationState.value,
-                onValueChange = { newValue ->
-                    passwordConfirmationState.value = newValue
-                    if (!newValue.contains('\n')) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextField(
+                    value = passwordConfirmationState.value,
+                    onValueChange = { newValue ->
                         passwordConfirmationState.value = newValue
+                        if (!newValue.contains('\n')) {
+                            passwordConfirmationState.value = newValue
+                        }
+                        if (newValue.endsWith("\n")) {
+                            val passwordMatch = passwordState.value.trim() == passwordConfirmationState.value.trim()
+                            if (passwordMatch) {
+                                showPasswordConfirmationField.value = false
+                                showDateOfBirthField.value = true
+                            } else {
+                                // Ajoutez ici la logique pour gérer les mots de passe non concordants
+                                // Par exemple, afficher un message d'erreur
+                            }
+                        }
+                    },
+                    placeholder = { Text("Confirm your password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(onClick = {
+                        showPasswordConfirmationField.value = false
+                        showPasswordField.value = true
+                    }) {
+                        Text("Précédent")
                     }
-                    if (newValue.endsWith("\n")) {
-                        val passwordMatch = passwordState.value == passwordConfirmationState.value
-                        if (passwordMatch) {
+
+                    Button(onClick = {
+                        if (passwordConfirmationState.value.trim() == passwordState.value.trim()) {
                             showPasswordConfirmationField.value = false
                             showDateOfBirthField.value = true
                         } else {
+                            // Ajoutez ici la logique pour gérer les mots de passe non concordants
                         }
+                    }) {
+                        Text("Suivant")
                     }
-                },
-                placeholder = { Text("Confirm your password") },
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+                }
+            }
         }
-
         val isDateOfBirthSubmitted = remember { mutableStateOf(false) }
 
         if (showDateOfBirthField.value) {
@@ -324,6 +430,24 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(onClick = {
+                    showPasswordField.value = false
+                    showEmailField.value = true
+                }) {
+                    Text("Précédent")
+                }
+
+                Button(onClick = {
+                    showPasswordField.value = false
+                    showPasswordConfirmationField.value = true
+                }) {
+                    Text("Suivant")
+                }
+            }
         }
 
         if (!showDateOfBirthField.value) {
@@ -336,7 +460,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     birth_date = dateOfBirthState.value.trim(),
                     password = passwordState.value.trim()
                 )
-
                 val userInfoWrapper = UserInfosWrapper(userInfo)
                 val userInfoJson = Json.encodeToString(userInfoWrapper)
                 println(userInfoJson)
