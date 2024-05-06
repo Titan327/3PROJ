@@ -74,7 +74,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                     .padding(top = 16.dp)
                     .align(Alignment.TopEnd)
                     .clickable {
-                        navController.navigate("ProfilScreen")
+                        navController.navigate("profilScreen")
                     }
             )
         }
@@ -94,27 +94,39 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Image(
-                painter = painterResource(id = R.drawable.groupslogo),
+                painter = if (currentRoute == "/groups") {
+                    painterResource(id = R.drawable.groupslogo)
+                } else {
+                    painterResource(id = R.drawable.groupslogofull)
+                },
                 contentDescription = "Settings Icon",
                 modifier = Modifier
                     .size(40.dp)
-                    .clickable { /* Ajoutez votre action de clic ici */ }
+                    .clickable { navController.navigate("groups") }
             )
 
             Image(
-                painter = painterResource(id = R.drawable.homepage),
+                painter = if (currentRoute == "/home") {
+                    painterResource(id = R.drawable.homelogofull)
+                } else {
+                    painterResource(id = R.drawable.homepage)
+                },
                 contentDescription = "Home Icon",
                 modifier = Modifier
                     .size(40.dp)
-                    .clickable { /* Ajoutez votre action de clic ici */ }
+                    .clickable { navController.navigate("home") }
             )
 
             Image(
-                painter = painterResource(id = R.drawable.notificationbellhome),
+                painter = if (currentRoute == "/notifications") {
+                    painterResource(id = R.drawable.notificationbell200)
+                } else {
+                    painterResource(id = R.drawable.notificationlogofull)
+                },
                 contentDescription = "Notification Icon",
                 modifier = Modifier
                     .size(40.dp)
-                    .clickable { /* Ajoutez votre action de clic ici */ }
+                    .clickable { navController.navigate("notifications") }
             )
         }
     }
