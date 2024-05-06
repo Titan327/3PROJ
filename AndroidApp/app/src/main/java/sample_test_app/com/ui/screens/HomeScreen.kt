@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,8 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -38,10 +39,6 @@ import sample_test_app.com.http.Repository.GroupRepository
 import sample_test_app.com.http.Repository.TransactionRepository
 import sample_test_app.com.models.Group
 import sample_test_app.com.models.TransactionUser
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -57,10 +54,14 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
         CoroutineScope(Dispatchers.Main).launch {
             groups.value = groupRepository.getUserGroups(userId, jwtToken, true)
             transactions.value = transactionRepository.getLastTransactions(userId, jwtToken)
+            println(groups.value)
         }
     }
 
-    Column {
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
         Row (
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,7 +77,6 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                 Row{
                     Text(
                         text = "Mes groupes favoris:",
-                        modifier = Modifier.height(64.dp),
                         color = androidx.compose.ui.graphics.Color.White,
                         style = TextStyle(
                             fontSize = 24.sp,
@@ -136,6 +136,33 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        for (i in 0..10) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(color = androidx.compose.ui.graphics.Color(0xFF808080))
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Dernières transactions:",
+                        color = androidx.compose.ui.graphics.Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
                 }
             }
         }

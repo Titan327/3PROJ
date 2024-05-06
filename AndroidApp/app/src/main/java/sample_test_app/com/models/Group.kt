@@ -7,7 +7,7 @@ data class Group(
     val id: String? = "",
     val name: String? = "",
     val description: String? = "",
-    val picture: String? = "",
+    val picture: List<String?>? = emptyList(),
     val ownerId: String? = "",
     val createdAt: String? = "",
     val updatedAt: String? = "",
