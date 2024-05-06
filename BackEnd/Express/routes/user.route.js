@@ -29,7 +29,7 @@ router.put("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddlewa
 router.put("/:userId/password", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyPasswordForSensibleInfos, userMiddleware.verifyPasswordWhenCreatingOrUpdating, UserController.modifyPassword);
 //DELETE http://localhost:9002/api/users/{id}
 router.delete("/:userId", securityMiddleware.verifyIsAuthAndActivUser, userMiddleware.verifyPasswordForSensibleInfos, UserController.deleteUser);
-router.post("/:userId/paymentMethode", securityMiddleware.verifyIsAuthAndActivUser, PaymentMethodeController.createPaymentMethode);
+router.post("/paymentMethode", securityMiddleware.verifyIsAuth, PaymentMethodeController.createPaymentMethode);
 router.get("/:userId/:groupId/paymentMethode", securityMiddleware.verifyIsAuth, PaymentMethodeController.getPaymentMethode);
 router.get("/me/paymentMethode", securityMiddleware.verifyIsAuth, PaymentMethodeController.getMyPaymentMethode);
 
