@@ -20,13 +20,10 @@ import androidx.navigation.NavHostController
 import android.util.Patterns
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import io.ktor.client.*
-import androidx.compose.material.Text
 import androidx.compose.material.Button
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import sample_test_app.com.http.repositories.AuthRepository
-import sample_test_app.com.http.types.UserInfos
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -41,12 +38,19 @@ import java.text.SimpleDateFormat
 
 
 
+@Serializable
+data class UserInfos(
+    val firstname: String,
+    val lastname: String,
+    val username: String,
+    val email: String,
+    val birth_date: String,
+    val password: String
+)
+
 @OptIn(InternalAPI::class)
-
 @Composable
-
 fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
-    val authRepository = AuthRepository()
 
     val firstnameState = remember { mutableStateOf("") }
 
