@@ -132,8 +132,5 @@ const callback = async (req, res) => {
 
 
 module.exports = {
-    register,
-    login,
     callback
-
 }

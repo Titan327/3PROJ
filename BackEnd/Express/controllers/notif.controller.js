@@ -27,6 +27,8 @@ const GetAllNotifByUser = async (req,res) => {
     }
 }
 
+
+
 const GetNumNotifByUser = async (req,res) => {
     try {
         const userId = req.authorization.userId;
