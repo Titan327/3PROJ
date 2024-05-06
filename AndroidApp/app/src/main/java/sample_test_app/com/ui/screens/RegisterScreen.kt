@@ -59,6 +59,8 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     val lastnameState = remember { mutableStateOf("") }
     val usernameState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
+    val isDateOfBirthValid = remember { mutableStateOf(false) }
+
     val passwordState = remember { mutableStateOf("") }
     val passwordConfirmationState = remember { mutableStateOf("") }
     val isFirstnameSubmitted = remember { mutableStateOf(false) }
@@ -69,13 +71,11 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     val showDateOfBirthField = remember { mutableStateOf(false) }
     val dateOfBirthState = remember { mutableStateOf("") }
 
+
     @Serializable
     data class UserInfosWrapper(val userInfos: UserInfos)
-    // État pour suivre si le champ "Password" a été soumis
     val isPasswordSubmitted = remember { mutableStateOf(false) }
-    // État pour suivre si le champ "Password Confirmation" a été soumis
     val isPasswordConfirmationSubmitted = remember { mutableStateOf(false) }
-    // État pour contrôler la visibilité des champs de texte
     val showFirstnameField = remember { mutableStateOf(true) }
     val showLastnameField = remember { mutableStateOf(false) }
     val showUsernameField = remember { mutableStateOf(false) }
@@ -89,6 +89,7 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
+
 
     fun handleRegistration() {
         val userInfo = UserInfos(
@@ -219,7 +220,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                         isUsernameSubmitted.value = isFieldSubmitted(newValue)
                         if (isUsernameSubmitted.value) {
                             showUsernameField.value = false
-                            // Mettez à jour le champ suivant à afficher ici
                         }
                     },
                     placeholder = { Text("Enter your username") },
@@ -273,6 +273,24 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                 isError = emailErrorState.value,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(onClick = {
+                    showUsernameField.value = true
+                    showEmailField.value = false
+                }) {
+                    Text("Précédent")
+                }
+
+                Button(onClick = {
+                    showPasswordField.value = true
+                    showEmailField.value = false
+                }) {
+                    Text("Suivant")
+                }
+            }
 
             if (emailErrorState.value) {
                 Text(
@@ -419,6 +437,7 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                         dateFormat.isLenient = false
                         try {
                             dateFormat.parse(newValue.trim())
+                            isDateOfBirthValid.value = true
                             showDateOfBirthField.value = false
                         } catch (e: Exception) {
                             CoroutineScope(Dispatchers.Main).launch {
@@ -435,22 +454,22 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(onClick = {
-                    showPasswordField.value = false
-                    showEmailField.value = true
+                    showPasswordConfirmationField.value = true
+                    showDateOfBirthField.value = false
                 }) {
                     Text("Précédent")
                 }
 
                 Button(onClick = {
                     showPasswordField.value = false
-                    showPasswordConfirmationField.value = true
+                    showPasswordConfirmationField.value = false
                 }) {
                     Text("Suivant")
                 }
             }
         }
 
-        if (!showDateOfBirthField.value) {
+        if (!showDateOfBirthField.value && isDateOfBirthValid.value) {
             Button(onClick = {
                 val userInfo = UserInfos(
                     firstname = firstnameState.value.trim(),
