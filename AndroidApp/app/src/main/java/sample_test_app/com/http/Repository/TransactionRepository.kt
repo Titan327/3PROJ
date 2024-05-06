@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import sample_test_app.com.models.Transaction
 import sample_test_app.com.models.TransactionUser
 
 
@@ -28,8 +27,7 @@ class TransactionRepository(private val httpClient: HttpClient) {
             return if (userResponse.status == HttpStatusCode.OK) {
                 val responseBody = userResponse.body<String>()
                 val json = Json { ignoreUnknownKeys = true; isLenient = true }
-                val transactions = json.decodeFromString<List<TransactionUser>>(responseBody)
-                return transactions
+                return json.decodeFromString<List<TransactionUser>>(responseBody)
             } else {
                 println("Error: ${userResponse.status}")
                 emptyList()
