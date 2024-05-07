@@ -100,7 +100,7 @@ const getAllUserTransactionsByMonthOnLastYear = async (userId) => {
         let amountByMonth = {};
         let numberByMonth = {};
         for (let i = 0; i < transactions.length; i++) {
-            let month = transactions[i].createdAt.getMonth().toString() + "/" + transactions[i].createdAt.getFullYear().toString();
+            let month = (transactions[i].createdAt.getMonth()+1).toString() + "/" + transactions[i].createdAt.getFullYear().toString();
             if (!amountByMonth[month]) {
                 amountByMonth[month] = 0;
                 numberByMonth[month] = 0;

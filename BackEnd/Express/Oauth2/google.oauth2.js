@@ -2,18 +2,6 @@ const passport = require("passport");
 const User = require('../models/user.model');
 const {createToken} = require("../security/token.security");
 
-const register = async (req, res) => {
-
-    console.log("ici");
-
-}
-
-const login = async (req, res) => {
-
-    return res.status(200).send({ message: "Login"});
-
-}
-
 const callback = async (req, res) => {
     console.log("la");
 
@@ -144,8 +132,5 @@ const callback = async (req, res) => {
 
 
 module.exports = {
-    register,
-    login,
     callback
-
 }
