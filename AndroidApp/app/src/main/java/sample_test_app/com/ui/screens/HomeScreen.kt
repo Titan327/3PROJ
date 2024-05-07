@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +56,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
             groups.value = groupRepository.getUserGroups(userId, jwtToken, true)
             transactions.value = transactionRepository.getLastTransactions(userId, jwtToken)
             println(groups.value)
+            println(transactions.value)
         }
     }
 
@@ -70,14 +72,14 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
             ){
             Column (
                 modifier = Modifier
-                    .background(color = androidx.compose.ui.graphics.Color(0xFF808080))
+                    .background(color = Color(0xFF808080))
                     .padding(16.dp)
                     .fillMaxWidth()
             ) {
                 Row{
                     Text(
                         text = "Mes groupes favoris:",
-                        color = androidx.compose.ui.graphics.Color.White,
+                        color = Color.White,
                         style = TextStyle(
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
@@ -92,7 +94,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                     if (groups.value.isEmpty()) {
                         Text(
                             text = "Aucun groupe favori",
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = Color.White,
                             style = TextStyle(
                                 fontSize = 18.sp
                             )
@@ -140,29 +142,68 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
             }
         }
 
-        for (i in 0..10) {
-
-            Row(
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp))
+        ) {
+            Column(
                 modifier = Modifier
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
                     .fillMaxWidth()
-                    .padding(24.dp)
-                    .clip(RoundedCornerShape(16.dp))
             ) {
-                Column(
-                    modifier = Modifier
-                        .background(color = androidx.compose.ui.graphics.Color(0xFF808080))
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
+                Row {
                     Text(
                         text = "Dernières transactions:",
-                        color = androidx.compose.ui.graphics.Color.White,
+                        color = Color.White,
                         style = TextStyle(
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             textDecoration = TextDecoration.Underline
                         )
                     )
+                }
+                Row (
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (transactions.value.isEmpty()) {
+                        Text(
+                            text = "Aucune transaction récente",
+                            color = androidx.compose.ui.graphics.Color.White,
+                            style = TextStyle(
+                                fontSize = 18.sp
+                            )
+                        )
+                    } else {
+                        for (transaction in transactions.value) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(Color(R.color.red)) // Juste pour visualiser l'espace pris par la colonne
+                            ) {
+                                Text(text = "test")
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(2f)
+                                    .background(Color(R.color.green) ) // Juste pour visualiser l'espace pris par la colonne
+                            ) {
+                                Text(text = "test")
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(Color(R.color.blue)) // Juste pour visualiser l'espace pris par la colonne
+                            ) {
+                                Text(text = "test")
+                            }
+                        }
+                    }
                 }
             }
         }

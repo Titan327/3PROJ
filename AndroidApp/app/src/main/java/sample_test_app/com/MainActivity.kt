@@ -44,8 +44,8 @@ var LocalUser = compositionLocalOf<User> { error("No User provided") }
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
-    var jwtToken = remember { mutableStateOf("") }
-    var user = remember { mutableStateOf(User()) }
+    val jwtToken = remember { mutableStateOf("") }
+    val user = remember { mutableStateOf(User()) }
 
     CompositionLocalProvider(LocalJwtToken provides jwtToken.value, LocalUser provides user.value) {
         Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF1b1b1b)) {

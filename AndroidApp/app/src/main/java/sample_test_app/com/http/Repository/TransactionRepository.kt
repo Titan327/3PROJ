@@ -26,6 +26,7 @@ class TransactionRepository(private val httpClient: HttpClient) {
             }
             return if (userResponse.status == HttpStatusCode.OK) {
                 val responseBody = userResponse.body<String>()
+                println(responseBody)
                 val json = Json { ignoreUnknownKeys = true; isLenient = true }
                 return json.decodeFromString<List<TransactionUser>>(responseBody)
             } else {
