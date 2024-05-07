@@ -2,7 +2,6 @@
 import { useQuasar } from 'quasar';
 import {ref, defineProps} from "vue";
 import {api} from "boot/axios";
-import process from "node:process";
 const $q = useQuasar();
 
 let isOpen = ref(false);
