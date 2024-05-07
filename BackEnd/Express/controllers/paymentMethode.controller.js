@@ -163,8 +163,8 @@ const createPaymentMethode = async (req, res) => {
             }
         );
 
-        await PaymentMethode.create(result_crypt);
-        return res.status(201).send({ message: "Payment methode created successfully" });
+        const method = await PaymentMethode.create(result_crypt);
+        return res.status(201).send({ message: "Payment methode created successfully", id: method._id });
 
     } catch (e) {
         console.error(e);

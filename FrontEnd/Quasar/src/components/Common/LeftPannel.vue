@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from "vue";
 import { disconnectUser, getUser } from "stores/userStore";
 import { useRouter } from "vue-router";
-import { api } from "boot/axios";
+import {getNotificationsCountData} from "stores/notificationsStore";
 
 const drawer = ref(false);
 const miniState = ref(true);
@@ -20,9 +20,7 @@ onMounted(async () => {
     if (userData.profile_picture != null) {
       pictureUrl.value = userData.profile_picture[0];
     }
-    await getNotifications();
   }
-
   function setDrawerState() {
     if (window.innerWidth < 1000) {
       miniState.value = true;
@@ -30,7 +28,7 @@ onMounted(async () => {
       miniState.value = false;
     }
   }
-
+  await getCountNotifs()
   setDrawerState();
 
   window.addEventListener('resize', setDrawerState);
@@ -42,15 +40,8 @@ function disconnect() {
   router.push('/login');
 }
 
-
-
-async function getNotifications() {
-  try {
-    const response = await api.get('notifs/count');
-    notifCount.value = response.data.num;
-  } catch (error) {
-    console.error(error);
-  }
+async function getCountNotifs(){
+  notifCount.value = await getNotificationsCountData(true);
 }
 </script>
 
@@ -69,7 +60,7 @@ async function getNotifications() {
           src="assets/logo-500.png"
           style="max-width: 150px"
         />
-        <q-item clickable v-ripple  @click="router.push('../');getNotifications()">
+        <q-item clickable v-ripple  @click="router.push('../');getCountNotifs()">
           <q-item-section avatar>
             <q-icon color="secondary" name="dashboard" />
           </q-item-section>
@@ -77,17 +68,17 @@ async function getNotifications() {
           <q-item-section>Accueil</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/notifications');getNotifications()">
+        <q-item clickable v-ripple @click="router.push('/notifications');getCountNotifs()">
           <q-item-section avatar>
             <q-icon color="secondary" name="notifications"></q-icon>
           </q-item-section>
 
           <q-item-section>
-            <span>Notifications <q-badge v-if="notifCount>0" rounded color="red">{{ notifCount }}</q-badge></span>
+            <span>Notifications <q-badge v-if="notifCount>0" rounded color="red">{{notifCount}}</q-badge></span>
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/groups');getNotifications()">
+        <q-item clickable v-ripple @click="router.push('/groups');getCountNotifs()">
           <q-item-section avatar>
             <q-icon color="secondary" name="group" />
           </q-item-section>
@@ -95,17 +86,17 @@ async function getNotifications() {
           <q-item-section>Groupes</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/statistics');getNotifications()">
+        <q-item clickable v-ripple @click="router.push('/statistics');getCountNotifs()">
           <q-item-section avatar>
-            <q-icon color="secondary" name="person" />
+            <q-icon color="secondary" name="insights" />
           </q-item-section>
 
-          <q-item-section>Compte</q-item-section>
+          <q-item-section>Statistiques</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple  @click="router.push('/user-data');getNotifications()">
+        <q-item clickable v-ripple  @click="router.push('/user-data');getCountNotifs()">
           <q-item-section avatar>
-            <q-icon color="secondary" name="settings" />
+            <q-icon color="secondary" name="manage_accounts" />
           </q-item-section>
 
           <q-item-section>Paramètres</q-item-section>

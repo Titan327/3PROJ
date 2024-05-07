@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
 import {ref, defineProps, onMounted} from "vue";
-import process from "node:process";
 const $q = useQuasar();
 
 let isOpen = ref(false);

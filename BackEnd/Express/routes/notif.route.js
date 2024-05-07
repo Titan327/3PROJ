@@ -5,5 +5,6 @@ const notif = require('../controllers/notif.controller');
 router.get("/", securityMiddleware.verifyIsAuth, notif.GetAllNotifByUser);
 router.delete("/", securityMiddleware.verifyIsAuth, notif.DeleteNotifById);
 router.get("/count", securityMiddleware.verifyIsAuth, notif.GetNumNotifByUser);
+router.get("/count", securityMiddleware.verifyIsAuth, notif.GetNumNotifByUser);
 
 module.exports = router;
