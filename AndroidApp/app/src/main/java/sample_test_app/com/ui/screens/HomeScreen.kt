@@ -1,15 +1,20 @@
 package sample_test_app.com.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -48,6 +54,8 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
     val userId = LocalUser.current.id.toString()
     val groups = remember { mutableStateOf(emptyList<Group>()) }
     val transactions = remember { mutableStateOf(emptyList<TransactionUser>()) }
+    val totalPaidThisMonth = remember { mutableStateOf(Pair(0.0f, 0)) }
+    val restToPay = remember { mutableStateOf(Pair(0.0f, 0)) }
     val groupRepository = GroupRepository(httpClient)
     val transactionRepository = TransactionRepository(httpClient)
 
@@ -55,8 +63,8 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
         CoroutineScope(Dispatchers.Main).launch {
             groups.value = groupRepository.getUserGroups(userId, jwtToken, true)
             transactions.value = transactionRepository.getLastTransactions(userId, jwtToken)
-            println(groups.value)
-            println(transactions.value)
+            totalPaidThisMonth.value = transactionRepository.getTotalPaidThisMonth(userId, jwtToken)
+            restToPay.value = transactionRepository.getRestToPay(userId, jwtToken)
         }
     }
 
@@ -112,7 +120,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                                     ),
                                     contentDescription = "Group Picture",
                                     modifier = Modifier
-                                        .size(80.dp)
+                                        .size(100.dp)
                                         .padding(top = 16.dp)
                                         .clickable {
                                             navController.navigate("group/${group.id}")
@@ -129,7 +137,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                                     ),
                                     contentDescription = "Logo",
                                     modifier = Modifier
-                                        .size(80.dp)
+                                        .size(100.dp)
                                         .padding(top = 16.dp)
                                         .clickable {
                                             navController.navigate("group/${group.id}")
@@ -166,41 +174,251 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                     )
                 }
                 Row (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (transactions.value.isEmpty()) {
-                        Text(
-                            text = "Aucune transaction récente",
-                            color = androidx.compose.ui.graphics.Color.White,
-                            style = TextStyle(
-                                fontSize = 18.sp
-                            )
+                    Column {
+                        if (transactions.value.isEmpty()) {
+                            Row {
+                                Text(
+                                    text = "Aucune transaction récente",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 18.sp
+                                    )
+                                )
+                            }
+                        } else {
+                            Row (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .align(Alignment.CenterVertically),
+                                ) {
+                                    Text(text = "Groupe", color = Color.White)
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(2f)
+                                        .align(Alignment.CenterVertically),
+                                ) {
+                                    Text(text = "Dépense", color = Color.White)
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .align(Alignment.CenterVertically),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(text = "Montant", color = Color.White)
+                                }
+                            }
+                            Surface(
+                                color = Color.White,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp),
+                                elevation = 1.dp,
+                                border = BorderStroke(1.dp, Color.White)
+                            ) {}
+                            for (transaction in transactions.value) {
+                                Row (
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .align(Alignment.CenterVertically),
+                                        horizontalAlignment = Alignment.CenterHorizontally                                    ) {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(
+                                                ImageRequest.Builder(LocalContext.current)
+                                                    .data(data = transaction.Transaction?.Group?.picture?.get(0))
+                                                    .apply(block = fun ImageRequest.Builder.() {
+                                                        transformations(CircleCropTransformation())
+                                                    }).build()
+                                            ),
+                                            contentDescription = "Logo",
+                                            modifier = Modifier
+                                                .size(60.dp)
+                                        )
+                                    }
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(2f)
+                                            .align(Alignment.CenterVertically),
+                                    ) {
+                                        Text(text = transaction.Transaction?.label ?: "", color = Color.White)
+                                    }
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .align(Alignment.CenterVertically),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(text = transaction.amount.toString() + "€", color = Color.White)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row {
+                    Text(
+                        text = "Total payé ce mois-ci:",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
                         )
-                    } else {
-                        for (transaction in transactions.value) {
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .background(Color(R.color.red)) // Juste pour visualiser l'espace pris par la colonne
-                            ) {
-                                Text(text = "test")
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(color = Color(0xFFffa31a))
+                            .padding(16.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.botleftarrow),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Column (
+                        modifier = Modifier.padding(start = 24.dp)
+                    ) {
+                        if (totalPaidThisMonth.value.first == 0.0f) {
+                            Row {
+                                Text(
+                                    text = "Aucune transaction ce mois-ci",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
                             }
-
-                            Column(
-                                modifier = Modifier
-                                    .weight(2f)
-                                    .background(Color(R.color.green) ) // Juste pour visualiser l'espace pris par la colonne
-                            ) {
-                                Text(text = "test")
+                        } else {
+                            Row {
+                                Text(
+                                    text = "Total: ${totalPaidThisMonth.value.first}€",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
                             }
-
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .background(Color(R.color.blue)) // Juste pour visualiser l'espace pris par la colonne
-                            ) {
-                                Text(text = "test")
+                            Row {
+                                Text(
+                                    text = "Nombre de transactions: ${totalPaidThisMonth.value.second}",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 18.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row {
+                    Text(
+                        text = "Reste à rembourser:",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(color = Color(0xFFffa31a))
+                            .padding(16.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.toprightarrow),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Column (
+                        modifier = Modifier.padding(start = 24.dp)
+                    ) {
+                        if (totalPaidThisMonth.value.first == 0.0f) {
+                            Row {
+                                Text(
+                                    text = "0€ à rembourser",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
+                            }
+                        } else {
+                            Row {
+                                Text(
+                                    text = "Total: ${restToPay.value.first}€",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
                             }
                         }
                     }

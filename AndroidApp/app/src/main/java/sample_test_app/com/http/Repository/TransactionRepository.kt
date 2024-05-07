@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.json.JSONObject
 import sample_test_app.com.models.TransactionUser
 
 
@@ -26,7 +27,6 @@ class TransactionRepository(private val httpClient: HttpClient) {
             }
             return if (userResponse.status == HttpStatusCode.OK) {
                 val responseBody = userResponse.body<String>()
-                println(responseBody)
                 val json = Json { ignoreUnknownKeys = true; isLenient = true }
                 return json.decodeFromString<List<TransactionUser>>(responseBody)
             } else {
@@ -36,6 +36,54 @@ class TransactionRepository(private val httpClient: HttpClient) {
         } catch (e: Exception) {
             println("Error: $e")
             return emptyList()
+        }
+    }
+
+    suspend fun getRestToPay(userId: String, jwtToken: String): Pair<Float, Int> {
+        try {
+            val response: HttpResponse = withContext(Dispatchers.IO) {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/transactions/totalBalance") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer $jwtToken")
+                }
+            }
+            return if (response.status == HttpStatusCode.OK) {
+                val responseBody = response.body<String>()
+                val jsonObject = JSONObject(responseBody)
+                val amount = jsonObject.getInt("amount").toFloat()
+                val transactions = jsonObject.getInt("transactions")
+                Pair(amount, transactions)
+            } else {
+                println("Error: ${response.status}")
+                Pair(0.0f, 0)
+            }
+        } catch (e: Exception) {
+            println("Error: $e")
+            return Pair(0.0f, 0)
+        }
+    }
+
+    suspend fun getTotalPaidThisMonth(userId: String, jwtToken: String): Pair<Float, Int> {
+        try {
+            val response: HttpResponse = withContext(Dispatchers.IO) {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/transactions/thisMonth") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer $jwtToken")
+                }
+            }
+            return if (response.status == HttpStatusCode.OK) {
+                val responseBody = response.body<String>()
+                val jsonObject = JSONObject(responseBody)
+                val amount = jsonObject.getInt("amount").toFloat()
+                val transactions = jsonObject.getInt("transactions")
+                Pair(amount, transactions)
+            } else {
+                println("Error: ${response.status}")
+                Pair(0.0f, 0)
+            }
+        } catch (e: Exception) {
+            println("Error: $e")
+            return Pair(0.0f, 0)
         }
     }
 }
