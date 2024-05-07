@@ -184,6 +184,19 @@ const getXLastsUserTransactions = async (req, res) => {
                 }]
             }]
         });
+
+        transactions.map(obj => {
+
+            const base_url = obj.Transaction.Group.picture;
+            if (base_url){
+                obj.Transaction.Group.picture = [base_url+"/100",base_url+"/200",base_url+"/500"]
+            }else {
+                obj.Transaction.Group.picture = null;
+            }
+
+        });
+
+
         if(transactions === null) {
             return res.status(404).send('No transaction found for this user');
         }

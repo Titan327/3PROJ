@@ -1,15 +1,21 @@
 const UserGroup = require("../models/userGroup.model");
 const {minioClient} = require("../configurations/minio.config");
 const path = require("path");
+const PaymentMethode = require('../models/paymentMethode.model');
 
 
 const postRib = async (req, res) => {
     try {
         const userId = req.authorization.userId;
+        const idMethod = req.params.idMethod;
 
-        await minioClient.putObject("ticket", userId+'/'+1, req.file.buffer);
+        if(!await PaymentMethode.findOne({_id: idMethod,userId: userId})){
+            return res.status(404).send({ error: "Payement method don't exist" });
+        }
 
-        return res.status(200).send({ message: "Ticket uploaded successfully"});
+        await minioClient.putObject("rib", userId+'/'+idMethod, req.file.buffer);
+
+        return res.status(200).send({ message: "RIB uploaded successfully"});
 
     }catch (e){
         console.log(e)
@@ -17,7 +23,7 @@ const postRib = async (req, res) => {
     }
 }
 
-const getTicketByName = async (req, res) => {
+const getRibById = async (req, res) => {
     try {
         const userId = req.authorization.userId;
         const groupId = req.params.groupId;
@@ -42,5 +48,5 @@ const getTicketByName = async (req, res) => {
 
 module.exports={
     postRib,
-    getTicketByName
+    getRibById
 }
