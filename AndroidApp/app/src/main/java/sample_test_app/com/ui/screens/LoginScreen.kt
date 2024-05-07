@@ -111,6 +111,7 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient, jwtTok
                                     httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}") {
                                         contentType(ContentType.Application.Json)
                                         header("Authorization", "Bearer ${jwtToken.value}")
+                                        println("Received token: ${jwtToken.value}")
                                     }
                                 }
                                 if (userResponse.status == HttpStatusCode.OK) {

@@ -20,7 +20,6 @@ import androidx.navigation.NavHostController
 import android.util.Patterns
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import io.ktor.client.*
 import androidx.compose.material.Button
@@ -38,9 +37,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
-
-
-
 @Serializable
 data class UserInfos(
     val firstname: String,
@@ -50,17 +46,14 @@ data class UserInfos(
     val birth_date: String,
     val password: String
 )
-
 @OptIn(InternalAPI::class)
 @Composable
 fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
-
     val firstnameState = remember { mutableStateOf("") }
     val lastnameState = remember { mutableStateOf("") }
     val usernameState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
     val isDateOfBirthValid = remember { mutableStateOf(false) }
-
     val passwordState = remember { mutableStateOf("") }
     val passwordConfirmationState = remember { mutableStateOf("") }
     val isFirstnameSubmitted = remember { mutableStateOf(false) }
@@ -68,10 +61,9 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     val isUsernameSubmitted = remember { mutableStateOf(false) }
     val isEmailSubmitted = remember { mutableStateOf(false) }
     val emailErrorState = remember { mutableStateOf(false) }
+    val showRegisterButton = remember { mutableStateOf(false) }
     val showDateOfBirthField = remember { mutableStateOf(false) }
     val dateOfBirthState = remember { mutableStateOf("") }
-
-
     @Serializable
     data class UserInfosWrapper(val userInfos: UserInfos)
     val isPasswordSubmitted = remember { mutableStateOf(false) }
@@ -88,32 +80,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     }
     fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-
-    fun handleRegistration() {
-        val userInfo = UserInfos(
-            firstname = firstnameState.value,
-            lastname = lastnameState.value,
-            username = usernameState.value,
-            email = emailState.value,
-            birth_date = dateOfBirthState.value,
-            password = passwordState.value
-        )
-        CoroutineScope(Dispatchers.IO).launch {
-            val response: HttpResponse = httpClient.post("http://10.128.173.52:9002/api/auth/register") {
-                contentType(ContentType.Application.Json)
-                body = Json.encodeToString(userInfo)
-            }
-
-            if (response.status == HttpStatusCode.OK) {
-                withContext(Dispatchers.Main) {
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                }
-            }
-        }
     }
 
     Column(
@@ -147,7 +113,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -157,7 +122,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     }) {
                         Text("Précédent")
                     }
-
                     Button(onClick = {
                         showFirstnameField.value = false
                         showLastnameField.value = true
@@ -186,7 +150,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -226,7 +189,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -236,7 +198,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                         showLastnameField.value = true}) {
                         Text("Précédent")
                     }
-
                     Button(onClick = {
                         showUsernameField.value = false
                         showEmailField.value = true
@@ -283,7 +244,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                 }) {
                     Text("Précédent")
                 }
-
                 Button(onClick = {
                     showPasswordField.value = true
                     showEmailField.value = false
@@ -291,7 +251,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     Text("Suivant")
                 }
             }
-
             if (emailErrorState.value) {
                 Text(
                     color = Color.Red,
@@ -308,7 +267,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     }) {
                         Text("Précédent")
                     }
-
                     Button(onClick = {
                         if (!emailErrorState.value) {
                             showEmailField.value = false
@@ -320,7 +278,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                 }
             }
         }
-
         if (showPasswordField.value) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -341,7 +298,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -352,7 +308,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                     }) {
                         Text("Précédent")
                     }
-
                     Button(onClick = {
                         showPasswordField.value = false
                         showPasswordConfirmationField.value = true
@@ -362,8 +317,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                 }
             }
         }
-
-
 
         if (showPasswordConfirmationField.value) {
             Column(
@@ -384,7 +337,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                                 showDateOfBirthField.value = true
                             } else {
                                 // Ajoutez ici la logique pour gérer les mots de passe non concordants
-                                // Par exemple, afficher un message d'erreur
                             }
                         }
                     },
@@ -439,6 +391,7 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                             dateFormat.parse(newValue.trim())
                             isDateOfBirthValid.value = true
                             showDateOfBirthField.value = false
+                            showRegisterButton.value = true
                         } catch (e: Exception) {
                             CoroutineScope(Dispatchers.Main).launch {
                             }
@@ -449,23 +402,13 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = {
-                    showPasswordConfirmationField.value = true
-                    showDateOfBirthField.value = false
-                }) {
-                    Text("Précédent")
-                }
+        }
 
-                Button(onClick = {
-                    showPasswordField.value = false
-                    showPasswordConfirmationField.value = false
-                }) {
-                    Text("Suivant")
-                }
+        if (showRegisterButton.value) { // Affichez le bouton "Register" si showRegisterButton.value est true
+            Button(onClick = {
+                // Ajoutez ici la logique pour le bouton "Register"
+            }) {
+                Text("Register")
             }
         }
 

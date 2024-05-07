@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ktor.client.HttpClient
 import sample_test_app.com.models.User
+import sample_test_app.com.ui.screens.GroupListScreen
 import sample_test_app.com.ui.screens.HomeScreen
 import sample_test_app.com.ui.screens.LoginScreen
 import sample_test_app.com.ui.screens.MainScreen
@@ -56,6 +57,11 @@ fun AppNavHost() {
                 composable("home") {
                     MainScreen(navController) {
                         HomeScreen(HttpClient(), navController)
+                    }
+                }
+                composable("groupList") {
+                    MainScreen(navController) {
+                        GroupListScreen(HttpClient(), navController)
                     }
                 }
             }

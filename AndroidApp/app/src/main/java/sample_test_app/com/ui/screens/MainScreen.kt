@@ -117,7 +117,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                 contentDescription = "Settings Icon",
                 modifier = Modifier
                     .size(40.dp)
-                    .clickable { navController.navigate("groups") }
+                    .clickable { navController.navigate("groupList") }
             )
 
             Image(
