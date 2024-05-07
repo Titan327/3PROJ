@@ -31,7 +31,6 @@ async function getNotifications() {
   const response = await api.get(`notifs`);
   notifList.value = response.data;
 
-  console.log(response.data.allNotif.length)
   notifList.value.allNotif.sort((a, b) => {
     return new Date(b.date) - new Date(a.date);
   });
@@ -39,12 +38,12 @@ async function getNotifications() {
 
 async function deleteNotification(notifId: string) {
   try {
-    await api.delete(`notifs/${notifId}`);
-    await getNotifications();
+    await api.delete(`notifs`,{'data': {'id_notif': notifId}});
     $q.notify({
       type: 'positive',
       message: 'Supprimé'
     })
+    await getNotifications();
   }
   catch (error) {
     console.error(error);
@@ -87,10 +86,10 @@ async function deleteNotification(notifId: string) {
             </q-item-section>
             <q-item-section avatar v-if="width>400">
               <q-btn
-                color="negative"
-                unelevated
+                color="red-6"
+                round
                 flat
-                outline
+                dense
                 class="btn-consulter"
                 icon="delete"
                 @click="deleteNotification(notif._id)"
