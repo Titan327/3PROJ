@@ -1,8 +1,10 @@
 package sample_test_app.com
 import SplashScreen
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -16,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ktor.client.HttpClient
+import sample_test_app.com.models.NotificationScreen
 import sample_test_app.com.models.User
 import sample_test_app.com.ui.screens.GroupListScreen
 import sample_test_app.com.ui.screens.HomeScreen
@@ -26,6 +29,7 @@ import sample_test_app.com.ui.theme.SampleTestAppTheme
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -42,6 +46,7 @@ class MainActivity : ComponentActivity() {
 var LocalJwtToken = compositionLocalOf<String> { error("No JWT Token provided") }
 var LocalUser = compositionLocalOf<User> { error("No User provided") }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
@@ -62,6 +67,11 @@ fun AppNavHost() {
                 composable("groupList") {
                     MainScreen(navController) {
                         GroupListScreen(HttpClient(), navController)
+                    }
+                }
+                composable("notifications") {
+                    MainScreen(navController) {
+                        NotificationScreen(HttpClient(), navController)
                     }
                 }
             }

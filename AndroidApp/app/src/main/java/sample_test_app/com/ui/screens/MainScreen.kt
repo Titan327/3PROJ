@@ -27,12 +27,11 @@ import sample_test_app.com.LocalUser
 import sample_test_app.com.R
 
 
-const val KEY_ROUTE = "androidx.navigation.compose.KEY_ROUTE"
 @Composable
 fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+    val currentRoute = navController.currentDestination?.route
     val scrollState = rememberScrollState()
+    println(currentRoute)
 
     Column{
         Column (
@@ -109,7 +108,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
             horizontalArrangement = Arrangement.SpaceAround
         )  {
             Image(
-                painter = if (currentRoute == "/groups") {
+                painter = if (currentRoute == "groupList") {
                     painterResource(id = R.drawable.groupslogofull)
                 } else {
                     painterResource(id = R.drawable.groupslogo)
@@ -121,7 +120,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
             )
 
             Image(
-                painter = if (currentRoute == "/home") {
+                painter = if (currentRoute == "home") {
                     painterResource(id = R.drawable.homelogofull)
                 } else {
                     painterResource(id = R.drawable.homepage)
@@ -133,7 +132,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
             )
 
             Image(
-                painter = if (currentRoute == "/notifications") {
+                painter = if (currentRoute == "notifications") {
                     painterResource(id = R.drawable.notificationlogofull)
                 } else {
                     painterResource(id = R.drawable.notificationlogo)
