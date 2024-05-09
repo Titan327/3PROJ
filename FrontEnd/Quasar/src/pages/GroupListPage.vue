@@ -113,7 +113,7 @@ async function setFavorite(groupID:number, favorite:boolean){
         <q-item>
           <q-item-section avatar>
             <q-avatar rounded color="secondary" text-color="white"  clickable @click="router.push(`/groups/${group.id}`)">
-              <img :src="group.picture ?  group.picture+'/200' : 'assets/defaults/group-default.webp'">
+              <img :src="group.picture ?  group.picture[0] : 'assets/defaults/group-default.webp'">
             </q-avatar>
           </q-item-section>
 
