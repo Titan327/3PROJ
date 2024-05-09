@@ -29,7 +29,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.IconButton
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,13 +56,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 
-
 @Composable
 fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
     val jwtToken = LocalJwtToken.current
     val userId = LocalUser.current.id.toString()
     val groups = remember { mutableStateOf(emptyList<Group>()) }
     val groupRepository = GroupRepository(httpClient)
+    val showDialog = remember { mutableStateOf(false) }
+    val groupName = remember { mutableStateOf("") }
+    val groupDescription = remember { mutableStateOf("") }
+
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -67,21 +75,24 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
     }
 
     Column {
-        Row (
+        Column (
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp)
-                .clip(RoundedCornerShape(16.dp))
         ){
             Column (
                 modifier = Modifier
-                    .background(color = androidx.compose.ui.graphics.Color(0xFF808080))
-                    .padding(16.dp)
                     .fillMaxWidth()
-            ) {
-                Row{
+                    .padding(24.dp)
+            ){
+                Row (
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
-                        text = "Mes groupes favoris:",
+                        text = "Mes groupes :",
                         modifier = Modifier.height(64.dp),
                         color = androidx.compose.ui.graphics.Color.White,
                         style = TextStyle(
@@ -90,11 +101,59 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                             textDecoration = TextDecoration.Underline
                         )
                     )
+
+                    // Ajouter un IconButton avec une image de croix
+                    IconButton(onClick = { showDialog.value = true }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_cross), // Remplacez par votre ressource d'image de croix
+                            contentDescription = "Create Group",
+                            modifier = Modifier.size(24.dp) // Contrôlez la taille de l'image ici
+                        )
+                    }
                 }
-                Row (
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
+
+                if (showDialog.value) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog.value = false },
+                        title = { Text("Create Group") },
+                        text = {
+                            Column {
+                                TextField(
+                                    value = groupName.value,
+                                    onValueChange = { groupName.value = it },
+                                    label = { Text("Group Name") }
+                                )
+
+                                TextField(
+                                    value = groupDescription.value,
+                                    onValueChange = { groupDescription.value = it },
+                                    label = { Text("Group Description") }
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(onClick = {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    groupRepository.createGroup(jwtToken, groupName.value, groupDescription.value)
+                                    showDialog.value = false
+                                    groups.value = groupRepository.getUserGroups(userId, jwtToken, true)
+                                }
+                            }) {
+                                Text("Create Group")
+                            }
+                        },
+                        dismissButton = {
+                            Button(onClick = { showDialog.value = false }) {
+                                Text("Cancel")
+                            }
+                        }
+                    )
+                }
+
+                Column (
+                    verticalArrangement = Arrangement.SpaceAround
                 ) {
+
                     if (groups.value.isEmpty()) {
                         Text(
                             text = "",
@@ -105,45 +164,61 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                         )
                     } else {
                         for (group in groups.value) {
-                            if (group.picture?.isNotEmpty() == true) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = group.picture[0])
-                                            .apply(block = fun ImageRequest.Builder.() {
-                                                transformations(CircleCropTransformation())
-                                            }).build()
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (group.picture?.isNotEmpty() == true) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(
+                                            ImageRequest.Builder(LocalContext.current)
+                                                .data(data = group.picture[0])
+                                                .apply(block = fun ImageRequest.Builder.() {
+                                                    transformations(CircleCropTransformation())
+                                                }).build()
+                                        ),
+
+                                        contentDescription = "Group Picture",
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .padding(top = 16.dp)
+                                            .clickable {
+                                                navController.navigate("group/${group.id}")
+                                            }
+
+                                    )
+                                } else {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(
+                                            ImageRequest.Builder(LocalContext.current)
+                                                .data(data = R.drawable.groupslogofull)
+                                                .apply(block = fun ImageRequest.Builder.() {
+                                                    transformations(CircleCropTransformation())
+                                                }).build()
+                                        ),
+                                        contentDescription = "Logo",
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .padding(top = 16.dp)
+                                            .clickable {
+                                                navController.navigate("group/${group.id}")
+                                            }
+
+                                    )
+                                }
+                                Text(
+                                    text = group.name ?: "", // Utilisez le nom du groupe ou une chaîne vide si le nom est null
+                                    color = androidx.compose.ui.graphics.Color.White, // Changez la couleur en blanc
+                                    style = TextStyle(
+                                        fontSize = 18.sp
                                     ),
-                                    contentDescription = "Group Picture",
-                                    modifier = Modifier
-                                        .size(80.dp)
-                                        .padding(top = 16.dp)
-                                        .clickable {
-                                            navController.navigate("group/${group.id}")
-                                        }
-                                )
-                            } else {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = R.drawable.groupslogofull)
-                                            .apply(block = fun ImageRequest.Builder.() {
-                                                transformations(CircleCropTransformation())
-                                            }).build()
-                                    ),
-                                    contentDescription = "Logo",
-                                    modifier = Modifier
-                                        .size(80.dp)
-                                        .padding(top = 16.dp)
-                                        .clickable {
-                                            navController.navigate("group/${group.id}")
-                                        }
+                                    modifier = Modifier.padding(start = 16.dp) // Ajoutez un espace entre l'image et le texte
                                 )
                             }
+                        }
                         }
                     }
                 }
             }
         }
     }
-}
+

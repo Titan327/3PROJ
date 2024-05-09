@@ -14,13 +14,22 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import sample_test_app.com.models.Group
 
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.utils.EmptyContent.contentType
+import io.ktor.http.contentType
+import io.ktor.util.InternalAPI
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 
 class GroupRepository(private val httpClient: HttpClient) {
     suspend fun getUserGroups(userId: String, jwtToken: String, favorite: Boolean): List<Group> {
         try {
             val userResponse: HttpResponse = if (favorite) {
                 withContext(Dispatchers.IO) {
-                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/groups?favorite=true") {
+                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/groups?favorite=false") {
                         contentType(ContentType.Application.Json)
                         header("Authorization", "Bearer $jwtToken")
                     }
@@ -45,6 +54,27 @@ class GroupRepository(private val httpClient: HttpClient) {
             return emptyList()
         }
     }
-
-
+    @OptIn(InternalAPI::class)
+    suspend fun createGroup(jwtToken: String, groupName: String, groupDescription: String) {
+        try {
+            withContext(Dispatchers.IO) {
+                val response: HttpResponse = httpClient.post("https://3proj-back.tristan-tourbier.com/api/groups") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer $jwtToken")
+                    body = """
+                {
+                    "name": "$groupName",
+                    "description": "$groupDescription"
+                }
+                """.trimIndent()
+                }
+                // Utilisez la réponse ici
+                println("Response: ${response.status}")
+            }
+        } catch (e: Exception) {
+            println("Error: $e")
+        }
+    }
 }
+
+
