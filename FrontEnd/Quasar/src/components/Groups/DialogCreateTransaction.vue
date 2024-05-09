@@ -106,6 +106,9 @@ function calculateTotal(): number {
 
   if (_transaction.value.details && _transaction.value.details.length > 0) {
     for (const detail of _transaction.value.details) {
+      if(detail.amount < 0){
+        detail.amount = 0;
+      }
       totalAmount += Number(detail.amount);
     }
   }
@@ -147,7 +150,7 @@ function calculateTotal(): number {
                 :option-value="catOptn => catOptn.id"
                 :option-label="catOptn => catOptn.label"
                 :options="catOptn"
-                :rules="[checkNotNull]"
+                :rules="[val => !!val.label || 'La catégorie est requise']"
                 hide-bottom-space
               />
           </div>
