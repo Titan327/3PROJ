@@ -109,12 +109,6 @@ async function openDialogInvite(){
           groupName: group.value.name,
           groupId: group.value.id
         }
-      }).onOk(() => {
-        console.log('OK')
-      }).onCancel(() => {
-        console.log('Cancel')
-      }).onDismiss(() => {
-        console.log('Dismiss')
       })
 }
 

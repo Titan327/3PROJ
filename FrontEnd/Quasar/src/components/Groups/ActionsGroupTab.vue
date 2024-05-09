@@ -80,8 +80,6 @@ function openDialogCreateTransaction(){
     dialogCreateTransaction.value = false;
     getTransactionList();
     getOptimalRefundList();
-    socket.emit('new-transaction', props.groupId);
-
   })
 }
 

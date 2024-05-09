@@ -7,6 +7,7 @@ import {DefaultTransactionCreated} from "src/interfaces/transactions.interface";
 import {getUser} from "stores/userStore";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {formatNumber} from "stores/globalFunctionsStore";
+import { io } from 'socket.io-client';
 const $q = useQuasar();
 
 let isOpen = ref(false);
@@ -17,6 +18,8 @@ let User = ref(DefaultUser());
 let group = ref(DefaultGroup());
 const _transaction = ref(DefaultTransactionCreated());
 const catOptn = ref([]);
+const socket = io(process.env.URL_BACKEND);
+
 
 const props = defineProps({
   groupId: Number,
@@ -56,6 +59,7 @@ async function createTransaction() {
         "details": _transaction.value.details
       });
       if (response.data) {
+        socket.emit('new-transaction', props.groupId);
         $q.notify({
           type: 'positive',
           message: 'Transaction créée'
