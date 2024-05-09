@@ -67,6 +67,7 @@ function openDialogCreateTransaction(){
   }).onDismiss(() => {
     dialogCreateTransaction.value = false;
     getTransactionList();
+    getOptimalRefundList();
   })
 }
 
