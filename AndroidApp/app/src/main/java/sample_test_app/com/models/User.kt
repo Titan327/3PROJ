@@ -10,5 +10,6 @@ data class User(
     val username: String? = "",
     val email: String? = "",
     val birth_date: String? = "",
-    val profile_picture: List<String?>? = emptyList()
+    val profile_picture: List<String?>? = emptyList(),
+    val UserGroup : UserGroup = UserGroup()
 )

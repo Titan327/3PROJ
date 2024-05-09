@@ -54,6 +54,7 @@ class GroupRepository(private val httpClient: HttpClient) {
             return emptyList()
         }
     }
+
     @OptIn(InternalAPI::class)
     suspend fun createGroup(jwtToken: String, groupName: String, groupDescription: String) {
         try {
@@ -73,6 +74,27 @@ class GroupRepository(private val httpClient: HttpClient) {
             }
         } catch (e: Exception) {
             println("Error: $e")
+        }
+    }
+
+    suspend fun getGroup(groupId: String, jwtToken: String): Group {
+        try {
+            val groupResponse: HttpResponse = withContext(Dispatchers.IO) {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/${groupId}") {
+                    contentType(ContentType.Application.Json)
+                    header("Authorization", "Bearer $jwtToken")
+                }
+            }
+            return if (groupResponse.status == HttpStatusCode.OK) {
+                val responseBody = groupResponse.body<String>()
+                Json.decodeFromString<Group>(responseBody)
+            } else {
+                println("Error: ${groupResponse.status}")
+                Group()
+            }
+        } catch (e: Exception) {
+            println("Error: $e")
+            return Group()
         }
     }
 }

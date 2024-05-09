@@ -12,5 +12,6 @@ data class Group(
     val createdAt: String? = "",
     val updatedAt: String? = "",
     val activeUsersCount: Int? = 0,
-    val isFavorite: Boolean? = false
+    val isFavorite: Boolean? = false,
+    val Users: List<User> = emptyList(),
 )

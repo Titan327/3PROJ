@@ -17,7 +17,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import sample_test_app.com.models.Group
 
 @Serializable
 data class NotificationsResponse(
@@ -63,7 +62,6 @@ class NotificationRepository(private val httpClient: HttpClient) {
                     )
                 }
             }
-            println(response.status)
             return response.status == HttpStatusCode.OK
         } catch (e: Exception) {
             println("Error: $e")

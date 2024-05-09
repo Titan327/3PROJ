@@ -3,14 +3,12 @@ package sample_test_app.com.ui.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -109,6 +107,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                         )
                     } else {
                         for (group in groups.value) {
+                            val groupId = group.id.toString()
                             if (group.picture?.isNotEmpty() == true) {
                                 Image(
                                     painter = rememberAsyncImagePainter(
@@ -123,7 +122,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                                         .size(100.dp)
                                         .padding(top = 16.dp)
                                         .clickable {
-                                            navController.navigate("group/${group.id}")
+                                            navController.navigate("group/$groupId")
                                         }
                                 )
                             } else {
@@ -140,7 +139,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                                         .size(100.dp)
                                         .padding(top = 16.dp)
                                         .clickable {
-                                            navController.navigate("group/${group.id}")
+                                            navController.navigate("group/$groupId")
                                         }
                                 )
                             }

@@ -101,7 +101,6 @@ fun NotificationScreen(httpClient: HttpClient, navController: NavController) {
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
-                                    println("cliqué sur la poubelle")
                                     CoroutineScope(Dispatchers.Main).launch {
                                         NotificationRepository(httpClient).deleteNotification(
                                             jwtToken,

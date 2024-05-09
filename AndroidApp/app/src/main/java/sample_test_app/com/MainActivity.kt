@@ -21,6 +21,7 @@ import io.ktor.client.HttpClient
 import sample_test_app.com.models.NotificationScreen
 import sample_test_app.com.models.User
 import sample_test_app.com.ui.screens.GroupListScreen
+import sample_test_app.com.ui.screens.GroupScreen
 import sample_test_app.com.ui.screens.HomeScreen
 import sample_test_app.com.ui.screens.LoginScreen
 import sample_test_app.com.ui.screens.MainScreen
@@ -72,6 +73,11 @@ fun AppNavHost() {
                 composable("notifications") {
                     MainScreen(navController) {
                         NotificationScreen(HttpClient(), navController)
+                    }
+                }
+                composable("group/{groupId}") { backStackEntry ->
+                    MainScreen(navController) {
+                        GroupScreen(HttpClient(), navController, backStackEntry.arguments?.getString("groupId"))
                     }
                 }
             }
