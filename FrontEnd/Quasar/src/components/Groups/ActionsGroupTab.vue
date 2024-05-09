@@ -11,6 +11,7 @@ import { Refund } from 'src/interfaces/refund.interface';
 import { DefaultGroup } from 'src/interfaces/group.interface';
 import { getGroup, getUserGroupData } from 'stores/groupStore';
 import DialogRefund from 'components/Groups/DialogRefund.vue';
+import { io } from 'socket.io-client';
 
 
 let  tab = ref('transactions')
@@ -37,6 +38,17 @@ onMounted(async () => {
   await getOptimalRefundList();
   await getCat();
   group.value = await getGroup(props.groupId);
+});
+
+const socket = io(process.env.URL_BACKEND);
+
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
+
+socket.on(`new-transaction-${props.groupId}`, () => {
+  getTransactionList();
+  getOptimalRefundList();
 });
 
 async function getTransactionList(){
@@ -68,6 +80,8 @@ function openDialogCreateTransaction(){
     dialogCreateTransaction.value = false;
     getTransactionList();
     getOptimalRefundList();
+    socket.emit('new-transaction', props.groupId);
+
   })
 }
 

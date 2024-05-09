@@ -48,8 +48,10 @@ io.on('connection', function(socket){
 
     socket.on('chat message', function (msg, group){
         io.emit(`chat-group-${group}`, msg, group);
-        console.log(`Groupe ${group} message:`);
-        console.log(msg);
+    });
+
+    socket.on('new-transaction', function (group){
+        io.emit(`new-transaction-${group}`);
     });
 });
 app.post('/api/messages', (req, res) => {
