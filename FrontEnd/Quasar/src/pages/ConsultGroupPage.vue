@@ -29,9 +29,6 @@ let newMessageNotification = ref(0);
 let isFavorite = ref(false);
 const dialogConsultTransaction = ref(false);
 
-let isEditGroupName = ref(false);
-let isEditGroupDesc = ref(false);
-
 let isOpenDialogInvite = ref(false);
 
 onMounted(async () => {
@@ -136,9 +133,6 @@ async function addOrRemoveFav() {
 
 async function editGroup() {
 
-  isEditGroupDesc.value = false;
-  isEditGroupName.value = false;
-
   try {
     await api.put(`groups/${groupId}/`, {
       name: group.value.name,
@@ -196,57 +190,28 @@ function openDialogConsultTransaction(transactionId:number){
             </q-avatar>
           </div>
           <q-card-section class="q-pa-xl" :style="'min-width: ' + width/2+ 'px'">
-          <q-input
-              class="input-group-name text-h4"
-              v-if="isEditGroupName"
-              v-model="group.name"
-              @blur="isEditGroupName = false"
-              @keyup.enter="editGroup"
-              dark
-              dense
-              autofocus
-              outlined
-              color="secondary"
-              rounded
-              label="Nom du groupe">
-            </q-input>
-            <q-item-label v-if="!isEditGroupName" class="text-h4">{{group.name}}<q-icon
-              name="edit"
-              class="q-ml-md"
-              v-if="mounted"
-              color="secondary"
-              @click="isEditGroupName = true"
-              size="32px" /></q-item-label>
-            <q-input
-              class="input-group-desc text-subtitle1"
-              v-if="isEditGroupDesc"
-              v-model="group.description"
-              @blur="isEditGroupDesc = false"
-              @keyup.enter="editGroup"
-              dark
-              outlined
-              autofocus
-              dense
-              color="secondary"
-              rounded
-              label="Description">
-            </q-input>
-            <q-item-label v-if="!isEditGroupDesc" class="text-subtitle1">{{group.description}}<q-icon
-              name="edit"
-              class="q-ml-md text-subtitle1"
-              v-if="mounted"
-              color="secondary"
-              @click="isEditGroupDesc = true"
-              size="18px" />
-            </q-item-label>
-            <q-btn class="btn-fav"
-                   no-caps
-                   v-if="isEditGroupDesc || isEditGroupName"
-                   color="positive"
-                   @click="editGroup"
-                   rounded
-            >Sauvegarder les modifications
-            </q-btn>
+
+            <div class="cursor-pointer">
+              <q-item-label class="text-h4">{{ group.name }}</q-item-label>
+              <q-popup-edit v-model="group.name" class="bg-accent text-white" v-slot="scope" @save="editGroup">
+                <q-input dark color="white" v-model="scope.value" dense autofocus counter @keyup.enter="scope.set">
+                  <template v-slot:append>
+                    <q-icon name="edit" />
+                  </template>
+                </q-input>
+              </q-popup-edit>
+            </div>
+            <div class="cursor-pointer">
+              <q-item-label class="text-h6">{{ group.description }}</q-item-label>
+              <q-popup-edit v-model="group.description" class="bg-accent text-white" v-slot="scope" @save="editGroup">
+                <q-input dark color="white" v-model="scope.value" dense autofocus counter @keyup.enter="scope.set">
+                  <template v-slot:append>
+                    <q-icon name="edit" />
+                  </template>
+                </q-input>
+              </q-popup-edit>
+            </div>
+
             <br>
             <q-btn class="btn-fav"
                    no-caps
