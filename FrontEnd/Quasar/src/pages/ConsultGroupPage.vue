@@ -187,7 +187,7 @@ function openDialogConsultTransaction(transactionId:number){
 
             <div class="cursor-pointer">
               <q-item-label class="text-h4">{{ group.name }}</q-item-label>
-              <q-popup-edit v-model="group.name" class="bg-accent text-white" v-slot="scope" @save="editGroup">
+              <q-popup-edit v-if="User.id == group.ownerId" v-model="group.name" class="bg-accent" v-slot="scope" @save="editGroup">
                 <q-input dark color="white" v-model="scope.value" dense autofocus counter @keyup.enter="scope.set">
                   <template v-slot:append>
                     <q-icon name="edit" />
@@ -197,7 +197,7 @@ function openDialogConsultTransaction(transactionId:number){
             </div>
             <div class="cursor-pointer">
               <q-item-label class="text-h6">{{ group.description }}</q-item-label>
-              <q-popup-edit v-model="group.description" class="bg-accent text-white" v-slot="scope" @save="editGroup">
+              <q-popup-edit v-if="User.id== group.ownerId" v-model="group.description" class="bg-accent" v-slot="scope" @save="editGroup">
                 <q-input dark color="white" v-model="scope.value" dense autofocus counter @keyup.enter="scope.set">
                   <template v-slot:append>
                     <q-icon name="edit" />
