@@ -24,16 +24,19 @@ let isPhotoHover = ref(false);
 let expendUserDatas = ref(true);
 let expendPasswordData = ref(false);
 let expendPaymentMethod = ref(false);
+let expendDeleteAccount = ref(false);
 let dialogModifyPp = ref(false);
 
 let isUserDataModified = ref(false);
 let isMailModified = ref(false);
 
-
 let pass = ref();
 let pass2 = ref();
 let newPass = ref();
 let newPassConfirmation = ref();
+
+let confirmUsername = ref();
+let passDeleteAccount = ref();
 
 const paiementsMethod = ref();
 
@@ -193,6 +196,38 @@ async function openDialgAddPayment(){
   }).onDismiss(() => {
     getMethod();
   })
+}
+async function deleteAccount(){
+  try {
+    loading.value = true;
+    const response = await api.delete(`users/${User.value.id}`, {
+      data: {
+        "password": passDeleteAccount.value
+      }
+    });
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Votre compte a été supprimé'
+      })
+      disconnect();
+    }
+  }
+  catch (error) {
+    if (error.response.status===401) {
+      $q.notify({
+        type: 'negative',
+        message: 'Mot de passe incorrect'
+      })
+    }
+    else {
+      $q.notify({
+        type: 'negative',
+        message: 'Une erreur s\'est produite'
+      })
+    }
+  }
+  loading.value = false;
 }
 
 </script>
@@ -479,6 +514,73 @@ async function openDialgAddPayment(){
               <q-space></q-space>
               <q-btn class="q-pa-md" color="secondary rounded" @click="openDialgAddPayment">Ajouter</q-btn>
             </div>
+          </div>
+        </q-slide-transition>
+      </q-card>
+    </div>
+
+    <div class="q-pa-md row items-start q-gutter-md">
+      <q-card class="card-user-data bg-primary rounded-borders">
+        <q-card-actions>
+          <q-item-label class="text-h6 text-head-card q-pa-md" @click="expendDeleteAccount = !expendDeleteAccount">Supprimer mon compte</q-item-label>
+
+          <q-space />
+
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expendDeleteAccount ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expendDeleteAccount = !expendDeleteAccount"
+          />
+        </q-card-actions>
+
+        <q-slide-transition>
+          <div v-show="expendDeleteAccount">
+            <q-separator />
+            <q-card-section class="text-subtitle2">
+              <div class="inputs">
+                <q-item-label class="q-pa-md">Confirmez votre pseudo et mot de passe pour supprimer votre compte.</q-item-label>
+                <q-form
+                  @submit="deleteAccount"
+                >
+                  <q-input
+                    class="input"
+                    outlined
+                    v-model="confirmUsername"
+                    :label="'Votre pseudo (' + User.username + ')'"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                    :rules="[val => val === User.username || 'Le pseudo ne correspond pas']"
+                  />
+                  <q-input
+                    class="input"
+                    outlined
+                    v-model="passDeleteAccount"
+                    label="Mot de passe"
+                    type="password"
+                    dark
+                    color="secondary"
+                    hide-bottom-space
+                  />
+                  <div class="row">
+                    <q-btn
+                      v-if="passDeleteAccount"
+                      color="red"
+                      rounded
+                      type="submit"
+                      :loading="loading"
+                    >
+                      Supprimer
+                    </q-btn>
+                    <q-item-label class="text-negative q-pa-md">Attention, cette action est irréversible</q-item-label>
+                  </div>
+                </q-form>
+                <br>
+              </div>
+            </q-card-section>
           </div>
         </q-slide-transition>
       </q-card>
