@@ -175,7 +175,11 @@ function openDialogConsultTransaction(transactionId:number){
               @mouseenter ="isPhotoHover=true"
               @mouseleave ="isPhotoHover=false"
               size="200px"
+              class="cursor-pointer"
             >
+              <q-tooltip>
+               Modifier la photo du groupe
+              </q-tooltip>
               <img :src="group.picture ? group.picture[2] : 'assets/defaults/group-default.webp'">
               <div class="absolute-full text-subtitle2 flex flex-center text-secondary"
                    v-if="isPhotoHover">
@@ -194,6 +198,12 @@ function openDialogConsultTransaction(transactionId:number){
                   </template>
                 </q-input>
               </q-popup-edit>
+              <q-tooltip v-if="User.id== group.ownerId">
+                Cliquez pour modifier le nom
+              </q-tooltip>
+              <q-tooltip v-if="User.id!= group.ownerId" class="bg-red">
+                Vous devez être propriétaire du groupe pour modifier son nom
+              </q-tooltip>
             </div>
             <div class="cursor-pointer">
               <q-item-label class="text-h6">{{ group.description }}</q-item-label>
@@ -204,6 +214,12 @@ function openDialogConsultTransaction(transactionId:number){
                   </template>
                 </q-input>
               </q-popup-edit>
+              <q-tooltip v-if="User.id== group.ownerId">
+                Cliquez pour modifier la description
+              </q-tooltip>
+              <q-tooltip v-if="User.id!= group.ownerId" class="bg-red">
+                Vous devez être propriétaire du groupe pour modifier la description
+              </q-tooltip>
             </div>
 
             <br>
@@ -220,7 +236,7 @@ function openDialogConsultTransaction(transactionId:number){
         </q-card-section>
       </q-card>
     </div>
-    <div class="q-pa-md q-gutter-sm" style="height: 80px">
+    <div class="q-pa-md">
       <q-item-label class="text-h6">
         {{group.activeUsersCount}} {{ group.activeUsersCount === 1 ? 'Membre' : 'Membres' }}
         <q-btn class="q-mx-auto q-pa-xs"
@@ -231,8 +247,11 @@ function openDialogConsultTransaction(transactionId:number){
                @click="openDialogInvite"
                flat
                outline
-        ></q-btn>
+        >  <q-tooltip>
+         Inviter d'autres membres
+        </q-tooltip></q-btn>
       </q-item-label>
+    <div class="group-items q-pa-xs">
       <q-avatar
         v-for="(user, index) in group.Users"
         :key="user.id"
@@ -241,7 +260,11 @@ function openDialogConsultTransaction(transactionId:number){
         :style="{ left: index * 25 + 'px' }"
       >
         <img :src="user.profile_picture ? `${user.profile_picture[0]}` : 'assets/defaults/user-default.webp'">
+        <q-tooltip>
+          {{ user.username }}
+        </q-tooltip>
       </q-avatar>
+    </div>
     </div>
     <ActionsGroupTab :groupId = groupId :userId = User.id></ActionsGroupTab>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -270,6 +293,9 @@ function openDialogConsultTransaction(transactionId:number){
   margin-top: 30px;
 }
 
+.group-items *{
+  margin-left: 2%;
+}
 
 @media screen and (max-width: 1200px) {
   .paiement{
