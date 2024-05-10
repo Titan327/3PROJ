@@ -18,7 +18,7 @@ watch(() => props.open, () => {
 
 const emit = defineEmits(['updateState', 'messages'])
 
-const socket = io('https://3proj-back.tristan-tourbier.com/');
+const socket = io(process.env.URL_BACKEND);
 
 socket.on('connect', () => {
   console.log('Connected to server');

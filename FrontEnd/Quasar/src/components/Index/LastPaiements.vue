@@ -67,7 +67,7 @@ function goToTransaction(groupId, transactionId) {
       <q-item v-for="transaction in transactionList" :key="transaction.id" clickable @click="goToTransaction(transaction.Transaction.groupId, transaction.Transaction.id)">
         <q-item-section avatar>
           <q-avatar round color="secondary" text-color="white">
-            <img :src="transaction.Transaction.Group.picture ? `${transaction.Transaction.Group.picture}/100` : 'assets/defaults/group-default.webp'"/>
+            <img :src="transaction.Transaction.Group.picture ? `${transaction.Transaction.Group.picture[0]}` : 'assets/defaults/group-default.webp'"/>
           </q-avatar>
         </q-item-section>
 

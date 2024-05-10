@@ -5,6 +5,7 @@ import {api} from "boot/axios";
 import {getUser} from "stores/userStore";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
+import { getUserGroupData } from 'stores/groupStore';
 
 let isOpen = ref(false);
 let mounted = ref(false);
@@ -85,10 +86,14 @@ function getCatColor(catId: number) {
           <div class="text-h6">{{formatNumber(_transaction.total_amount)}}€</div>
           <span>{{ getCatText(_transaction.categoryId) }}</span>
           <br>
-          <span>Créé le {{formatDate(_transaction.date)}}</span>
+          <span>Créé le {{formatDate(_transaction.date)}} par {{getUserGroupData(_transaction.senderId)?.username}}</span>
+          <br>
+          <span><a v-if="_transaction.receipt != 'default'" class="text-secondary" :href="_transaction.receipt" target="_blank">Afficher le ticket de caisse</a></span>
+
         </div>
         <div class="picture">
-          <q-avatar size="128px" font-size="52px" :style="{ 'background-color': getCatColor(_transaction.categoryId) }" text-color="white" :icon="getCatIcon(_transaction.categoryId)" />
+          <q-avatar size="128px" font-size="52px" :style="{ 'background-color': getCatColor(_transaction.categoryId) }" text-color="white" :icon="getCatIcon(_transaction.categoryId)">
+          </q-avatar>
         </div>
       </q-card-section>
       <q-card-section>
@@ -128,4 +133,8 @@ function getCatColor(catId: number) {
 .text-head{
   width: 70%;
 }
+.icon-user{
+  margin: 0 0 0 0;
+}
+
 </style>

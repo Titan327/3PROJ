@@ -7,6 +7,8 @@ import {DefaultTransactionCreated} from "src/interfaces/transactions.interface";
 import {getUser} from "stores/userStore";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {formatNumber} from "stores/globalFunctionsStore";
+import { io } from 'socket.io-client';
+import { NotificationBus } from 'boot/eventBus';
 const $q = useQuasar();
 
 let isOpen = ref(false);
@@ -17,6 +19,9 @@ let User = ref(DefaultUser());
 let group = ref(DefaultGroup());
 const _transaction = ref(DefaultTransactionCreated());
 const catOptn = ref([]);
+let file = ref(null);
+const socket = io(process.env.URL_BACKEND);
+
 
 const props = defineProps({
   groupId: Number,
@@ -50,12 +55,17 @@ async function createTransaction() {
         "label": _transaction.value.label,
         "total_amount": _transaction.value.total_amount,
         "date": new Date(),
-        "receipt": "receipt test",
+        "receipt": "default",
         "senderId": props.userId,
         "categoryId": _transaction.value.categoryId.id,
         "details": _transaction.value.details
       });
       if (response.data) {
+        if(file.value){
+          await joinTicket(response.data.id);
+        }
+        socket.emit('new-transaction', props.groupId);
+        NotificationBus.emit('new-notif');
         $q.notify({
           type: 'positive',
           message: 'Transaction créée'
@@ -102,6 +112,9 @@ function calculateTotal(): number {
 
   if (_transaction.value.details && _transaction.value.details.length > 0) {
     for (const detail of _transaction.value.details) {
+      if(detail.amount < 0){
+        detail.amount = 0;
+      }
       totalAmount += Number(detail.amount);
     }
   }
@@ -109,6 +122,19 @@ function calculateTotal(): number {
   return totalAmount;
 }
 
+async function joinTicket(transactionId: number) {
+  loading.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file?.value);
+    const response = await api.post(`img/ticket/${props.groupId}/${transactionId}`, formData);
+    return
+  }
+  catch (error) {
+   console.error(error);
+  }
+  loading.value = false;
+}
 </script>
 
 
@@ -143,7 +169,7 @@ function calculateTotal(): number {
                 :option-value="catOptn => catOptn.id"
                 :option-label="catOptn => catOptn.label"
                 :options="catOptn"
-                :rules="[checkNotNull]"
+                :rules="[val => !!val.label || 'La catégorie est requise']"
                 hide-bottom-space
               />
           </div>
@@ -186,15 +212,20 @@ function calculateTotal(): number {
           </div>
           <div class="inputs row">
             <div class="row q-mx-auto">
-              <q-item-label class=" q-pa-sm">Ticket de caisse :</q-item-label>
-              <q-btn
+              <q-file
+                v-model="file"
                 class="btn"
                 color="secondary"
-                outline
-                label="Joindre"
+                outlined
+                dark
+                label="Ticket de caisse"
                 :loading="loading"
                 hide-bottom-space
-              />
+              >
+                <template v-slot:prepend>
+                  <q-icon name="description" />
+                </template>
+              </q-file>
             </div>
             <q-space>
             </q-space>
