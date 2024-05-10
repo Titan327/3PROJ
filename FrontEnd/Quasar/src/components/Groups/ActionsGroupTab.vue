@@ -315,9 +315,6 @@ function getCatColor(catId: number) {
                   <q-item-label class="">Montant</q-item-label>
                 </q-item-section>
                 <q-space></q-space>
-                <q-item-section v-if="width>800">
-                  <q-item-label class="q-mx-auto">Statut</q-item-label>
-                </q-item-section>
                   <q-space></q-space>
                 <q-item-section>
                   <q-item-label class="q-mx-auto">Action</q-item-label>
@@ -364,12 +361,9 @@ function getCatColor(catId: number) {
                     <q-item-label class="q-mx-xl">{{formatNumber(refund.amount)}}€</q-item-label>
                   </q-item-section>
                   <q-space></q-space>
-                  <q-item-section v-if="width>800">
-                    <span color="red" class="q-pa-s text-secondary q-mx-auto">À rembourser</span>
-                  </q-item-section>
                   <q-space></q-space>
                   <q-item-section class="q-mx-auto">
-                  <q-btn outline color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
+                  <q-btn outline class="w-60 q-mx-auto" color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
                   <span v-else class="q-mx-auto">Rien à effectuer</span>
                   </q-item-section>
 
