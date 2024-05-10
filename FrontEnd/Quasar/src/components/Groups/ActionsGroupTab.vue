@@ -26,6 +26,7 @@ const $q = useQuasar();
 let catList = ref([]);
 const router = useRouter();
 let group = ref(DefaultGroup());
+let width = ref(0);
 
 
 const props = defineProps({
@@ -38,6 +39,12 @@ onMounted(async () => {
   await getOptimalRefundList();
   await getCat();
   group.value = await getGroup(props.groupId);
+
+  function getWidth() {
+    width.value = window.innerWidth;
+  }
+  getWidth();
+  window.addEventListener('resize', getWidth);
 });
 
 const socket = io(process.env.URL_BACKEND);
@@ -296,7 +303,7 @@ function getCatColor(catId: number) {
                   <q-avatar round text-color="white" icon="group"/>
                 </q-item-section>
                   <q-space></q-space>
-                <q-item-section>
+                <q-item-section v-if="width>800">
                   <q-item-label class="q-mx-xl">Payeur
                     <q-icon
                     size="xs"
@@ -308,7 +315,7 @@ function getCatColor(catId: number) {
                   <q-item-label class="">Montant</q-item-label>
                 </q-item-section>
                 <q-space></q-space>
-                <q-item-section>
+                <q-item-section v-if="width>800">
                   <q-item-label class="q-mx-auto">Statut</q-item-label>
                 </q-item-section>
                   <q-space></q-space>
@@ -344,7 +351,7 @@ function getCatColor(catId: number) {
                     </q-avatar>
                    </q-item-section>
                   <q-space></q-space>
-                  <q-item-section>
+                  <q-item-section v-if="width>800">
                     <q-item-label class="q-mx-xl">{{getUserGroupData(refund.refundingUserId)?.username}}
                       <q-icon
                       size="xs"
@@ -354,10 +361,10 @@ function getCatColor(catId: number) {
                   </q-item-section>
                   <q-space></q-space>
                   <q-item-section>
-                    <q-item-label class="">{{formatNumber(refund.amount)}}€</q-item-label>
+                    <q-item-label class="q-mx-xl">{{formatNumber(refund.amount)}}€</q-item-label>
                   </q-item-section>
                   <q-space></q-space>
-                  <q-item-section>
+                  <q-item-section v-if="width>800">
                     <span color="red" class="q-pa-s text-secondary q-mx-auto">À rembourser</span>
                   </q-item-section>
                   <q-space></q-space>
