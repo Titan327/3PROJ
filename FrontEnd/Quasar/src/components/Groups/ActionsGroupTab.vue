@@ -312,7 +312,7 @@ function getCatColor(catId: number) {
                 </q-item-section>
                   <q-space></q-space>
                 <q-item-section>
-                  <q-item-label class="">Montant</q-item-label>
+                  <q-item-label class="q-mx-xl">Montant</q-item-label>
                 </q-item-section>
                 <q-space></q-space>
                   <q-space></q-space>
