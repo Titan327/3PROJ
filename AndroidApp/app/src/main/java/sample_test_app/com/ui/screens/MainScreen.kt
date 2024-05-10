@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +31,7 @@ import sample_test_app.com.R
 fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
     val currentRoute = navController.currentDestination?.route
     val scrollState = rememberScrollState()
+    val groupPicture = remember { mutableStateOf("") }
 
     Column{
         Column (
@@ -55,7 +58,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
-                                    .data(data = LocalUser.current.profile_picture!![0])
+                                    .data(data = if (groupPicture.value == "") {LocalUser.current.profile_picture!![0] } else { groupPicture.value })
                                     .apply(block = fun ImageRequest.Builder.() {
                                         transformations(CircleCropTransformation())
                                     }).build()
@@ -101,7 +104,9 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
         }
 
         Row (
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceAround
         )  {
             Image(

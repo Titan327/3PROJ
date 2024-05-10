@@ -4,12 +4,20 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +61,7 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
         CoroutineScope(Dispatchers.Main).launch {
             group.value = groupId?.let { GroupRepository(httpClient).getGroup(it, jwtToken) }!!
             users.value = group.value.Users
+            
         }
     }
 
@@ -123,96 +132,126 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-
-            // Titre
-            Row {
-                Column (
-                    modifier = Modifier
-                        .weight(2F)
-                        .clickable {
-                            isBalanceDisplayed.value = true
-                            isTransactionsDisplayed.value = false
-                            isRefundDisplayed.value = false
-                        },
-                    horizontalAlignment = CenterHorizontally
-                ) {
-                    Text(
-                        text = "Solde",
-                        color = if (isBalanceDisplayed.value) Color.Black else Color.White,
-                    )
+            Column {
+                // Titre
+                Row {
+                    Column(
+                        modifier = Modifier
+                            .weight(2F)
+                            .clickable {
+                                isBalanceDisplayed.value = true
+                                isTransactionsDisplayed.value = false
+                                isRefundDisplayed.value = false
+                            },
+                        horizontalAlignment = CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Solde",
+                            color = if (isBalanceDisplayed.value) Color.Black else Color.White,
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .weight(3F)
+                            .clickable {
+                                isBalanceDisplayed.value = false
+                                isTransactionsDisplayed.value = true
+                                isRefundDisplayed.value = false
+                            },
+                        horizontalAlignment = CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Transactions",
+                            color = if (isTransactionsDisplayed.value) Color.Black else Color.White,
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .weight(3F)
+                            .clickable {
+                                isBalanceDisplayed.value = false
+                                isTransactionsDisplayed.value = false
+                                isRefundDisplayed.value = true
+                            },
+                        horizontalAlignment = CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Remboursement",
+                            color = if (isRefundDisplayed.value) Color.Black else Color.White,
+                        )
+                    }
                 }
-                Column (
-                    modifier = Modifier
-                        .weight(3F)
-                        .clickable {
-                            isBalanceDisplayed.value = false
-                            isTransactionsDisplayed.value = true
-                            isRefundDisplayed.value = false
-                        },
-                    horizontalAlignment = CenterHorizontally
-                ) {
-                    Text(
-                        text = "Transactions",
-                        color = if (isTransactionsDisplayed.value) Color.Black else Color.White,
-                    )
-                }
-                Column (
-                    modifier = Modifier
-                        .weight(3F)
-                        .clickable {
-                            isBalanceDisplayed.value = false
-                            isTransactionsDisplayed.value = false
-                            isRefundDisplayed.value = true
-                        },
-                    horizontalAlignment = CenterHorizontally
-                ) {
-                    Text(
-                        text = "Remboursement",
-                        color = if (isRefundDisplayed.value) Color.Black else Color.White,
-                    )
-                }
-            }
 
-            Surface(
-                color = Color.White,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp),
-                elevation = 2.dp,
-                border = BorderStroke(1.dp, Color.White)
-            ) {}
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 16.dp)
+                ) {
+                    Surface(
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(2.dp),
+                        elevation = 2.dp,
+                        border = BorderStroke(1.dp, Color.White)
+                    ) {}
+                }
 
-            // Solde
-            //if (isBalanceDisplayed.value) {
-            //    Column(
-            //        modifier = Modifier.fillMaxWidth()
-            //    ) {
-                    for (user in users.value) {
-                        println(user.UserGroup.balance)
-                        Row {
-                            //Image(
-                            //    painter = if (user.profile_picture?.isEmpty() == true) {
-                            //        rememberAsyncImagePainter(
-                            //            ImageRequest.Builder(LocalContext.current)
-                            //                .data(data = user.profile_picture[0])
-                            //                .build()
-                            //        )
-                            //    } else {
-                            //        rememberAsyncImagePainter(
-                            //            ImageRequest.Builder(LocalContext.current)
-                            //                .data(data = R.drawable.userdefault)
-                            //                .build()
-                            //        )
-                            //    },
-                            //    contentDescription = "User Picture",
-                            //)
-                            Text(
-                                user.UserGroup.balance.toString()
-                            )
+
+                // Solde
+                if (isBalanceDisplayed.value) {
+                    val rowNumber = if (users.value.size % 3 == 0) {
+                        users.value.size / 3
+                    } else {
+                        users.value.size / 3 + 1
+                    }
+                    val boxHeight = rowNumber * 140
+                    Box (modifier = Modifier.height(boxHeight.dp)) {
+                        LazyColumn {
+                            items(users.value.chunked(3)) { rowUsers ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp, bottom = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    for (user in rowUsers) {
+                                        Card {
+                                            Column {
+                                                Image(
+                                                    painter = if (user.profile_picture?.isEmpty() == false) {
+                                                        rememberAsyncImagePainter(
+                                                            ImageRequest.Builder(LocalContext.current)
+                                                                .data(data = user.profile_picture[0])
+                                                                .build()
+                                                        )
+                                                    } else {
+                                                        rememberAsyncImagePainter(
+                                                            ImageRequest.Builder(LocalContext.current)
+                                                                .data(data = R.drawable.userdefault)
+                                                                .build()
+                                                        )
+                                                    },
+                                                    contentDescription = "User Picture",
+                                                    modifier = Modifier.size(100.dp)
+                                                )
+
+                                                Text(
+                                                    user.UserGroup.balance.toString(),
+                                                    modifier = Modifier.align(CenterHorizontally)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-        //    }
-        //}
+
+                // Transactions
+
+            }
+        }
     }
 }
