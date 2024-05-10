@@ -1,5 +1,6 @@
 package sample_test_app.com.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -53,77 +55,34 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
     val group = remember { mutableStateOf(Group()) }
     val transactions = remember { mutableStateOf(emptyList<Transaction>()) }
     val users = remember { mutableStateOf(emptyList<User>()) }
-    val isBalanceDisplayed = remember { mutableStateOf(true) }
-    val isTransactionsDisplayed = remember { mutableStateOf(false) }
-    val isRefundDisplayed = remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
             group.value = groupId?.let { GroupRepository(httpClient).getGroup(it, jwtToken) }!!
             users.value = group.value.Users
-            
         }
     }
+
+    MainScreen(navController = navController,
+        groupPicture = if (!group.value.picture?.isEmpty()!!) {
+        group.value.picture?.get(1)
+    } else null) {
+        GroupScreenContent(group = group.value, users = users.value, navController = navController, groupId = groupId)
+    }
+
+}
+
+@Composable
+fun GroupScreenContent(group: Group, users: List<User>, navController: NavController, groupId: String?) {
+    val isBalanceDisplayed = remember { mutableStateOf(true) }
+    val isTransactionsDisplayed = remember { mutableStateOf(false) }
+    val isRefundDisplayed = remember { mutableStateOf(false) }
 
     Column (
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        // Group infos
-
-        Row {
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(2F),
-                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-            ) {
-                if (group.value.picture?.isNotEmpty() == true) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = group.value.picture!![1])
-                                .apply(block = fun ImageRequest.Builder.() {
-                                    transformations(CircleCropTransformation())
-                                }).build()
-                        ),
-                        contentDescription = "Group Picture",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .padding(top = 16.dp)
-                            .clickable {
-                                navController.navigate("group/$groupId")
-                            }
-                    )
-                } else {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = R.drawable.groupslogofull)
-                                .apply(block = fun ImageRequest.Builder.() {
-                                    transformations(CircleCropTransformation())
-                                }).build()
-                        ),
-                        contentDescription = "Logo",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .padding(top = 16.dp)
-                            .clickable {
-                                navController.navigate("group/$groupId")
-                            }
-                    )
-                }
-            }
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(5F)
-            ) {
-
-            }
-        }
-
         // Solde / Transactions / Remboursement
         Row (
             modifier = Modifier
@@ -200,15 +159,15 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
 
                 // Solde
                 if (isBalanceDisplayed.value) {
-                    val rowNumber = if (users.value.size % 3 == 0) {
-                        users.value.size / 3
+                    val rowNumber = if (users.size % 3 == 0) {
+                        users.size / 3
                     } else {
-                        users.value.size / 3 + 1
+                        users.size / 3 + 1
                     }
                     val boxHeight = rowNumber * 140
                     Box (modifier = Modifier.height(boxHeight.dp)) {
                         LazyColumn {
-                            items(users.value.chunked(3)) { rowUsers ->
+                            items(users.chunked(3)) { rowUsers ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -216,7 +175,9 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     for (user in rowUsers) {
-                                        Card {
+                                        Card (
+                                            backgroundColor = Color.Black
+                                        ) {
                                             Column {
                                                 Image(
                                                     painter = if (user.profile_picture?.isEmpty() == false) {
@@ -237,8 +198,9 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
                                                 )
 
                                                 Text(
-                                                    user.UserGroup.balance.toString(),
-                                                    modifier = Modifier.align(CenterHorizontally)
+                                                    if (user.UserGroup.balance != null) { user.UserGroup.balance.toString() + " €" } else { "0 €" },
+                                                    modifier = Modifier.align(CenterHorizontally),
+                                                    color = Color.White
                                                 )
                                             }
                                         }

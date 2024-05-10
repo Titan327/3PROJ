@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,11 +26,10 @@ import sample_test_app.com.R
 
 
 @Composable
-fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
+fun MainScreen(navController: NavController, groupPicture : String? = null, content: @Composable () -> Unit) {
     val currentRoute = navController.currentDestination?.route
     val scrollState = rememberScrollState()
-    val groupPicture = remember { mutableStateOf("") }
-
+    println(groupPicture)
     Column{
         Column (
             modifier = Modifier
@@ -46,11 +43,31 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logomid),
-                        contentDescription = "Logo",
-                        modifier = Modifier.align(Alignment.TopCenter)
-                    )
+                    if (groupPicture != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = groupPicture)
+                                    .apply(block = fun ImageRequest.Builder.() {
+                                        transformations(CircleCropTransformation())
+                                    }).build()
+                            ),
+                            contentDescription = "Group Picture",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .size(180.dp)
+                                .padding(top = 16.dp, bottom = 16.dp)
+                        )
+                    }
+                    else {
+                        Image(
+                            painter = painterResource(id = R.drawable.logomid),
+                            contentDescription = "Group Picture",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .size(200.dp)
+                        )
+                    }
 
                     if (LocalUser.current.profile_picture?.get(0)
                             ?.isNotBlank() == true && LocalUser.current.profile_picture!![0] != "null"
@@ -58,7 +75,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
-                                    .data(data = if (groupPicture.value == "") {LocalUser.current.profile_picture!![0] } else { groupPicture.value })
+                                    .data(data = LocalUser.current.profile_picture!![0])
                                     .apply(block = fun ImageRequest.Builder.() {
                                         transformations(CircleCropTransformation())
                                     }).build()
@@ -104,9 +121,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
         }
 
         Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
             horizontalArrangement = Arrangement.SpaceAround
         )  {
             Image(

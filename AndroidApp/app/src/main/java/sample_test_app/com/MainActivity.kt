@@ -76,9 +76,7 @@ fun AppNavHost() {
                     }
                 }
                 composable("group/{groupId}") { backStackEntry ->
-                    MainScreen(navController) {
-                        GroupScreen(HttpClient(), navController, backStackEntry.arguments?.getString("groupId"))
-                    }
+                    GroupScreen(HttpClient(), navController, backStackEntry.arguments?.getString("groupId"))
                 }
             }
         }
