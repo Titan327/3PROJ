@@ -12,6 +12,7 @@ import { DefaultGroup } from 'src/interfaces/group.interface';
 import { getGroup, getUserGroupData } from 'stores/groupStore';
 import DialogRefund from 'components/Groups/DialogRefund.vue';
 import { io } from 'socket.io-client';
+import { NotificationBus } from 'boot/eventBus';
 
 
 let  tab = ref('transactions')
@@ -56,6 +57,7 @@ socket.on('connect', () => {
 socket.on(`new-transaction-${props.groupId}`, () => {
   getTransactionList();
   getOptimalRefundList();
+  NotificationBus.emit('new-notif');
 });
 
 async function getTransactionList(){
