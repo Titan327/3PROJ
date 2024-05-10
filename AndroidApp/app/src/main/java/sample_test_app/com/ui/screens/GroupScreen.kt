@@ -164,7 +164,7 @@ fun GroupScreenContent(group: Group, users: List<User>, navController: NavContro
                     } else {
                         users.size / 3 + 1
                     }
-                    val boxHeight = rowNumber * 140
+                    val boxHeight = rowNumber * 170
                     Box (modifier = Modifier.height(boxHeight.dp)) {
                         LazyColumn {
                             items(users.chunked(3)) { rowUsers ->
@@ -197,9 +197,21 @@ fun GroupScreenContent(group: Group, users: List<User>, navController: NavContro
                                                     modifier = Modifier.size(100.dp)
                                                 )
 
+                                                user.username?.let {
+                                                    val truncatedUsername = if (it.length > 11) it.substring(0, 8) + "..." else it
+                                                    Text(
+                                                        text = truncatedUsername,
+                                                        color = Color.White,
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis,
+                                                        modifier = Modifier.align(CenterHorizontally)
+                                                            .padding(top = 4.dp)
+                                                    )
+                                                }
+
                                                 Text(
                                                     if (user.UserGroup.balance != null) { user.UserGroup.balance.toString() + " €" } else { "0 €" },
-                                                    modifier = Modifier.align(CenterHorizontally),
+                                                    modifier = Modifier.align(CenterHorizontally).padding(bottom = 4.dp),
                                                     color = Color.White
                                                 )
                                             }
