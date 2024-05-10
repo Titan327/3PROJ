@@ -55,10 +55,12 @@ function checkScroll() {
     if (scrollPercentage.top == 0) {
       msgPage.value++;
       getMessages();
+      scrollArea.setScrollPercentage('vertical', 0.2);
     }
     if (scrollPercentage.top >= 0.8 && msgPage.value > 1) {
       msgPage.value--;
       getMessages();
+      scrollArea.setScrollPercentage('vertical', 0.8);
     }
   }
 }
