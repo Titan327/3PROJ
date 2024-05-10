@@ -84,7 +84,7 @@ const createTransaction = async (req, res) => {
                             }
                         }
                     );
-                    CreateNotif(detail.userId,`"Nouvelle dépense: " ${label}`,`groups/${groupId}`);
+                    CreateNotif(detail.userId,`Nouvelle dépense: ${label}`,`groups/${groupId}`);
                 }
             }
             await RefundController.calculateMinimalRefunds(groupId)
