@@ -26,16 +26,27 @@
 <script setup lang="ts">
 
 import {onMounted,ref} from "vue";
-import {useRouter} from "vue-router";
+import { useRoute, useRouter } from 'vue-router';
 import LeftPannel from "components/Common/LeftPannel.vue";
 const router = useRouter();
 const isLog= ref(false);
+const route = useRoute();
+
+function setCookie(name, value, minutes) {
+  const date = new Date();
+  date.setTime(date.getTime() + (minutes * 60 * 1000));
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
 
 onMounted(() => {
-
   try {
+    const tokenGroup = route.params.token;
     const token = sessionStorage.getItem('userToken');
     if (!token){
+      if(tokenGroup){
+        setCookie('join-group', tokenGroup, 5);
+      }
       router.push('/login');
     }
     else {
@@ -51,8 +62,6 @@ onMounted(() => {
 <style>
 body{
   background: #1b1b1b;
-  //background: linear-gradient(345deg, rgba(181,0,150,0.8855917366946778) 0%, rgba(22,20,101,1) 42%);
-  //background: linear-gradient(145deg, rgba(9,9,121,1) 0%, rgba(197,0,203,1) 100%);
   color: #ffff
 }
 </style>
