@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from "vue";
 import { disconnectUser, getUser } from "stores/userStore";
 import { useRouter } from "vue-router";
 import {getNotificationsCountData} from "stores/notificationsStore";
+import { NotificationBus } from 'boot/eventBus';
 
 const drawer = ref(false);
 const miniState = ref(true);
@@ -34,6 +35,10 @@ onMounted(async () => {
   window.addEventListener('resize', setDrawerState);
 });
 
+NotificationBus.on('new-notif', async () => {
+  console.log('get count')
+  await getCountNotifs();
+});
 
 function disconnect() {
   disconnectUser();

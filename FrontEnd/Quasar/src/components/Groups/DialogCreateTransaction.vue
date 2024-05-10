@@ -8,6 +8,7 @@ import {getUser} from "stores/userStore";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {formatNumber} from "stores/globalFunctionsStore";
 import { io } from 'socket.io-client';
+import { NotificationBus } from 'boot/eventBus';
 const $q = useQuasar();
 
 let isOpen = ref(false);
@@ -64,6 +65,7 @@ async function createTransaction() {
           await joinTicket(response.data.id);
         }
         socket.emit('new-transaction', props.groupId);
+        NotificationBus.emit('new-notif');
         $q.notify({
           type: 'positive',
           message: 'Transaction créée'
