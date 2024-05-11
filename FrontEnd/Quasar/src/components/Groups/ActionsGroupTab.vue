@@ -294,6 +294,9 @@ function getCatColor(catId: number) {
               </q-item>
               </q-scroll-area>
             </q-card-section>
+            <q-card-section v-if="transactionList.length == 0">
+              <q-item-label class="text-h6 q-mx-auto">Rien à afficher</q-item-label>
+            </q-card-section>
           </q-tab-panel>
 
           <!-- ----------------------------------REMBOURSEMENTS--------------------------------------------- -->
@@ -325,7 +328,7 @@ function getCatColor(catId: number) {
               </q-item>
               <q-item v-if="refundsList.length==0">
                 <q-item-section>
-                  <q-item-label class="q-mx-auto text-h6">Rien à afficher</q-item-label>
+                  <q-item-label class="text-h6">Rien à afficher</q-item-label>
                 </q-item-section>
               </q-item>
             </q-card-section>
