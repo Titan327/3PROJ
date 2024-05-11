@@ -1,6 +1,6 @@
 package sample_test_app.com.ui.screens
 
-import android.content.Intent
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,12 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
@@ -30,12 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +42,8 @@ import sample_test_app.com.LocalJwtToken
 import sample_test_app.com.LocalUser
 import sample_test_app.com.R
 import sample_test_app.com.http.Repository.GroupRepository
+import sample_test_app.com.http.Repository.TransactionRepository
+import sample_test_app.com.models.CategoryStore
 import sample_test_app.com.models.Group
 import sample_test_app.com.models.Transaction
 import sample_test_app.com.models.User
@@ -60,23 +60,27 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
         CoroutineScope(Dispatchers.Main).launch {
             group.value = groupId?.let { GroupRepository(httpClient).getGroup(it, jwtToken) }!!
             users.value = group.value.Users
+            transactions.value = TransactionRepository(httpClient).getGroupTransactions(groupId, jwtToken).sortedByDescending { it.date }
         }
     }
 
     MainScreen(navController = navController,
-        groupPicture = if (group.value?.picture?.isEmpty() == false) {
-            group.value?.picture?.get(1)
+        groupPicture = if (group.value.picture?.isEmpty() == false) {
+            group.value.picture?.get(1)
         } else null) {
-        GroupScreenContent(group = group.value, users = users.value, navController = navController, groupId = groupId)
+        GroupScreenContent(group = group.value, users = users.value, transactions = transactions.value, navController = navController, groupId = groupId)
     }
 
 }
 
+@SuppressLint("DiscouragedApi")
 @Composable
-fun GroupScreenContent(group: Group, users: List<User>, navController: NavController, groupId: String?) {
+fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Transaction>, navController: NavController, groupId: String?) {
     val isBalanceDisplayed = remember { mutableStateOf(true) }
     val isTransactionsDisplayed = remember { mutableStateOf(false) }
     val isRefundDisplayed = remember { mutableStateOf(false) }
+    val categories = CategoryStore.categories
+
 
     Column (
         modifier = Modifier
@@ -204,14 +208,17 @@ fun GroupScreenContent(group: Group, users: List<User>, navController: NavContro
                                                         color = Color.White,
                                                         maxLines = 1,
                                                         overflow = TextOverflow.Ellipsis,
-                                                        modifier = Modifier.align(CenterHorizontally)
+                                                        modifier = Modifier
+                                                            .align(CenterHorizontally)
                                                             .padding(top = 4.dp)
                                                     )
                                                 }
 
                                                 Text(
                                                     if (user.UserGroup.balance != null) { user.UserGroup.balance.toString() + " €" } else { "0 €" },
-                                                    modifier = Modifier.align(CenterHorizontally).padding(bottom = 4.dp),
+                                                    modifier = Modifier
+                                                        .align(CenterHorizontally)
+                                                        .padding(bottom = 4.dp),
                                                     color = Color.White
                                                 )
                                             }
@@ -224,7 +231,107 @@ fun GroupScreenContent(group: Group, users: List<User>, navController: NavContro
                 }
 
                 // Transactions
-
+                if (isTransactionsDisplayed.value) {
+                    Row {
+                        if (transactions.isEmpty()) {
+                            Text(
+                                text = "Aucune transaction",
+                                color = Color.White,
+                                style = TextStyle(
+                                    fontSize = 24.sp
+                                )
+                            )
+                        } else {
+                            Column {
+                                Row {
+                                    Column (
+                                        modifier = Modifier
+                                            .weight(1f),
+                                        horizontalAlignment = CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "Type",
+                                            color = Color.White
+                                        )
+                                    }
+                                    Column (
+                                        modifier = Modifier
+                                            .weight(3f),
+                                        horizontalAlignment = CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "Titre",
+                                            color = Color.White
+                                        )
+                                    }
+                                    Column (
+                                        modifier = Modifier
+                                            .weight(2f),
+                                        horizontalAlignment = CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "Montant",
+                                            color = Color.White)
+                                    }
+                                }
+                                for (transaction in transactions) {
+                                    Row {
+                                        Column (
+                                            modifier = Modifier
+                                                .weight(1f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            val category = categories.find { it.id == transaction.categoryId }
+                                            if (category?.icon != null) {
+                                                val resourceId = LocalContext.current.resources.getIdentifier(
+                                                    category.icon, "drawable", LocalContext.current.packageName
+                                                )
+                                                Image(
+                                                    painter = rememberAsyncImagePainter(
+                                                        ImageRequest.Builder(LocalContext.current)
+                                                            .data(data = resourceId)
+                                                            .build()
+                                                    ),
+                                                    contentDescription = "Category Icon",
+                                                    modifier = Modifier
+                                                        .size(60.dp)
+                                                        .padding(4.dp)
+                                                        .clip(shape = androidx.compose.foundation.shape.CircleShape)
+                                                        .background(
+                                                            Color(
+                                                                android.graphics.Color.parseColor(
+                                                                    category.color
+                                                                )
+                                                            )
+                                                        )
+                                                )
+                                            }
+                                        }
+                                        Column (
+                                            modifier = Modifier
+                                                .weight(3f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = transaction.label.toString(),
+                                                color = Color.White
+                                            )
+                                        }
+                                        Column (
+                                            modifier = Modifier
+                                                .weight(2f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = transaction.total_amount.toString() + " €",
+                                                color = Color.White)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

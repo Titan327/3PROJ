@@ -49,7 +49,6 @@ class NotificationRepository(private val httpClient: HttpClient) {
     @OptIn(InternalAPI::class)
     suspend fun deleteNotification(jwtToken: String, notificationId: String): Boolean {
         try {
-            println("{\"id_notif\":\"$notificationId\"}",)
             val response: HttpResponse = withContext(Dispatchers.IO) {
                 httpClient.delete("https://3proj-back.tristan-tourbier.com/api/notifs") {
                     contentType(ContentType.Application.Json)

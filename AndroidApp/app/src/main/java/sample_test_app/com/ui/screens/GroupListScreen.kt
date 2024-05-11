@@ -70,7 +70,6 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
             groups.value = groupRepository.getUserGroups(userId, jwtToken, true)
-            println("Received token: ${jwtToken}")
         }
     }
 

@@ -18,6 +18,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import sample_test_app.com.http.Repository.CategoryRepository
+import sample_test_app.com.models.CategoryStore
 import sample_test_app.com.models.NotificationScreen
 import sample_test_app.com.models.User
 import sample_test_app.com.ui.screens.GroupListScreen
@@ -33,9 +38,11 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CoroutineScope(Dispatchers.IO).launch {
+            CategoryStore.categories = CategoryRepository(HttpClient()).getCategories()
+        }
         setContent {
             SampleTestAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF1b1b1b)) {
                     AppNavHost()
                 }
@@ -53,6 +60,7 @@ fun AppNavHost() {
     val navController = rememberNavController()
     val jwtToken = remember { mutableStateOf("") }
     val user = remember { mutableStateOf(User()) }
+
 
     CompositionLocalProvider(LocalJwtToken provides jwtToken.value, LocalUser provides user.value) {
         Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF1b1b1b)) {

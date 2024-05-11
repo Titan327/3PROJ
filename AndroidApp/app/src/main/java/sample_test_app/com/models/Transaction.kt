@@ -4,17 +4,17 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Transaction(
-    val id: String?,
-    val groupId: String?,
-    val label: String?,
-    val total_amount: Int?,
-    val date: String?,
-    val receipt: String?,
-    val senderId: String?,
-    val categoryId: String?,
-    val createdAt: String?,
-    val updatedAt: String?,
-    val Group: Group?,
+    val id: String? = "",
+    val groupId: String? = "",
+    val label: String? = "",
+    val total_amount: Float? = 0.0f,
+    val date: String? = "",
+    val receipt: String? = "",
+    val senderId: String? = "",
+    val categoryId: String? = "",
+    val createdAt: String? = "",
+    val updatedAt: String? = "",
+    val Group: Group? = null,
 )
 
 @Serializable

@@ -86,7 +86,6 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient, jwtTok
             )
 
             val loginInfoJson = Json.encodeToString(loginInfo)
-            println(loginInfoJson)
 
             CoroutineScope(Dispatchers.Main).launch {
                 try {

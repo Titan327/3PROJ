@@ -29,7 +29,7 @@ import sample_test_app.com.R
 fun MainScreen(navController: NavController, groupPicture : String? = null, content: @Composable () -> Unit) {
     val currentRoute = navController.currentDestination?.route
     val scrollState = rememberScrollState()
-    println("groupPicture: " + groupPicture)
+
     Column{
         Column (
             modifier = Modifier

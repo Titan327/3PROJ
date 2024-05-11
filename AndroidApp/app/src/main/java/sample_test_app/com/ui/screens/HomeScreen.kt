@@ -239,15 +239,20 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                                         modifier = Modifier
                                             .weight(1f)
                                             .align(Alignment.CenterVertically),
-                                        horizontalAlignment = Alignment.CenterHorizontally                                    ) {
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
                                         Image(
-                                            painter = rememberAsyncImagePainter(
-                                                ImageRequest.Builder(LocalContext.current)
-                                                    .data(data = transaction.Transaction?.Group?.picture?.get(0))
-                                                    .apply(block = fun ImageRequest.Builder.() {
-                                                        transformations(CircleCropTransformation())
-                                                    }).build()
-                                            ),
+                                            painter = if (transaction.Transaction?.Group?.picture?.isNotEmpty() == true) {
+                                                rememberAsyncImagePainter(
+                                                    ImageRequest.Builder(LocalContext.current)
+                                                        .data(data = transaction.Transaction.Group.picture[0])
+                                                        .apply(block = fun ImageRequest.Builder.() {
+                                                            transformations(CircleCropTransformation())
+                                                        }).build()
+                                                )
+                                            } else {
+                                                painterResource(id = R.drawable.groupslogofull)
+                                            },
                                             contentDescription = "Logo",
                                             modifier = Modifier
                                                 .size(60.dp)
@@ -309,7 +314,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                     Column(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp))
-                            .background(color = Color(0xFFffa31a))
+                            .background(color = Color(R.color.secondary))
                             .padding(16.dp)
                     ) {
                         Image(
@@ -387,7 +392,7 @@ fun HomeScreen(httpClient: HttpClient, navController: NavController) {
                     Column(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp))
-                            .background(color = Color(0xFFffa31a))
+                            .background(color = Color(R.color.secondary))
                             .padding(16.dp)
                     ) {
                         Image(
