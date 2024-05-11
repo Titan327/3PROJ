@@ -3,6 +3,7 @@ const User = require("../models/user.model");
 const {genSalt, hash, compare} = require("bcrypt");
 const transporter = require("../configurations/email.config");
 const path = require('path');
+const Joi = require('joi');
 
 const fs = require('fs');
 const {isTokenValid} = require("../security/token.security");
