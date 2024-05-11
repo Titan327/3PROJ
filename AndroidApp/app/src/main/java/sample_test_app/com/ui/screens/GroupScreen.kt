@@ -64,9 +64,9 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
     }
 
     MainScreen(navController = navController,
-        groupPicture = if (!group.value.picture?.isEmpty()!!) {
-        group.value.picture?.get(1)
-    } else null) {
+        groupPicture = if (group.value?.picture?.isEmpty() == false) {
+            group.value?.picture?.get(1)
+        } else null) {
         GroupScreenContent(group = group.value, users = users.value, navController = navController, groupId = groupId)
     }
 
