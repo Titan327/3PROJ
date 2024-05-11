@@ -2,6 +2,7 @@ const UserGroup = require("../models/userGroup.model");
 const {minioClient} = require("../configurations/minio.config");
 const path = require("path");
 const PaymentMethode = require('../models/paymentMethode.model');
+const Security = require('../security/AES.security');
 
 
 const postRib = async (req, res) => {
@@ -14,6 +15,7 @@ const postRib = async (req, res) => {
         }
 
         await minioClient.putObject("rib", userId+'/'+idMethod, req.file.buffer);
+        //await minioClient.putObject("rib", userId+'/'+idMethod, req.file.buffer);
 
         return res.status(200).send({ message: "RIB uploaded successfully"});
 
@@ -26,18 +28,14 @@ const postRib = async (req, res) => {
 const getRibById = async (req, res) => {
     try {
         const userId = req.authorization.userId;
-        const groupId = req.params.groupId;
-        const transactionId = req.params.transactionId;
+        const idMethod = req.params.idMethod;
 
-        if (!await UserGroup.findOne({ where: { userId: userId, groupId: groupId } })) {
-            return res.status(403).send({ error: "You are not in this group" });
+        if(!await PaymentMethode.findOne({_id: idMethod,userId: userId})){
+            return res.status(404).send({ error: "Payement method don't exist" });
         }
 
-        await minioClient.getObject("ticket", groupId+'/'+transactionId, (err, dataStream) => {
-            if (err) {
-                return res.status(404).json({ error: "Picture not found" });
-            }
-            dataStream.pipe(res);
+        minioClient.getObject('rib', userId+'/'+idMethod, (err, data) => {
+
         });
 
     }catch (e) {

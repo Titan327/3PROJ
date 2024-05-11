@@ -9,7 +9,6 @@ const PaymentMethodeController = require("../controllers/paymentMethode.controll
 router.post("/register", UserMiddleware.verifyUserInfos , UserMiddleware.verifyPasswordWhenCreatingOrUpdating ,AuthController.register);
 //POST http://localhost:9002/api/auth/login
 router.post("/login",AuthController.authentication);
-router.get("/test", PaymentMethodeController.test);
 //POST http://localhost:9000/api/auth/forgottenPassword
 router.post("/forgottenPassword",AuthController.forgottenPassword);
 //GET http://localhost:9000/api/auth/resetPassword
