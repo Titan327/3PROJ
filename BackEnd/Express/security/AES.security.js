@@ -22,7 +22,7 @@ function decrypt(key,string){
     const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key,'hex'), iv);
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
+    return decrypted.toString("utf-8");
 
 }
 

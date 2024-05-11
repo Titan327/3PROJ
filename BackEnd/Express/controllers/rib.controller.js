@@ -14,8 +14,8 @@ const postRib = async (req, res) => {
             return res.status(404).send({ error: "Payement method don't exist" });
         }
 
-        await minioClient.putObject("rib", userId+'/'+idMethod, req.file.buffer);
-        //await minioClient.putObject("rib", userId+'/'+idMethod, req.file.buffer);
+        const img = (req.file.buffer).toString('base64');
+        await minioClient.putObject("rib", userId+'/'+idMethod, Security.crypt(process.env.AES_PAYEMENT_KEY,img));
 
         return res.status(200).send({ message: "RIB uploaded successfully"});
 
@@ -34,9 +34,26 @@ const getRibById = async (req, res) => {
             return res.status(404).send({ error: "Payement method don't exist" });
         }
 
-        minioClient.getObject('rib', userId+'/'+idMethod, (err, data) => {
+        let documentData = '';
+        let crypt_chunk = '';
+        let iv = '';
+
+        minioClient.getObject('rib', userId+'/'+idMethod, (err, dataStream) => {
+
+            res.contentType('image/jpeg');
+
+            dataStream.on('data', (chunk) => {
+                documentData += chunk;
+            });
+
+            dataStream.on('end', () => {
+                const decryptData = Security.decrypt(process.env.AES_PAYEMENT_KEY,documentData);
+                res.write(Buffer.from(decryptData, 'base64'));
+                res.end();
+            });
 
         });
+
 
     }catch (e) {
         console.log(e)
