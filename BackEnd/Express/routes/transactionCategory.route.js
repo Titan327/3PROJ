@@ -4,6 +4,6 @@ const securityMiddleware = require("../security/middleware.security");
 
 //PUBLIC
 //GET http://localhost:9002/api/transactionCategories
-router.get("/",securityMiddleware.verifyIsAuth, TransactionCategory.getTrasactionCategories);
+router.get("/", TransactionCategory.getTrasactionCategories);
 
 module.exports = router;
