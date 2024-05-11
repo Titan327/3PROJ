@@ -58,12 +58,20 @@ function openDialogCreate() {
       <div class="row">
         <h3 class="text-h6">Mes Groupes
           <q-badge color="secondary" floating>
-            <q-icon v-if="favEnabled" name="star" color="white" />
-            <q-icon v-else name="history" color="white" />
+            <q-icon v-if="favEnabled" name="star" color="white" >
+              <q-tooltip>
+                Seul les favoris sont affichés
+              </q-tooltip>
+            </q-icon>
+            <q-icon v-else name="history" color="white">
+              <q-tooltip>
+              Seul les groupes les plus récents sont affichés
+            </q-tooltip>
+            </q-icon>
           </q-badge>
         </h3>
         <q-space />
-        <q-icon name="more_horiz" size="md" color="secondary" class="q-pa-md">
+        <q-icon name="more_horiz" size="md" color="secondary" class="q-pa-md cursor-pointer">
           <q-menu auto-close dark>
             <q-list style="min-width: 50px">
               <q-item clickable @click="getGroups(true, true)">
@@ -82,7 +90,7 @@ function openDialogCreate() {
       </div>
     </q-card-section>
     <q-card-section>
-      <div class="q-gutter-md q-ml-none">
+      <div class="q-gutter-md q-ml-none cursor-pointer">
         <q-avatar
           v-for="group in groupList"
           :key="group.id"
@@ -90,7 +98,9 @@ function openDialogCreate() {
           @click="router.push(`/groups/${group.id}`)"
         >
           <img :src="group.picture ? group.picture[1] : 'assets/defaults/group-default.webp'" />
-          <q-badge color="red" floating>{{ group.id }}</q-badge>
+          <q-tooltip>
+            {{ group.name }}
+          </q-tooltip>
         </q-avatar>
       </div>
     </q-card-section>

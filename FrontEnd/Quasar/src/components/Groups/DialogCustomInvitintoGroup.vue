@@ -67,24 +67,26 @@ async function copyLink() {
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
       <q-card-section class="column">
-        <q-input
+        <q-select
           @update:model-value="linkGenerated=false"
           class="input"
           type="number"
           v-model.number="usages"
           outlined  label="Quantité d'utilisations possibles"
           dark
+          :options="[1,2,3,5,10,100]"
           color="secondary">
-        </q-input>
-        <q-input
+        </q-select>
+        <q-select
           @update:model-value="linkGenerated=false"
           class="input"
           type="number"
           v-model.number="validity"
           outlined label="Durée de validité"
           dark
+          :options="[1,2,3,5,7,15,30,365]"
           color="secondary"
-          suffix="Jours"></q-input>
+          suffix="Jours"></q-select>
         <q-space></q-space>
         <q-btn
           color="secondary"

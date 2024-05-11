@@ -12,6 +12,7 @@ import { DefaultGroup } from 'src/interfaces/group.interface';
 import { getGroup, getUserGroupData } from 'stores/groupStore';
 import DialogRefund from 'components/Groups/DialogRefund.vue';
 import { io } from 'socket.io-client';
+import { NotificationBus } from 'boot/eventBus';
 
 
 let  tab = ref('transactions')
@@ -26,6 +27,7 @@ const $q = useQuasar();
 let catList = ref([]);
 const router = useRouter();
 let group = ref(DefaultGroup());
+let width = ref(0);
 
 
 const props = defineProps({
@@ -38,6 +40,12 @@ onMounted(async () => {
   await getOptimalRefundList();
   await getCat();
   group.value = await getGroup(props.groupId);
+
+  function getWidth() {
+    width.value = window.innerWidth;
+  }
+  getWidth();
+  window.addEventListener('resize', getWidth);
 });
 
 const socket = io(process.env.URL_BACKEND);
@@ -49,6 +57,7 @@ socket.on('connect', () => {
 socket.on(`new-transaction-${props.groupId}`, () => {
   getTransactionList();
   getOptimalRefundList();
+  NotificationBus.emit('new-notif');
 });
 
 async function getTransactionList(){
@@ -296,7 +305,7 @@ function getCatColor(catId: number) {
                   <q-avatar round text-color="white" icon="group"/>
                 </q-item-section>
                   <q-space></q-space>
-                <q-item-section>
+                <q-item-section v-if="width>800">
                   <q-item-label class="q-mx-xl">Payeur
                     <q-icon
                     size="xs"
@@ -305,12 +314,9 @@ function getCatColor(catId: number) {
                 </q-item-section>
                   <q-space></q-space>
                 <q-item-section>
-                  <q-item-label class="">Montant</q-item-label>
+                  <q-item-label class="q-mx-xl">Montant</q-item-label>
                 </q-item-section>
                 <q-space></q-space>
-                <q-item-section>
-                  <q-item-label class="q-mx-auto">Statut</q-item-label>
-                </q-item-section>
                   <q-space></q-space>
                 <q-item-section>
                   <q-item-label class="q-mx-auto">Action</q-item-label>
@@ -344,7 +350,7 @@ function getCatColor(catId: number) {
                     </q-avatar>
                    </q-item-section>
                   <q-space></q-space>
-                  <q-item-section>
+                  <q-item-section v-if="width>800">
                     <q-item-label class="q-mx-xl">{{getUserGroupData(refund.refundingUserId)?.username}}
                       <q-icon
                       size="xs"
@@ -354,15 +360,12 @@ function getCatColor(catId: number) {
                   </q-item-section>
                   <q-space></q-space>
                   <q-item-section>
-                    <q-item-label class="">{{formatNumber(refund.amount)}}€</q-item-label>
+                    <q-item-label class="q-mx-xl">{{formatNumber(refund.amount)}}€</q-item-label>
                   </q-item-section>
                   <q-space></q-space>
-                  <q-item-section>
-                    <span color="red" class="q-pa-s text-secondary q-mx-auto">À rembourser</span>
-                  </q-item-section>
                   <q-space></q-space>
                   <q-item-section class="q-mx-auto">
-                  <q-btn outline color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
+                  <q-btn outline class="w-60 q-mx-auto" color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
                   <span v-else class="q-mx-auto">Rien à effectuer</span>
                   </q-item-section>
 

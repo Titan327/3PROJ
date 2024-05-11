@@ -20,10 +20,6 @@ const emit = defineEmits(['updateState', 'messages'])
 
 const socket = io(process.env.URL_BACKEND);
 
-socket.on('connect', () => {
-  console.log('Connected to server');
-});
-
 socket.on(`chat-group-${props.groupId}`, (msg, group) => {
   getMessages();
   scrollNewMsg();
@@ -37,8 +33,8 @@ const messages = ref<IMessage[]>([]);
 const senders = ref<Partial<IUser>[]>([]);
 let writingMessage = ref('');
 const scrollAreaRef = ref(null);
-
-const position = ref(100000);
+const topLoading = ref(false);
+const bottomLoading = ref(false);
 const msgPage = ref(1);
 const User = ref(DefaultUser());
 
@@ -49,14 +45,28 @@ onMounted(async () => {
   await getUserData();
   await getGroup();
   await getMessages();
-
   scrollNewMsg ();
-
 });
 
+function checkScroll() {
+  const scrollArea = scrollAreaRef.value;
+  if (scrollArea !== null) {
+    const scrollPercentage = scrollArea.getScrollPercentage('vertical');
+    if (scrollPercentage.top == 0) {
+      msgPage.value++;
+      getMessages();
+      scrollArea.setScrollPercentage('vertical', 0.2);
+    }
+    if (scrollPercentage.top >= 0.8 && msgPage.value > 1) {
+      msgPage.value--;
+      getMessages();
+      scrollArea.setScrollPercentage('vertical', 0.8);
+    }
+  }
+}
+
 function scrollNewMsg () {
-  scrollAreaRef.value.setScrollPosition('vertical', position.value, 500)
-  position.value = 100000
+  scrollAreaRef.value.setScrollPercentage('vertical',100);
 }
 
 async function getGroup() {
@@ -83,14 +93,16 @@ function CloseDrawer() {
 }
 
 async function getMessages() {
+  bottomLoading.value = true;
   try {
     const response = await api.get(`/messages/${props.groupId}?limit=50&page=${msgPage.value}`);
     messages.value = response.data.messages
     messages.value.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
   } catch (error) {
     console.error('Error getting messages:', error);
   }
+  topLoading.value = false;
+  bottomLoading.value = false;
 }
 
 async function sendMessage() {
@@ -171,8 +183,13 @@ function getDate(timestamp: string) {
 
       <div class="q-pa-md row justify-center">
         <q-label v-if="messages.length == 0" class="text-h6 q-pa-md">Aucun message</q-label>
+        <q-spinner
+          color="secondary"
+          size="2em"
+          v-if="topLoading"
+        />
         <div v-if="messages.length > 0" style="width: 100%; max-width: 400px">
-          <q-scroll-area ref="scrollAreaRef" class="q-pa-md" style="height: 85vh; max-width: 400px;">
+          <q-scroll-area @scroll="checkScroll" ref="scrollAreaRef" class="q-pa-md" style="height:calc(100vh - 200px); max-width: 400px;">
             <q-chat-message
               class="message"
               v-for="(message, index) in messages"
@@ -186,6 +203,11 @@ function getDate(timestamp: string) {
             />
           </q-scroll-area>
         </div>
+        <q-spinner
+          color="secondary"
+          size="2em"
+          v-if="bottomLoading"
+        />
         <div class="bloc-send row items-center justify-evenly bg-primary">
           <q-input
             class="input-msg"
