@@ -3,6 +3,7 @@ const UserGroup = require('../models/userGroup.model');
 const BankInfo = require("../models/bankInfo.model");
 const crypto = require('crypto');
 const Joi = require('joi');
+const Security = require('../security/AES.security');
 
 const getPaymentMethode = async (req, res) => {
     const groupId = req.params.groupId;
@@ -29,7 +30,7 @@ const getPaymentMethode = async (req, res) => {
                     let obj;
 
                     if (methode.type === "RIB"){
-                        const exist = await BankInfo.findOne({code_banque: decrypt(process.env.AES_PAYEMENT_KEY, methode.value.bank_number)});
+                        const exist = await BankInfo.findOne({code_banque: Security.decrypt(process.env.AES_PAYEMENT_KEY, methode.value.bank_number)});
                         let bank_link = null;
                         if (exist) {
                             bank_link = exist.site_internet;
@@ -52,7 +53,7 @@ const getPaymentMethode = async (req, res) => {
 
                     Object.keys(methode.value).forEach(
                         val => {
-                            obj.value[val] = decrypt(process.env.AES_PAYEMENT_KEY, methode.value[val]);
+                            obj.value[val] = Security.decrypt(process.env.AES_PAYEMENT_KEY, methode.value[val]);
                         }
                     )
 
@@ -88,7 +89,7 @@ const createPaymentMethode = async (req, res) => {
             all = await PaymentMethode.find({ userId: userId, type: type });
             all.forEach(
                 RIB_crypt => {
-                    const decrypt_IBAN = decrypt(process.env.AES_PAYEMENT_KEY,RIB_crypt.value.IBAN);
+                    const decrypt_IBAN = Security.decrypt(process.env.AES_PAYEMENT_KEY,RIB_crypt.value.IBAN);
                     if (IBAN === decrypt_IBAN){
                         alreadyExist = true;
                     }
@@ -99,7 +100,7 @@ const createPaymentMethode = async (req, res) => {
             all = await PaymentMethode.find({ userId: userId, type: type });
             all.forEach(
                 paypal_crypt => {
-                    const decrypt_paypal = decrypt(process.env.AES_PAYEMENT_KEY,paypal_crypt.value.user_paypal);
+                    const decrypt_paypal = Security.decrypt(process.env.AES_PAYEMENT_KEY,paypal_crypt.value.user_paypal);
                     if (paypal_username === decrypt_paypal){
                         alreadyExist = true;
                     }
@@ -159,7 +160,7 @@ const createPaymentMethode = async (req, res) => {
 
         Object.keys(result).forEach(
             detail => {
-                result_crypt.value[detail] = crypt(process.env.AES_PAYEMENT_KEY,result[detail]);
+                result_crypt.value[detail] = Security.crypt(process.env.AES_PAYEMENT_KEY,result[detail]);
             }
         );
 
@@ -172,13 +173,6 @@ const createPaymentMethode = async (req, res) => {
     }
 }
 
-const test = async (req, res) => {
-    const aesKey = crypto.randomBytes(32);
-
-    console.log('Clé AES générée:', aesKey.toString('hex'));
-
-    res.status(200).send("ok")
-}
 
 const getMyPaymentMethode = async (req,res) => {
     const userId = req.authorization.userId;
@@ -200,7 +194,7 @@ const getMyPaymentMethode = async (req,res) => {
                 let obj;
 
                 if (methode.type === "RIB"){
-                    const exist = await BankInfo.findOne({code_banque: decrypt(process.env.AES_PAYEMENT_KEY, methode.value.bank_number)});
+                    const exist = await BankInfo.findOne({code_banque: Security.decrypt(process.env.AES_PAYEMENT_KEY, methode.value.bank_number)});
                     let bank_link = null;
                     if (exist) {
                         bank_link = exist.site_internet;
@@ -223,7 +217,7 @@ const getMyPaymentMethode = async (req,res) => {
 
                 Object.keys(methode.value).forEach(
                     val => {
-                        obj.value[val] = decrypt(process.env.AES_PAYEMENT_KEY, methode.value[val]);
+                        obj.value[val] = Security.decrypt(process.env.AES_PAYEMENT_KEY, methode.value[val]);
                     }
                 )
 
@@ -240,35 +234,9 @@ const getMyPaymentMethode = async (req,res) => {
     }
 }
 
-function crypt(key,string){
-    // creation de iv (comme le salt)
-    const iv = crypto.randomBytes(16);
-    // creation du chiffreur (cipher)
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key,'hex'), iv);
-    // chiffrage
-    let encrypted = cipher.update(string);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return iv.toString('hex') + ':' + encrypted.toString('hex');
-}
-
-
-function decrypt(key,string){
-
-    const crypt = string.split(':');
-    // recup iv
-    const iv = Buffer.from(crypt.shift(), 'hex');
-    const encryptedText = Buffer.from(crypt.join(':'), 'hex');
-    // decrypt
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key,'hex'), iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-
-}
 
 module.exports = {
     getPaymentMethode,
     createPaymentMethode,
-    test,
     getMyPaymentMethode
 }
