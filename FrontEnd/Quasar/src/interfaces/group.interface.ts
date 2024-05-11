@@ -5,7 +5,7 @@ export interface Group{
   name: string,
   description: string,
   picture?: string,
-  owner_id?: number,
+  ownerId?: number,
   updatedAt?: Date,
   activeUsersCount?: number,
   Users?: IUser[],

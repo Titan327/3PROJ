@@ -112,8 +112,8 @@ async function setFavorite(groupID:number, favorite:boolean){
       <q-card-section>
         <q-item>
           <q-item-section avatar>
-            <q-avatar rounded color="secondary" text-color="white"  clickable @click="router.push(`/groups/${group.id}`)">
-              <img :src="group.picture ?  group.picture+'/200' : 'assets/defaults/group-default.webp'">
+            <q-avatar rounded text-color="white"  clickable @click="router.push(`/groups/${group.id}`)">
+              <img :src="group.picture ?  group.picture[0] : 'assets/defaults/group-default.webp'">
             </q-avatar>
           </q-item-section>
 
@@ -134,6 +134,9 @@ async function setFavorite(groupID:number, favorite:boolean){
               icon="person_add"
               @click="openDialogInvite(group.id, group.name)"
             >
+              <q-tooltip>
+                Inviter d'autres membres
+              </q-tooltip>
             </q-btn>
           </q-item-section>
           <q-item-section avatar  v-if="width>500">
@@ -157,6 +160,9 @@ async function setFavorite(groupID:number, favorite:boolean){
                 style="cursor: pointer;"
                 size="30px"
               />
+              <q-tooltip>
+                {{ group.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}}
+              </q-tooltip>
             </q-avatar>
           </q-item-section>
         </q-item>

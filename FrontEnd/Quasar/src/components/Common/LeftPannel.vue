@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from "vue";
 import { disconnectUser, getUser } from "stores/userStore";
 import { useRouter } from "vue-router";
 import {getNotificationsCountData} from "stores/notificationsStore";
+import { NotificationBus } from 'boot/eventBus';
 
 const drawer = ref(false);
 const miniState = ref(true);
@@ -34,6 +35,10 @@ onMounted(async () => {
   window.addEventListener('resize', setDrawerState);
 });
 
+NotificationBus.on('new-notif', async () => {
+  console.log('get count')
+  await getCountNotifs();
+});
 
 function disconnect() {
   disconnectUser();
@@ -102,28 +107,21 @@ async function getCountNotifs(){
           <q-item-section>Paramètres</q-item-section>
         </q-item>
       </q-list>
-    <q-expansion-item
-    class="user-drawer">
-      <template v-slot:header="{}">
-        <q-item-section avatar>
-          <q-avatar>
-            <img :src="pictureUrl ? pictureUrl : 'assets/defaults/user-default.webp' ">
-          </q-avatar>
-        </q-item-section>
 
-        <q-item-section q-mini-drawer-hide>
-          {{ userString }}
-        </q-item-section>
-      </template>
-
-      <q-card>
-        <q-card-section class="disconnect-user">
-          <q-chip clickable :onclick="disconnect" color="red" class="text-white">
-            Se déconnecter
-          </q-chip>
-        </q-card-section>
-      </q-card>
-    </q-expansion-item>
+    <q-item class="absolute-bottom user-drawer">
+      <q-item-section top avatar>
+        <q-avatar>
+          <img :src="pictureUrl ? pictureUrl : 'assets/defaults/user-default.webp' ">
+        </q-avatar>
+      </q-item-section>
+      <q-item-section>{{ userString }}</q-item-section>
+      <q-item-section avatar clickable @click="disconnect" style="cursor: pointer">
+        <q-icon color="red" name="logout" />
+        <q-tooltip>
+          Se déconnecter
+        </q-tooltip>
+      </q-item-section>
+    </q-item>
   </q-drawer>
 
 </template>
@@ -134,11 +132,7 @@ async function getCountNotifs(){
 }
 
 .user-drawer{
-  margin-top: 40vh;
-}
-
-.disconnect-user{
-background-color: #1b1b1b;
+  margin-bottom: 20px;
 }
 
 @media (max-height: 920px) {

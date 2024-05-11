@@ -9,6 +9,7 @@ import PaymentsMethods from "components/Index/PaymentsMethods.vue";
 import {DefaultUser} from "src/interfaces/user.interface";
 import DialogWarnAuth from "components/Index/DialogWarnAuth.vue";
 import {useQuasar} from "quasar";
+import DialogJoinGroup from 'components/Groups/DialogJoinGroup.vue';
 
 const User = ref(DefaultUser());
 const $q = useQuasar();
@@ -18,7 +19,22 @@ onMounted(async () => {
 
   User.value = await getUser();
   CheckIs0Auth();
+
+  const tokenGroupCookie = getCookie('join-group');
+  if (tokenGroupCookie) {
+   openDialogJoin(tokenGroupCookie);
+  }
 });
+
+function openDialogJoin(tokenGroup: string){
+    $q.dialog({
+      component: DialogJoinGroup,
+
+      componentProps: {
+        tokenGroup: tokenGroup,
+      }
+    })
+}
 
 function CheckIs0Auth(){
   if (User.value.firstname == User.value.lastname){
@@ -35,6 +51,16 @@ function CheckIs0Auth(){
   else{
     return false;
   }
+}
+function getCookie(name) {
+  const cookieArray = document.cookie.split(';');
+  for (let cookie of cookieArray) {
+    const [cookieName, cookieValue] = cookie.split('=');
+    if (cookieName.trim() === name) {
+      return cookieValue;
+    }
+  }
+  return null;
 }
 
 </script>
