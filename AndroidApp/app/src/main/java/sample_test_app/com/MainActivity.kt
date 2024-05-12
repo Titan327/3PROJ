@@ -30,6 +30,7 @@ import sample_test_app.com.ui.screens.GroupScreen
 import sample_test_app.com.ui.screens.HomeScreen
 import sample_test_app.com.ui.screens.LoginScreen
 import sample_test_app.com.ui.screens.MainScreen
+import sample_test_app.com.ui.screens.ProfilScreen
 import sample_test_app.com.ui.screens.RegisterScreen
 import sample_test_app.com.ui.theme.SampleTestAppTheme
 
@@ -76,6 +77,12 @@ fun AppNavHost() {
                 composable("groupList") {
                     MainScreen(navController) {
                         GroupListScreen(HttpClient(), navController)
+                    }
+                }
+
+                composable("profil") {
+                    MainScreen(navController) {
+                        ProfilScreen(HttpClient(), navController, LocalJwtToken.current)
                     }
                 }
                 composable("notifications") {

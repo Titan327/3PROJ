@@ -1,38 +1,40 @@
-package sample_test_app.com.http.Repository
-
+import androidx.navigation.NavHostController
 import io.ktor.client.HttpClient
-import io.ktor.client.request.header
-import io.ktor.client.request.put
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.client.statement.*
+import io.ktor.http.content.*
 import io.ktor.util.InternalAPI
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
+import sample_test_app.com.models.User
 
-class ProfilRepository(private val httpClient: HttpClient) {
+class ProfilRepository(private val httpClient: HttpClient, navController: NavHostController) {
 
     @OptIn(InternalAPI::class)
-    suspend fun updateUser(userId: String, token: String, firstname: String, lastname: String, username: String, email: String, birth_date: String, password: String): HttpResponse {
+    suspend fun updateUser(userId: String, user: User, jwtToken: String): HttpResponse {
         val url = "https://3proj-back.tristan-tourbier.com/api/users/$userId"
+        println("User ID: $userId")
 
         val userInfos = mapOf(
-            "firstname" to firstname,
-            "lastname" to lastname,
-            "username" to username,
-            "email" to email,
-            "birth_date" to birth_date
+            "firstname" to user.firstname,
+            "lastname" to user.lastname,
+            "username" to user.username,
+            "email" to user.email,
+            "birth_date" to user.birth_date
         )
 
         val requestBody = mapOf(
             "userInfos" to userInfos,
-            "password" to password
         )
 
-        return httpClient.put(url) {
+        val response: HttpResponse = httpClient.request(url) {
+            method = HttpMethod.Put
             contentType(ContentType.Application.Json)
-            header("Authorization", "Bearer $token")
-            body = Json.encodeToJsonElement(requestBody)
+            header(HttpHeaders.Authorization, "Bearer $jwtToken")
+            body = TextContent(Json.encodeToString(requestBody), ContentType.Application.Json)
         }
+
+        return response
     }
 }

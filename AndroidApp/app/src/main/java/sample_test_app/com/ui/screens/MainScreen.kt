@@ -86,7 +86,7 @@ fun MainScreen(navController: NavController, groupPicture : String? = null, cont
                                 .padding(top = 16.dp)
                                 .align(Alignment.TopEnd)
                                 .clickable {
-                                    navController.navigate("ProfilScreen")
+                                    navController.navigate("profil")
                                 }
                         )
                     } else {
@@ -104,7 +104,7 @@ fun MainScreen(navController: NavController, groupPicture : String? = null, cont
                                 .padding(top = 16.dp)
                                 .align(Alignment.TopEnd)
                                 .clickable {
-                                    navController.navigate("profilScreen")
+                                    navController.navigate("profil")
                                 }
                         )
                     }

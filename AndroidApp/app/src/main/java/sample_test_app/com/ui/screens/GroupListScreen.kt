@@ -174,7 +174,7 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                                     .padding(8.dp) // Ajouter de l'espace entre chaque groupe
                                     .fillMaxWidth(0.9f)
                                     .background(Color.Gray) // Définir un fond gris
-                                    .clip(RoundedCornerShape(40.dp)) // Arrondir les bords
+                                    .clip(RoundedCornerShape(40.dp))
 
                             ) {
                                 if (group.picture?.isNotEmpty() == true) {
