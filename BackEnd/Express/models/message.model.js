@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const messageSchema = new mongoose.Schema({
     text: String,
     userId: Number,
-    groupId: Number,
+    groupId: String,
     timestamp: { type: Date, default: Date.now }
 }, { versionKey: false });
 
