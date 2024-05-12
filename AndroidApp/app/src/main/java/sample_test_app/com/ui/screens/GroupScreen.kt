@@ -1,6 +1,8 @@
 package sample_test_app.com.ui.screens
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -22,11 +28,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +56,10 @@ import sample_test_app.com.models.CategoryStore
 import sample_test_app.com.models.Group
 import sample_test_app.com.models.Transaction
 import sample_test_app.com.models.User
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: String?) {
     val jwtToken = LocalJwtToken.current
@@ -73,12 +85,16 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("DiscouragedApi")
 @Composable
 fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Transaction>, navController: NavController, groupId: String?) {
     val isBalanceDisplayed = remember { mutableStateOf(true) }
     val isTransactionsDisplayed = remember { mutableStateOf(false) }
     val isRefundDisplayed = remember { mutableStateOf(false) }
+    val isPopUpTransactionDisplayed = remember { mutableStateOf(false) }
+    val transactionToDisplay = remember { mutableStateOf(Transaction()) }
+    val isTransactionCreationPopUpDisplayed = remember { mutableStateOf(false) }
     val categories = CategoryStore.categories
 
 
@@ -90,7 +106,7 @@ fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Trans
         // Solde / Transactions / Remboursement
         Row (
             modifier = Modifier
-                .clip(shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                .clip(shape = RoundedCornerShape(16.dp))
                 .background(color = Color(0xFF808080))
                 .padding(16.dp)
                 .fillMaxWidth()
@@ -243,7 +259,34 @@ fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Trans
                             )
                         } else {
                             Column {
-                                Row {
+                                Row (
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            isTransactionCreationPopUpDisplayed.value = true
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                                            contentColor = Color.White
+                                        )
+                                    ) {
+                                        Text("Ajouter une transaction")
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_cross),
+                                            contentDescription = "Create Transaction",
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                }
+                                Row (
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+
+                                ) {
                                     Column (
                                         modifier = Modifier
                                             .weight(1f),
@@ -274,12 +317,28 @@ fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Trans
                                             color = Color.White)
                                     }
                                 }
+                                Surface(
+                                    color = Color(R.color.accent),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp)
+                                        .height(1.dp),
+                                    elevation = 1.dp,
+                                    border = BorderStroke(1.dp, Color(R.color.accent))
+                                ) {}
                                 for (transaction in transactions) {
-                                    Row {
+                                    Row (
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                isPopUpTransactionDisplayed.value =
+                                                    true; transactionToDisplay.value = transaction
+                                            },
+                                    ){
                                         Column (
                                             modifier = Modifier
                                                 .weight(1f),
-                                            horizontalAlignment = CenterHorizontally
+                                            horizontalAlignment = CenterHorizontally,
                                         ) {
                                             val category = categories.find { it.id == transaction.categoryId }
                                             if (category?.icon != null) {
@@ -310,7 +369,7 @@ fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Trans
                                         Column (
                                             modifier = Modifier
                                                 .weight(3f),
-                                            horizontalAlignment = CenterHorizontally
+                                            horizontalAlignment = CenterHorizontally,
                                         ) {
                                             Text(
                                                 text = transaction.label.toString(),
@@ -320,7 +379,7 @@ fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Trans
                                         Column (
                                             modifier = Modifier
                                                 .weight(2f),
-                                            horizontalAlignment = CenterHorizontally
+                                            horizontalAlignment = CenterHorizontally,
                                         ) {
                                             Text(
                                                 text = transaction.total_amount.toString() + " €",
@@ -335,4 +394,135 @@ fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Trans
             }
         }
     }
+
+    if (isPopUpTransactionDisplayed.value) {
+        AlertDialog(
+            onDismissRequest = { isPopUpTransactionDisplayed.value = false },
+            title = {
+                Row {
+                    Text(
+                        transactionToDisplay.value.label.toString(),
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp
+                        )
+                    )
+                }
+            },
+            text = {
+                Column (
+                    modifier = Modifier
+                        .padding(bottom = 16.dp, top = 16.dp),
+                ) {
+                    Text(
+                        "Montant : " + transactionToDisplay.value.total_amount.toString() + " €",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 16.sp
+                        )
+                    )
+                    Text(
+                        "Catégorie : " + categories.find { it.id == transactionToDisplay.value.categoryId }?.label,
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 16.sp
+                        )
+                    )
+                    Text(
+                        "Créé par : " + users.find { it.id == transactionToDisplay.value.senderId }?.username  + " le " + ZonedDateTime.parse(transactionToDisplay.value.date).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 16.sp
+                        )
+                    )
+                    for (user in transactionToDisplay.value.TransactionUsers!!) {
+                        Row (
+                            modifier = Modifier
+                                .padding(top = 16.dp, bottom = 16.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (users.find { it.id == user.userId }?.profile_picture?.get(0)
+                                    ?.isNotBlank() == true && users.find { it.id == user.userId }?.profile_picture?.get(
+                                    0
+                                ) != "null"
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(
+                                                data = users.find { it.id == user.userId }?.profile_picture?.get(
+                                                    0
+                                                )
+                                            )
+                                            .apply(block = fun ImageRequest.Builder.() {
+                                                transformations(CircleCropTransformation())
+                                            }).build()
+                                    ),
+                                    contentDescription = "User Profile Picture",
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                )
+                            } else {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(data = R.drawable.userdefault)
+                                            .apply(block = fun ImageRequest.Builder.() {
+                                                transformations(CircleCropTransformation())
+                                            }).build()
+                                    ),
+                                    contentDescription = "User Profile Picture",
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                )
+                            }
+                            val username = users.find { it.id == user.userId }?.username
+                            if (username != null) {
+                                Text(
+                                    text = if (username.length > 11) username.substring(0, 8) + "..." else username.toString(),
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 16.sp
+                                    )
+                                )
+                            }
+                            Text(
+                                text = user.amount.toString() + " €",
+                                color = Color.White,
+                                style = TextStyle(
+                                    fontSize = 16.sp
+                                )
+                            )
+
+                        }
+                        Surface(
+                                color = Color(android.graphics.Color.parseColor("#ffa31a")),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp),
+                        elevation = 1.dp,
+                            border = BorderStroke(1.dp, Color(android.graphics.Color.parseColor("#ffa31a")))
+                        ) {}
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isPopUpTransactionDisplayed.value = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                        contentColor = Color.White
+                    )                ) {
+                    Text("Fermer")
+                }
+            },
+            backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
+        )
+    }
 }
+
+

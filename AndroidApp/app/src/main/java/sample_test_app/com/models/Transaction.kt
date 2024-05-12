@@ -15,15 +15,16 @@ data class Transaction(
     val createdAt: String? = "",
     val updatedAt: String? = "",
     val Group: Group? = null,
+    val TransactionUsers: List<TransactionUser>? = null
 )
 
 @Serializable
 data class TransactionUser(
-    val id: String?,
-    val userId: String?,
-    val transactionId: String?,
-    val amount: Double?,
-    val createdAt: String?,
-    val updatedAt: String?,
-    val Transaction: Transaction?
+    val id: String? = "",
+    val userId: String? = "",
+    val transactionId: String? = "",
+    val amount: Double? = 0.0,
+    val createdAt: String? = "",
+    val updatedAt: String? = "",
+    val Transaction: Transaction? = null,
 )
