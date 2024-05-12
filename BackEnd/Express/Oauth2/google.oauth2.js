@@ -74,55 +74,6 @@ const callback = async (req, res) => {
         `);
 
 
-
-        /*
-        const email = user._json.email;
-
-        const exist = await User.findOne({ where: { email: email } });
-
-        if (exist){
-            console.log("trouvé");
-            const token = createToken(exist);
-            console.log(token);
-
-            res.json({ token });
-        }
-        console.log("pas trouvé");
-
-
-        const firstname = user._json.name
-
-        let lastname;
-        if (user._json.familyName){
-            lastname = user._json.familyName;
-        }else {
-            lastname = user._json.name;
-        }
-
-        const username = user._json.given_name
-
-        let birth_date;
-        if (user._json.birth_date){
-            birth_date = user._json.birth_date;
-        }else {
-            birth_date = null;
-        }
-
-        const newUser = await User.create({
-            firstname,
-            lastname,
-            username,
-            email,
-            birth_date,
-            password:null
-        });
-
-        const token = createToken(newUser);
-
-        return res.status(200).send({ token: token});
-
-         */
-
     })(req, res);
 
 
