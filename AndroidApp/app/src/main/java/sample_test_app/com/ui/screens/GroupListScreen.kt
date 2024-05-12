@@ -23,6 +23,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -36,6 +37,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -70,6 +72,7 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
             groups.value = groupRepository.getUserGroups(userId, jwtToken, true)
+            println("Received token: ${jwtToken}")
         }
     }
 
@@ -101,12 +104,11 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                         )
                     )
 
-                    // Ajouter un IconButton avec une image de croix
                     IconButton(onClick = { showDialog.value = true }) {
                         Image(
-                            painter = painterResource(id = R.drawable.ic_cross), // Remplacez par votre ressource d'image de croix
+                            painter = painterResource(id = R.drawable.ic_cross),
                             contentDescription = "Create Group",
-                            modifier = Modifier.size(24.dp) // Contrôlez la taille de l'image ici
+                            modifier = Modifier.size(48.dp)
                         )
                     }
                 }
@@ -150,7 +152,9 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                 }
 
                 Column (
-                    verticalArrangement = Arrangement.SpaceAround
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally) // Centrer les groupes horizontalement
                 ) {
 
                     if (groups.value.isEmpty()) {
@@ -164,7 +168,14 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                     } else {
                         for (group in groups.value) {
                             Row(
-                                verticalAlignment = Alignment.CenterVertically
+
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(8.dp) // Ajouter de l'espace entre chaque groupe
+                                    .fillMaxWidth(0.9f)
+                                    .background(Color.Gray) // Définir un fond gris
+                                    .clip(RoundedCornerShape(40.dp)) // Arrondir les bords
+
                             ) {
                                 if (group.picture?.isNotEmpty() == true) {
                                     Image(
@@ -205,19 +216,21 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                                     )
                                 }
                                 Text(
-                                    text = group.name ?: "", // Utilisez le nom du groupe ou une chaîne vide si le nom est null
-                                    color = androidx.compose.ui.graphics.Color.White, // Changez la couleur en blanc
+                                    text = group.name ?: "",
+                                    color = androidx.compose.ui.graphics.Color.White,
                                     style = TextStyle(
-                                        fontSize = 18.sp
+                                        fontSize = 22.sp
                                     ),
-                                    modifier = Modifier.padding(start = 16.dp) // Ajoutez un espace entre l'image et le texte
+                                    modifier = Modifier.padding(start = 16.dp)
                                 )
                             }
-                        }
+                            Spacer(modifier = Modifier.height(8.dp)) // Ajoutez cette ligne pour ajouter un espace entre les groupes
+
                         }
                     }
                 }
             }
         }
     }
+}
 
