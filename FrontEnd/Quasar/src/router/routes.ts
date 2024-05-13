@@ -62,17 +62,6 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/JoinGroupPage.vue') }],
   },
 
-  {
-    path: '/callback',
-    component: () => import('layouts/EmptyLayout.vue'),
-    children: [{ path: '', component: () => import('pages/CallbackOauth.vue') }],
-  },
-  {
-    path: '/oauth',
-    component: () => import('layouts/EmptyLayout.vue'),
-    children: [{ path: '', component: () => import('pages/OauthTest.vue') }],
-  },
-
   // Always leave this as last one,
   {
     path: '/404',
