@@ -8,6 +8,8 @@ const oauthGoogle = async (req,res) => {
     const { token } = req.body;
 
     try {
+        const client = new OAuth2Client('1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com');
+
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com',
