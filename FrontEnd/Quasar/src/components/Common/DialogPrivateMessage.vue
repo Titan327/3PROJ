@@ -5,6 +5,7 @@ import { getUser } from "stores/userStore";
 import {DefaultUser, IUser} from "src/interfaces/user.interface";
 import { io } from 'socket.io-client';
 import {api} from "boot/axios";
+import {NotificationBus} from "boot/eventBus";
 
 const messages = ref<IMessage[]>([]);
 const senders = ref<Partial<IUser>[]>([]);
@@ -30,6 +31,7 @@ socket.on(`chat-private-${props.groupId}`, (msg, group) => {
   scrollNewMsg();
   if(isOpen.value == false){
     emit('messages')
+    NotificationBus.emit('new-notif');
   }
 });
 
