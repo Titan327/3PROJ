@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <div ref="buttonDiv"></div>
-  </div>
+  <q-layout>
+    <q-page-container>
+      <div ref="buttonDiv"></div>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script>
@@ -23,7 +25,7 @@ export default {
         });
         google.accounts.id.renderButton(
           this.$refs.buttonDiv,
-          { theme: 'outline', size: 'large' }  // customization attributes
+          {theme: 'outline', size: 'large'}  // customization attributes
         );
         google.accounts.id.prompt(); // affiche également la boîte de dialogue One Tap
       } else {
