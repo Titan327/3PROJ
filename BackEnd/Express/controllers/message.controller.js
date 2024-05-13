@@ -177,7 +177,7 @@ const PostUserToUser = async (req,res) => {
                 nouveauMessage.save()
                     .then(savedMessage => {
                         console.log("Message enregistré avec succès :", savedMessage);
-                        CreateNotif(userId,`Nouveau message privé de ${user2Exist.user.username}`,`groups/${groupId}/private-chat/${user2Exist.userId}`);
+                        CreateNotif(userId,`Nouveau message privé de ${user2Exist.user}`,`groups/${groupId}/private-chat/${user2Exist.userId}`);
                         return res.status(200).json({ message: 'Message saved' });
                     })
                     .catch(error => {
