@@ -1,5 +1,8 @@
 package sample_test_app.com.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -18,8 +21,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.ui.Alignment
@@ -33,17 +34,24 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.http.ContentDisposition.Companion.File
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.content.ByteArrayContent
 import io.ktor.util.InternalAPI
+import io.ktor.utils.io.streams.asInput
 import kotlinx.serialization.encodeToString
 import sample_test_app.com.LocalUser
+import java.io.File
+import java.io.FileInputStream
 
 @OptIn(InternalAPI::class)
 @Composable
@@ -55,6 +63,11 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
     var lastnameState = remember { mutableStateOf(user.lastname ?: "") }
     var emailState = remember { mutableStateOf(user.email ?: "") }
     var birthDateState = remember { mutableStateOf(user.birth_date ?: "") }
+    var selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val selectImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        selectedImageUri.value = uri
+    }
 
     Column(
         modifier = Modifier
@@ -67,11 +80,10 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             value = usernameState.value,
             onValueChange = { usernameState.value = it },
             label = { Text("Username") },
+            modifier = Modifier.padding(bottom = 16.dp),
             colors = TextFieldDefaults.textFieldColors(
                 textColor = Color.Black,
                 cursorColor = Color.Black,
-                leadingIconColor = Color.Black,
-                trailingIconColor = Color.Black,
                 backgroundColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -82,11 +94,11 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             value = firstnameState.value,
             onValueChange = { firstnameState.value = it },
             label = { Text("First Name") },
+            modifier = Modifier.padding(bottom = 16.dp),
+
             colors = TextFieldDefaults.textFieldColors(
                 textColor = Color.Black,
                 cursorColor = Color.Black,
-                leadingIconColor = Color.Black,
-                trailingIconColor = Color.Black,
                 backgroundColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -97,11 +109,11 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             value = lastnameState.value,
             onValueChange = { lastnameState.value = it },
             label = { Text("Last Name") },
+            modifier = Modifier.padding(bottom = 16.dp),
+
             colors = TextFieldDefaults.textFieldColors(
                 textColor = Color.Black,
                 cursorColor = Color.Black,
-                leadingIconColor = Color.Black,
-                trailingIconColor = Color.Black,
                 backgroundColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -112,11 +124,11 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             value = emailState.value,
             onValueChange = { emailState.value = it },
             label = { Text("Email") },
+            modifier = Modifier.padding(bottom = 16.dp),
+
             colors = TextFieldDefaults.textFieldColors(
                 textColor = Color.Black,
                 cursorColor = Color.Black,
-                leadingIconColor = Color.Black,
-                trailingIconColor = Color.Black,
                 backgroundColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -127,11 +139,10 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             value = birthDateState.value,
             onValueChange = { birthDateState.value = it },
             label = { Text("Birth Date") },
+            modifier = Modifier.padding(bottom = 16.dp),
             colors = TextFieldDefaults.textFieldColors(
                 textColor = Color.Black,
                 cursorColor = Color.Black,
-                leadingIconColor = Color.Black,
-                trailingIconColor = Color.Black,
                 backgroundColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -157,6 +168,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                     val response: HttpResponse = withContext(Dispatchers.IO) {
                         httpClient.put("https://3proj-back.tristan-tourbier.com/api/users/${user.id}") {
                             contentType(ContentType.Application.Json)
+
                             header("Authorization", "Bearer $jwtToken")
                             body = userInfoJson
                         }
@@ -178,6 +190,60 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             }
         }) {
             Text("Update User")
+
+        }
+        Button(onClick = { selectImageLauncher.launch("image/*") }) {
+            Text("Select Image")
+        }
+        selectedImageUri.value?.let { uri ->
+            Image(
+                painter = rememberImagePainter(data = uri),
+                contentDescription = "Selection de l'image",
+                modifier = Modifier.size(200.dp)
+            )
+        }
+
+
+        Button(onClick = {
+            selectedImageUri.value?.let { uri ->
+                CoroutineScope(Dispatchers.Main).launch {
+                    try {
+                        val response: HttpResponse = withContext(Dispatchers.IO) {
+                            httpClient.post("https://3proj-back.tristan-tourbier.com/api/img/upload/profile-picture") {
+                                header("Authorization", "Bearer $jwtToken")
+                                body = MultiPartFormDataContent(formData {
+                                    val inputStream = context.contentResolver.openInputStream(uri)!!
+                                    val bytes = inputStream.readBytes()
+                                    inputStream.close()
+                                    append(
+                                        key = "image",
+                                        bytes,
+                                        Headers.build {
+                                            append(HttpHeaders.ContentDisposition, "form-data; name=image; filename=\"${uri.lastPathSegment}\"")
+                                            append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
+                                        }
+                                    )
+                                })
+                            }
+                        }
+                        if (response.status == HttpStatusCode.OK) {
+                            withContext(Dispatchers.Main) {
+                                println("Image upload request succeeded.")
+                            }
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                println("Image upload request failed. Error code: ${response.status.value}")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            println("An error occurred while sending the request: ${e.message}")
+                        }
+                    }
+                }
+            }
+        }) {
+            Text("Remplacer l'image de profil")
         }
     }
 }
