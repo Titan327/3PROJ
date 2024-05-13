@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: 'GoogleOneTap',
   mounted() {
@@ -15,7 +17,16 @@ export default {
   methods: {
     handleCredentialResponse(response) {
       console.log('Encoded JWT ID token: ' + response.credential);
-      // Vous pouvez effectuer des actions supplémentaires ici, comme l'envoi du token à votre serveur, etc.
+
+      axios.post('http://3proj-back.tristan-tourbier.com/api/oauth2/google', { token: response.credential })
+        .then(response => {
+          console.log('Réponse du backend :', response.data);
+
+        })
+        .catch(error => {
+          console.error('Erreur lors de la requête vers le backend :', error);
+        });
+
     },
     initializeGoogleOneTap() {
       if (typeof google !== 'undefined' && google.accounts) {
@@ -25,9 +36,9 @@ export default {
         });
         google.accounts.id.renderButton(
           this.$refs.buttonDiv,
-          {theme: 'outline', size: 'large'}  // customization attributes
+          {theme: 'outline', size: 'large'}
         );
-        google.accounts.id.prompt(); // affiche également la boîte de dialogue One Tap
+        google.accounts.id.prompt();
       } else {
         console.error("La bibliothèque Google One Tap n'est pas chargée.");
       }
