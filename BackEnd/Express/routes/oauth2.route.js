@@ -6,6 +6,6 @@ const router = require('express').Router();
 //GET http://localhost:9002/api/oauth2/google/register
 
 //GET http://localhost:9002/api/oauth2/google/
-router.get("/google",google.oauthGoogle);
+router.post("/google",google.oauthGoogle);
 
 module.exports = router;
