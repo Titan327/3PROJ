@@ -7,14 +7,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import io.ktor.client.request.*
@@ -25,9 +22,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.ui.Alignment
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -41,17 +36,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import io.ktor.client.request.forms.submitFormWithBinaryData
-import io.ktor.http.ContentDisposition.Companion.File
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import io.ktor.http.content.ByteArrayContent
 import io.ktor.util.InternalAPI
-import io.ktor.utils.io.streams.asInput
 import kotlinx.serialization.encodeToString
 import sample_test_app.com.LocalUser
-import java.io.File
-import java.io.FileInputStream
 
 @OptIn(InternalAPI::class)
 @Composable
@@ -220,7 +209,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                                         bytes,
                                         Headers.build {
                                             append(HttpHeaders.ContentDisposition, "form-data; name=image; filename=\"${uri.lastPathSegment}\"")
-                                            append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
+                                            append(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
                                         }
                                     )
                                 })
@@ -243,7 +232,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                 }
             }
         }) {
-            Text("Remplacer l'image de profil")
+            Text("Upload Image")
         }
     }
 }
