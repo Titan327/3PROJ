@@ -20,6 +20,7 @@ const $q = useQuasar();
 const route = useRoute();
 const groupId = route.params.id;
 const openedTransactionId = route.params.transactionId;
+const user2chatId = route.params.user2id;
 let group = ref(DefaultGroup());
 let isPhotoHover = ref(false);
 const width = ref(0);
@@ -37,8 +38,12 @@ onMounted(async () => {
   await getGroup()
   mounted.value=true;
 
-  if(openedTransactionId >= 0){
+  if(openedTransactionId > 0){
     openDialogConsultTransaction(openedTransactionId);
+  }
+
+  if(user2chatId > 0){
+   openDialogPrivateMessage(user2chatId);
   }
 
   function getWidth() {
@@ -49,12 +54,6 @@ onMounted(async () => {
   getWidth();
 
   window.addEventListener('resize', getWidth);
-});
-
-watch(dialogConsultTransaction, (newValue, oldValue) => {
-  if(newValue == false){
-    router.push(`/groups/${groupId}`);
-  }
 });
 
 async function getGroup() {
@@ -160,6 +159,7 @@ function openDialogConsultTransaction(transactionId:number){
     }
   }).onDismiss(() => {
     dialogConsultTransaction.value = false;
+    router.push(`/groups/${groupId}`);
   })
 }
 
@@ -173,12 +173,9 @@ function openDialogPrivateMessage(user2:number){
       groupId: groupId,
       user2id: user2,
     }
-  }).onOk(() => {
-    console.log('OK')
-  }).onCancel(() => {
-    console.log('Cancel')
   }).onDismiss(() => {
     dialogCreateMessage.value = false;
+    router.push(`/groups/${groupId}`);
   })
 }
 </script>
