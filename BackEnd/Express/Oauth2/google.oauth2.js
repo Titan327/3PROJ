@@ -13,10 +13,10 @@ const oauthGoogle = async (req,res) => {
             audience: '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com',
         });
         const payload = ticket.getPayload();
-        const userId = payload['sub']; // Identifiant unique de l'utilisateur
+        const userId = payload['sub'];
 
         console.log(payload);
-        // Vous pouvez accéder aux autres informations de l'utilisateur dans payload
+
 
         res.send('Token ID Google vérifié avec succès');
     } catch (error) {
