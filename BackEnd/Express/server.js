@@ -47,6 +47,9 @@ io.on('connection', function(socket){
     socket.on('chat message', function (msg, group){
         io.emit(`chat-group-${group}`, msg, group);
     });
+    socket.on('private message', function (msg, group){
+        io.emit(`chat-private-${group}`, msg, group);
+    });
 
     socket.on('new-transaction', function (group){
         io.emit(`new-transaction-${group}`);
