@@ -12,8 +12,7 @@ import { DefaultGroup } from 'src/interfaces/group.interface';
 import { getGroup, getUserGroupData } from 'stores/groupStore';
 import DialogRefund from 'components/Groups/DialogRefund.vue';
 import { io } from 'socket.io-client';
-import { NotificationBus, PrivateMessageBus } from 'boot/eventBus';
-import DialogPrivateMessage from "components/Common/DialogPrivateMessage.vue";
+import { NotificationBus } from 'boot/eventBus';
 
 
 let  tab = ref('transactions')
@@ -23,8 +22,6 @@ let sortedTransactionList = ref<Transaction[]>([]);
 let dialogCreateTransaction = ref(false);
 let dialogConsultTransaction = ref(false);
 let dialogRefundTransaction = ref(false);
-let dialogCreateMessage = ref(false);
-
 let currentSort = ref('date');
 const $q = useQuasar();
 let catList = ref([]);
@@ -92,25 +89,6 @@ function openDialogCreateTransaction(){
     dialogCreateTransaction.value = false;
     getTransactionList();
     getOptimalRefundList();
-  })
-}
-
-function openDialogPrivateMessage(user2:number){
-  dialogCreateMessage.value = true;
-  $q.dialog({
-    component: DialogPrivateMessage,
-
-    componentProps: {
-      isOpen: dialogCreateMessage,
-      groupId: props.groupId,
-      user2id: user2,
-    }
-  }).onOk(() => {
-    console.log('OK')
-  }).onCancel(() => {
-    console.log('Cancel')
-  }).onDismiss(() => {
-    dialogCreateMessage.value = false;
   })
 }
 
@@ -198,10 +176,6 @@ function getCatIcon(catId: number) {
 }
 function getCatColor(catId: number) {
   return catList.value.find(cat => cat.id === catId)?.color;
-}
-
-function callEventBus(user2Id : number){
-  PrivateMessageBus.emit('private-session',user2Id);
 }
 
 </script>
@@ -411,9 +385,6 @@ function callEventBus(user2Id : number){
                   <q-card-section>
                     <div class="text-h6"> {{user.username}}</div>
                     <div class="text-subtitle2"> {{formatNumber(user.UserGroup.balance)}}€</div>
-                    <q-card-actions align="right">
-                      <q-btn :disable="user.id == props.userId" flat round color="secondary" icon="message" @click="openDialogPrivateMessage(Number(user?.id))"><q-tooltip v-if="props.userId != user.id">Envoyer un message privé à {{user.username}}</q-tooltip><q-tooltip class="bg-red" v-if="props.userId == user.id">Vous ne pouvez pas envoyer de messages à vous même</q-tooltip></q-btn>
-                    </q-card-actions>
                   </q-card-section>
                 </q-card>
             </div>
