@@ -283,7 +283,7 @@ function openDialogPrivateMessage(user2:number){
         <q-tooltip>
           {{ user.username }}
         </q-tooltip>
-        <q-menu dark :offset="[-30, 10]">
+        <q-menu dark :offset="[-30, 10]" v-if="user.id != User.id">
           <q-list style="min-width: 100px">
             <q-item clickable v-close-popup @click="openDialogPrivateMessage(Number(user.id))">
               <q-item-section>Message privé</q-item-section>
