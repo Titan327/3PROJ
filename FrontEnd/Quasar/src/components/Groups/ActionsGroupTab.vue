@@ -12,7 +12,7 @@ import { DefaultGroup } from 'src/interfaces/group.interface';
 import { getGroup, getUserGroupData } from 'stores/groupStore';
 import DialogRefund from 'components/Groups/DialogRefund.vue';
 import { io } from 'socket.io-client';
-import { NotificationBus, PrivateMessageBus } from 'boot/eventBus';
+import { NotificationBus} from 'boot/eventBus';
 import DialogPrivateMessage from "components/Common/DialogPrivateMessage.vue";
 
 
