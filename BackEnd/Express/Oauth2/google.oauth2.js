@@ -2,6 +2,7 @@ const passport = require("passport");
 const User = require('../models/user.model');
 const {createToken} = require("../security/token.security");
 
+/*
 const callback = async (req, res) => {
     console.log("la");
 
@@ -75,9 +76,13 @@ const callback = async (req, res) => {
 
 
     })(req, res);
+}
+ */
 
+const callback = (req,res) => {
 
-
+    console.log(req.user.accessToken);
+    console.log(req.user.provider);
 
 }
 
