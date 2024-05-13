@@ -59,10 +59,7 @@ app.post('/api/messages', (req, res) => {
     io.emit('chat message', message);
     res.status(200).send('Message sent successfully');
 });
-app.post('/api/messages/private', (req, res) => {
-    const { message } = req.body;
-    io.emit(`chat-private-${group}`, message);
-});
+
 app.use(passport.initialize());
 
 
