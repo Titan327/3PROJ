@@ -17,17 +17,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -52,9 +61,11 @@ import sample_test_app.com.LocalUser
 import sample_test_app.com.R
 import sample_test_app.com.http.Repository.GroupRepository
 import sample_test_app.com.http.Repository.TransactionRepository
+import sample_test_app.com.models.Category
 import sample_test_app.com.models.CategoryStore
 import sample_test_app.com.models.Group
 import sample_test_app.com.models.Transaction
+import sample_test_app.com.models.TransactionUser
 import sample_test_app.com.models.User
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -80,7 +91,7 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
         groupPicture = if (group.value.picture?.isEmpty() == false) {
             group.value.picture?.get(1)
         } else null) {
-        GroupScreenContent(group = group.value, users = users.value, transactions = transactions.value, navController = navController, groupId = groupId)
+        GroupScreenContent(users = users.value, transactions = transactions.value, groupId = groupId.toString(), jwtToken = jwtToken, userId = userId)
     }
 
 }
@@ -88,13 +99,15 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("DiscouragedApi")
 @Composable
-fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Transaction>, navController: NavController, groupId: String?) {
+fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, groupId: String, jwtToken: String, userId: String) {
     val isBalanceDisplayed = remember { mutableStateOf(true) }
     val isTransactionsDisplayed = remember { mutableStateOf(false) }
     val isRefundDisplayed = remember { mutableStateOf(false) }
     val isPopUpTransactionDisplayed = remember { mutableStateOf(false) }
     val transactionToDisplay = remember { mutableStateOf(Transaction()) }
     val isTransactionCreationPopUpDisplayed = remember { mutableStateOf(false) }
+    val isErrorPopUpDisplayed = remember { mutableStateOf(false) }
+    val error = remember { mutableStateOf("") }
     val categories = CategoryStore.categories
 
 
@@ -523,6 +536,133 @@ fun GroupScreenContent(group: Group, users: List<User>, transactions: List<Trans
             backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
         )
     }
+
+    if (isTransactionCreationPopUpDisplayed.value) {
+        val newTransactionLabel = remember { mutableStateOf("") }
+        val newTransactionTotalAmount = remember { mutableStateOf(0.0f) }
+        val newTransactionDate = remember { mutableStateOf("") }
+        val newTransactionReceipt = remember { mutableStateOf("") }
+        val newTransactionCategoryId = remember { mutableStateOf(0.0f) }
+        val newTransactionDetails = remember { mutableStateOf(emptyList<TransactionUser>()) }
+
+        fun resetTransactionCreationPopUp() {
+            newTransactionLabel.value = ""
+            newTransactionTotalAmount.value = 0.0f
+            newTransactionDate.value = ""
+            newTransactionReceipt.value = ""
+            newTransactionCategoryId.value = 0.0f
+            newTransactionDetails.value = emptyList()
+        }
+
+        AlertDialog (
+            onDismissRequest = { isPopUpTransactionDisplayed.value = false },
+            title = {
+                Text (text = "Créer une transaction", color = Color.White)
+            },
+            text = {
+                Column (
+                    modifier = Modifier
+                        .padding(bottom = 16.dp, top = 16.dp)
+                        .verticalScroll(rememberScrollState())
+
+                ) {
+                    val orangeTextFieldColors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.White,
+                        focusedIndicatorColor = Color.White,
+                        unfocusedIndicatorColor = Color.White,
+                        cursorColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                        focusedLabelColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                    )
+                    Row {
+                        if (isErrorPopUpDisplayed.value) {
+                            Text(
+                                text = error.value,
+                                color = Color.Red,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
+                    TextField(
+                        value = newTransactionLabel.value,
+                        onValueChange = { newTransactionLabel.value = it },
+                        label = { Text("Titre") },
+                        colors = orangeTextFieldColors
+                    )
+                    var expanded by remember { mutableStateOf(false) }
+                    var selectedCategory by remember { mutableStateOf<Category?>(null) }
+
+                    Box {
+                        Text(
+                            text = selectedCategory?.label ?: "Sélectionnez une catégorie",
+                            modifier = Modifier.clickable { expanded = true }
+                        )
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                        ) {
+                            categories.forEach { category ->
+                                DropdownMenuItem(onClick = {
+                                    newTransactionCategoryId.value = category.id?.toFloat() ?: 0.0f
+                                    selectedCategory = category
+                                    expanded = false
+                                }) {
+                                    category.label?.let { Text(text = it) }
+                                }
+                            }
+                        }
+                    }
+                    TextField(
+                        value = newTransactionTotalAmount.value.toString(),
+                        onValueChange = { newTransactionTotalAmount.value = it.toFloat() },
+                        label = { Text("Montant") },
+                        colors = orangeTextFieldColors,
+                        readOnly = true
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        var succes = ""
+                        CoroutineScope(Dispatchers.Main).launch {
+                            succes = TransactionRepository(HttpClient()).createTransaction(groupId.toDouble(), jwtToken, newTransactionLabel.toString(), newTransactionTotalAmount.value, newTransactionDate.value, "", userId.toDouble(), newTransactionCategoryId.value.toDouble(), newTransactionDetails.value)
+                            if (succes == "true") {
+                                resetTransactionCreationPopUp()
+                                isTransactionCreationPopUpDisplayed.value = false
+                                isErrorPopUpDisplayed.value = false
+                                error.value = ""
+                            } else {
+                                isErrorPopUpDisplayed.value = true
+                                error.value = succes
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Valider")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        resetTransactionCreationPopUp()
+                        isErrorPopUpDisplayed.value = false
+                        error.value = ""
+                        isTransactionCreationPopUpDisplayed.value = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Fermer")
+                }
+            },
+            backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
+        )
+    }
 }
-
-
