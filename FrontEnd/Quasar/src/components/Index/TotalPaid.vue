@@ -24,9 +24,10 @@ onMounted(async () => {
       displayColor.value = 'red';
       titleText.value = 'Reste à payer';
       icon.value = 'north_east';
-      const response = await api.get(`users/${User.value.id}/transactions/notRefunded`);
+      const response = await api.get(`users/${User.value.id}/transactions/totalBalance`);
       montantTotal.value = response.data.amount;
-      operations.value = response.data.transactions;
+      operations.value = -1;
+
     } else {
       displayColor.value = 'green';
       titleText.value = 'Total payé ce mois-ci';
