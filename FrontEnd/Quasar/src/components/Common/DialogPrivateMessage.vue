@@ -160,7 +160,7 @@ function getDate(timestamp: string) {
     <div class="content">
 
       <div class="row">
-        <q-item-label class="text-h4 q-pa-md row">Messages</q-item-label>
+        <q-item-label class="text-h4 q-pa-md row">Messages privés</q-item-label>
         <q-space></q-space>
         <q-btn
           color="secondary"
@@ -171,6 +171,7 @@ function getDate(timestamp: string) {
           @click="CloseDrawer">
         </q-btn>
       </div>
+      <span class="q-pa-md">{{getSenderPseudo(props.user2id)}}</span>
 
       <div class="q-pa-md row justify-center">
         <q-label v-if="messages.length == 0" class="text-h6 q-pa-md">Aucun message</q-label>
