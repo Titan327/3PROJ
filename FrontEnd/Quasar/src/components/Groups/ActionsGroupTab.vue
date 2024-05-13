@@ -200,10 +200,6 @@ function getCatColor(catId: number) {
   return catList.value.find(cat => cat.id === catId)?.color;
 }
 
-function callEventBus(user2Id : number){
-  PrivateMessageBus.emit('private-session',user2Id);
-}
-
 </script>
 
 <template>

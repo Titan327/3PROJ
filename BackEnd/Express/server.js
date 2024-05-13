@@ -50,10 +50,6 @@ io.on('connection', function(socket){
         io.emit(`chat-group-${group}`, msg, group);
     });
 
-    socket.on('chat message', function (msg, group){
-        io.emit(`chat-private-${group}`, msg, group);
-    });
-
     socket.on('new-transaction', function (group){
         io.emit(`new-transaction-${group}`);
     });
@@ -63,7 +59,10 @@ app.post('/api/messages', (req, res) => {
     io.emit('chat message', message);
     res.status(200).send('Message sent successfully');
 });
-
+app.post('/api/messages/private', (req, res) => {
+    const { message } = req.body;
+    io.emit(`chat-private-${group}`, message);
+});
 app.use(passport.initialize());
 
 
