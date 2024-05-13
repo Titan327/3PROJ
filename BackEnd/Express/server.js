@@ -20,8 +20,6 @@ const io = socketIo(server, {
     }
 });
 
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // Middleware
 app.use(express.json());
@@ -60,7 +58,6 @@ app.post('/api/messages', (req, res) => {
     res.status(200).send('Message sent successfully');
 });
 
-app.use(passport.initialize());
 
 
 const PORT = process.env.PORT;
