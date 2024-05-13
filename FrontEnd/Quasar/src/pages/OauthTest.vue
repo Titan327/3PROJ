@@ -18,7 +18,7 @@ export default {
     handleCredentialResponse(response) {
       console.log('Encoded JWT ID token: ' + response.credential);
 
-      axios.post('http://3proj-back.tristan-tourbier.com/api/oauth2/google', { token: response.credential })
+      axios.post('https://3proj-back.tristan-tourbier.com/api/oauth2/google', { token: response.credential })
         .then(response => {
           console.log('Réponse du backend :', response.data);
 
