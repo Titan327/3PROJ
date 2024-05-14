@@ -29,7 +29,7 @@ class GroupRepository(private val httpClient: HttpClient) {
         try {
             val userResponse: HttpResponse = if (favorite) {
                 withContext(Dispatchers.IO) {
-                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/groups?limit=100?favorite=false") {
+                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/groups?favorite=true") {
                         contentType(ContentType.Application.Json)
                         header("Authorization", "Bearer $jwtToken")
                     }
