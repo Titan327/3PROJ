@@ -10,6 +10,15 @@ const createTransaction = async (req, res) => {
     let groupId = req.params.groupId;
     let senderId = req.authorization.userId;
     const {label, total_amount, date, receipt, categoryId, details} = req.body;
+    console.log("label", label);
+    console.log("total_amount", total_amount);
+    console.log("date", date);
+    console.log("receipt", receipt);
+    console.log("categoryId", categoryId);
+    console.log("details", details);
+    console.log("groupId", groupId);
+    console.log("senderId", senderId);
+    console.log("types: ", typeof label, typeof total_amount, typeof date, typeof receipt, typeof categoryId, typeof details, typeof groupId, typeof senderId);
     if (total_amount <= 0) {
         return res.status(400).send('The total amount of the transaction must be greater than 0');
     }
