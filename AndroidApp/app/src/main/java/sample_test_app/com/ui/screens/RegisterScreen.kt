@@ -86,7 +86,6 @@ fun RegisterScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
