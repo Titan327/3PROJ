@@ -40,10 +40,10 @@ const oauthGoogle = async (req,res) => {
             }
 
             const user = await User.create({
-                given_name,
-                family_name,
-                name,
-                email
+                firstname:given_name,
+                lastname:family_name,
+                username:name,
+                email:email
             });
 
             const token = Token.createToken(user);
