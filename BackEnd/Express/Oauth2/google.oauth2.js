@@ -26,9 +26,20 @@ const oauthGoogle = async (req,res) => {
         const payload = ticket.getPayload();
 
         const email = payload['email'];
-        const given_name = payload['given_name'];
-        const family_name = payload['family_name'];
+        let given_name = '';
+        let family_name = '';
         let name = payload['name'];
+
+        if (payload['given_name']){
+            given_name = payload['given_name'];
+        }else {
+            given_name = payload['name'];
+        }
+        if (payload['family_name']){
+            family_name = payload['family_name'];
+        }else {
+            family_name = payload['name'];
+        }
 
         const emailAlreadyExist = await User.findOne({where: { email: email }});
         let usernameAlreadyExist = await User.findOne({where: { username: name }});
