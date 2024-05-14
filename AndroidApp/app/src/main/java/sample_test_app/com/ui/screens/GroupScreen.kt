@@ -783,4 +783,14 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
             backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
         )
     }
+
+    if ( isRefundDisplayed.value ) {
+        Text(
+            text = "Remboursement",
+            color = Color.White,
+            style = TextStyle(
+                fontSize = 24.sp
+            )
+        )
+    }
 }

@@ -146,7 +146,7 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                     if (groups.value.isEmpty()) {
                         Text(
                             text = "",
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = Color.White,
                             style = TextStyle(
                                 fontSize = 18.sp
                             )
@@ -156,10 +156,10 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .background(Color.Gray) // Définir un fond gris
-                                    .clip(RoundedCornerShape(40.dp))
-
+                                    .clip(shape = RoundedCornerShape(16.dp))
+                                    .background(color = Color(0xFF808080))
+                                    .padding(8.dp)
+                                    .fillMaxWidth()
                             ) {
                                 if (group.picture?.isNotEmpty() == true) {
                                     Image(
@@ -200,14 +200,14 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                                 }
                                 Text(
                                     text = group.name ?: "",
-                                    color = androidx.compose.ui.graphics.Color.White,
+                                    color = Color.White,
                                     style = TextStyle(
                                         fontSize = 22.sp
                                     ),
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.height(8.dp)) // Ajoutez cette ligne pour ajouter un espace entre les groupes
+                            Spacer(modifier = Modifier.height(24.dp))
 
                         }
                     }

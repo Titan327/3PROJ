@@ -4,39 +4,31 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.util.InternalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import sample_test_app.com.models.Group
 
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.utils.EmptyContent.contentType
-import io.ktor.http.contentType
-import io.ktor.util.InternalAPI
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
-
 class GroupRepository(private val httpClient: HttpClient) {
     suspend fun getUserGroups(userId: String, jwtToken: String, favorite: Boolean): List<Group> {
         try {
             val userResponse: HttpResponse = if (favorite) {
                 withContext(Dispatchers.IO) {
-                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/groups?favorite=true") {
+                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/groups?favorite=true") {
                         contentType(ContentType.Application.Json)
                         header("Authorization", "Bearer $jwtToken")
                     }
                 }
             } else {
                 withContext(Dispatchers.IO) {
-                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/${userId}/groups") {
+                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/groups") {
                         contentType(ContentType.Application.Json)
                         header("Authorization", "Bearer $jwtToken")
                     }
@@ -46,7 +38,7 @@ class GroupRepository(private val httpClient: HttpClient) {
                 val responseBody = userResponse.body<String>()
                 Json.decodeFromString<List<Group>>(responseBody)
             } else {
-                println("Error: ${userResponse.status}")
+                println("Error récupération groupes: ${userResponse.status}")
                 emptyList()
             }
         } catch (e: Exception) {
@@ -59,7 +51,7 @@ class GroupRepository(private val httpClient: HttpClient) {
     suspend fun createGroup(jwtToken: String, groupName: String, groupDescription: String) {
         try {
             withContext(Dispatchers.IO) {
-                val response: HttpResponse = httpClient.post("https://3proj-back.tristan-tourbier.com/api/groups") {
+                httpClient.post("https://3proj-back.tristan-tourbier.com/api/groups") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                     body = """
