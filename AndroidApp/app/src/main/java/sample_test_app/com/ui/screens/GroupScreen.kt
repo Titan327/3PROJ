@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -87,6 +90,8 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
     val group = remember { mutableStateOf(Group()) }
     val transactions = remember { mutableStateOf(emptyList<Transaction>()) }
     val users = remember { mutableStateOf(emptyList<User>()) }
+    val refundsToDo = remember { mutableStateOf(emptyList<Transaction>()) }
+    val refundsDone = remember { mutableStateOf(emptyList<Transaction>()) }
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -113,438 +118,11 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
     val isTransactionsDisplayed = remember { mutableStateOf(false) }
     val isRefundDisplayed = remember { mutableStateOf(false) }
     val isPopUpTransactionDisplayed = remember { mutableStateOf(false) }
-    val transactionToDisplay = remember { mutableStateOf(Transaction()) }
+    val transactionDetails = remember { mutableStateOf(Transaction()) }
     val isTransactionCreationPopUpDisplayed = remember { mutableStateOf(false) }
     val isErrorPopUpDisplayed = remember { mutableStateOf(false) }
     val error = remember { mutableStateOf("") }
     val categories = CategoryStore.categories
-
-
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        // Solde / Transactions / Remboursement
-        Row (
-            modifier = Modifier
-                .clip(shape = RoundedCornerShape(16.dp))
-                .background(color = Color(0xFF808080))
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Column {
-                // Titre
-                Row {
-                    Column(
-                        modifier = Modifier
-                            .weight(2F)
-                            .clickable {
-                                isBalanceDisplayed.value = true
-                                isTransactionsDisplayed.value = false
-                                isRefundDisplayed.value = false
-                            },
-                        horizontalAlignment = CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Solde",
-                            color = if (isBalanceDisplayed.value) Color.Black else Color.White,
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .weight(3F)
-                            .clickable {
-                                isBalanceDisplayed.value = false
-                                isTransactionsDisplayed.value = true
-                                isRefundDisplayed.value = false
-                            },
-                        horizontalAlignment = CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Transactions",
-                            color = if (isTransactionsDisplayed.value) Color.Black else Color.White,
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .weight(3F)
-                            .clickable {
-                                isBalanceDisplayed.value = false
-                                isTransactionsDisplayed.value = false
-                                isRefundDisplayed.value = true
-                            },
-                        horizontalAlignment = CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Remboursement",
-                            color = if (isRefundDisplayed.value) Color.Black else Color.White,
-                        )
-                    }
-                }
-
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 16.dp)
-                ) {
-                    Surface(
-                        color = Color.White,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(2.dp),
-                        elevation = 2.dp,
-                        border = BorderStroke(1.dp, Color.White)
-                    ) {}
-                }
-
-
-                // Solde
-                if (isBalanceDisplayed.value) {
-                    val rowNumber = if (users.size % 3 == 0) {
-                        users.size / 3
-                    } else {
-                        users.size / 3 + 1
-                    }
-                    val boxHeight = rowNumber * 170
-                    Box (modifier = Modifier.height(boxHeight.dp)) {
-                        LazyColumn {
-                            items(users.chunked(3)) { rowUsers ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp, bottom = 8.dp),
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
-                                    for (user in rowUsers) {
-                                        Card (
-                                            backgroundColor = Color.Black
-                                        ) {
-                                            Column {
-                                                Image(
-                                                    painter = if (user.profile_picture?.isEmpty() == false) {
-                                                        rememberAsyncImagePainter(
-                                                            ImageRequest.Builder(LocalContext.current)
-                                                                .data(data = user.profile_picture[0])
-                                                                .build()
-                                                        )
-                                                    } else {
-                                                        rememberAsyncImagePainter(
-                                                            ImageRequest.Builder(LocalContext.current)
-                                                                .data(data = R.drawable.userdefault)
-                                                                .build()
-                                                        )
-                                                    },
-                                                    contentDescription = "User Picture",
-                                                    modifier = Modifier.size(100.dp)
-                                                )
-
-                                                user.username?.let {
-                                                    val truncatedUsername = if (it.length > 11) it.substring(0, 8) + "..." else it
-                                                    Text(
-                                                        text = truncatedUsername,
-                                                        color = Color.White,
-                                                        maxLines = 1,
-                                                        overflow = TextOverflow.Ellipsis,
-                                                        modifier = Modifier
-                                                            .align(CenterHorizontally)
-                                                            .padding(top = 4.dp)
-                                                    )
-                                                }
-
-                                                Text(
-                                                    if (user.UserGroup.balance != null) { user.UserGroup.balance.toString() + " €" } else { "0 €" },
-                                                    modifier = Modifier
-                                                        .align(CenterHorizontally)
-                                                        .padding(bottom = 4.dp),
-                                                    color = Color.White
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Transactions
-                if (isTransactionsDisplayed.value) {
-                    Row {
-                        if (transactions.isEmpty()) {
-                            Text(
-                                text = "Aucune transaction",
-                                color = Color.White,
-                                style = TextStyle(
-                                    fontSize = 24.sp
-                                )
-                            )
-                        } else {
-                            Column {
-                                Row (
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Button(
-                                        onClick = {
-                                            isTransactionCreationPopUpDisplayed.value = true
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
-                                            backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
-                                            contentColor = Color.White
-                                        )
-                                    ) {
-                                        Text("Ajouter une transaction")
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_cross),
-                                            contentDescription = "Create Transaction",
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    }
-                                }
-                                Row (
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 8.dp)
-
-                                ) {
-                                    Column (
-                                        modifier = Modifier
-                                            .weight(1f),
-                                        horizontalAlignment = CenterHorizontally
-                                    ) {
-                                        Text(
-                                            text = "Type",
-                                            color = Color.White
-                                        )
-                                    }
-                                    Column (
-                                        modifier = Modifier
-                                            .weight(3f),
-                                        horizontalAlignment = CenterHorizontally
-                                    ) {
-                                        Text(
-                                            text = "Titre",
-                                            color = Color.White
-                                        )
-                                    }
-                                    Column (
-                                        modifier = Modifier
-                                            .weight(2f),
-                                        horizontalAlignment = CenterHorizontally
-                                    ) {
-                                        Text(
-                                            text = "Montant",
-                                            color = Color.White)
-                                    }
-                                }
-                                Surface(
-                                    color = Color(R.color.accent),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 16.dp)
-                                        .height(1.dp),
-                                    elevation = 1.dp,
-                                    border = BorderStroke(1.dp, Color(R.color.accent))
-                                ) {}
-                                for (transaction in transactions) {
-                                    Row (
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable {
-                                                isPopUpTransactionDisplayed.value =
-                                                    true; transactionToDisplay.value = transaction
-                                            },
-                                    ){
-                                        Column (
-                                            modifier = Modifier
-                                                .weight(1f),
-                                            horizontalAlignment = CenterHorizontally,
-                                        ) {
-                                            val category = categories.find { it.id == transaction.categoryId }
-                                            if (category?.icon != null) {
-                                                val resourceId = LocalContext.current.resources.getIdentifier(
-                                                    category.icon, "drawable", LocalContext.current.packageName
-                                                )
-                                                Image(
-                                                    painter = rememberAsyncImagePainter(
-                                                        ImageRequest.Builder(LocalContext.current)
-                                                            .data(data = resourceId)
-                                                            .build()
-                                                    ),
-                                                    contentDescription = "Category Icon",
-                                                    modifier = Modifier
-                                                        .size(60.dp)
-                                                        .padding(4.dp)
-                                                        .clip(shape = androidx.compose.foundation.shape.CircleShape)
-                                                        .background(
-                                                            Color(
-                                                                android.graphics.Color.parseColor(
-                                                                    category.color
-                                                                )
-                                                            )
-                                                        )
-                                                )
-                                            }
-                                        }
-                                        Column (
-                                            modifier = Modifier
-                                                .weight(3f),
-                                            horizontalAlignment = CenterHorizontally,
-                                        ) {
-                                            Text(
-                                                text = transaction.label.toString(),
-                                                color = Color.White
-                                            )
-                                        }
-                                        Column (
-                                            modifier = Modifier
-                                                .weight(2f),
-                                            horizontalAlignment = CenterHorizontally,
-                                        ) {
-                                            Text(
-                                                text = transaction.total_amount.toString() + " €",
-                                                color = Color.White)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (isPopUpTransactionDisplayed.value) {
-        AlertDialog(
-            onDismissRequest = { isPopUpTransactionDisplayed.value = false },
-            title = {
-                Row {
-                    Text(
-                        transactionToDisplay.value.label.toString(),
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 24.sp
-                        )
-                    )
-                }
-            },
-            text = {
-                Column (
-                    modifier = Modifier
-                        .padding(bottom = 16.dp, top = 16.dp),
-                ) {
-                    Text(
-                        "Montant : " + transactionToDisplay.value.total_amount.toString() + " €",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 16.sp
-                        )
-                    )
-                    Text(
-                        "Catégorie : " + categories.find { it.id == transactionToDisplay.value.categoryId }?.label,
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 16.sp
-                        )
-                    )
-                    Text(
-                        "Créé par : " + users.find { it.id == transactionToDisplay.value.senderId }?.username  + " le " + ZonedDateTime.parse(transactionToDisplay.value.date).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        color = Color.White,
-                        style = TextStyle(
-                            fontSize = 16.sp
-                        )
-                    )
-                    for (user in transactionToDisplay.value.TransactionUsers!!) {
-                        Row (
-                            modifier = Modifier
-                                .padding(top = 16.dp, bottom = 16.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (users.find { it.id == user.userId }?.profile_picture?.get(0)
-                                    ?.isNotBlank() == true && users.find { it.id == user.userId }?.profile_picture?.get(
-                                    0
-                                ) != "null"
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(
-                                                data = users.find { it.id == user.userId }?.profile_picture?.get(
-                                                    0
-                                                )
-                                            )
-                                            .apply(block = fun ImageRequest.Builder.() {
-                                                transformations(CircleCropTransformation())
-                                            }).build()
-                                    ),
-                                    contentDescription = "User Profile Picture",
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                )
-                            } else {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = R.drawable.userdefault)
-                                            .apply(block = fun ImageRequest.Builder.() {
-                                                transformations(CircleCropTransformation())
-                                            }).build()
-                                    ),
-                                    contentDescription = "User Profile Picture",
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                )
-                            }
-                            val username = users.find { it.id == user.userId }?.username
-                            if (username != null) {
-                                Text(
-                                    text = if (username.length > 11) username.substring(0, 8) + "..." else username.toString(),
-                                    color = Color.White,
-                                    style = TextStyle(
-                                        fontSize = 16.sp
-                                    )
-                                )
-                            }
-                            Text(
-                                text = user.amount.toString() + " €",
-                                color = Color.White,
-                                style = TextStyle(
-                                    fontSize = 16.sp
-                                )
-                            )
-
-                        }
-                        Surface(
-                                color = Color(android.graphics.Color.parseColor("#ffa31a")),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp),
-                        elevation = 1.dp,
-                            border = BorderStroke(1.dp, Color(android.graphics.Color.parseColor("#ffa31a")))
-                        ) {}
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        isPopUpTransactionDisplayed.value = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
-                        contentColor = Color.White
-                    )                ) {
-                    Text("Fermer")
-                }
-            },
-            backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
-        )
-    }
 
     if (isTransactionCreationPopUpDisplayed.value) {
         val newTransactionLabel = remember { mutableStateOf("") }
@@ -563,19 +141,25 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
             newTransactionDetails.value = emptyList()
         }
 
-        AlertDialog (
-            onDismissRequest = { isPopUpTransactionDisplayed.value = false },
-            title = {
-                Text (text = "Créer une transaction", color = Color.White)
-            },
-            text = {
-                Column (
+        Box (
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Box (
+                modifier = Modifier
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(color = Color(R.color.background))
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+            ) {
+                Column(
                     modifier = Modifier
-                        .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.8f)
+                        .fillMaxHeight()
                         .wrapContentHeight()
                         .padding(bottom = 16.dp, top = 16.dp)
-                        .verticalScroll(rememberScrollState())
-
                 ) {
                     val orangeTextFieldColors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.White,
@@ -584,213 +168,720 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
                         cursorColor = Color(android.graphics.Color.parseColor("#ffa31a")),
                         focusedLabelColor = Color(android.graphics.Color.parseColor("#ffa31a")),
                     )
-                    Row {
-                        if (isErrorPopUpDisplayed.value) {
-                            Text(
-                                text = error.value,
-                                color = Color.Red,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                            )
-                        }
-                    }
-                    TextField(
-                        value = newTransactionLabel.value,
-                        onValueChange = { newTransactionLabel.value = it },
-                        label = { Text("Titre") },
-                        colors = orangeTextFieldColors
-                    )
-                    var expanded by remember { mutableStateOf(false) }
-                    var selectedCategory by remember { mutableStateOf<Category?>(null) }
 
-                    Box {
-                        TextField(
-                            value = selectedCategory?.label ?: "Catégorie",
-                            onValueChange = { },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { expanded = true }
-                                .onFocusChanged { if (it.isFocused) expanded = true }
-                                .focusable(false),
-                            colors = orangeTextFieldColors
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Nouvelle transaction",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 20.sp
+                            )
                         )
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
+                    }
+
+                    Row {
+                        Column (
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalAlignment = CenterHorizontally,
                         ) {
-                            categories.forEach { category ->
-                                DropdownMenuItem(onClick = {
-                                    newTransactionCategoryId.value = category.id?.toFloat() ?: 0.0f
-                                    selectedCategory = category
-                                    expanded = false
-                                }) {
-                                    category.label?.let { Text(text = it) }
+                            Row {
+                                if (isErrorPopUpDisplayed.value) {
+                                    Text(
+                                        text = error.value,
+                                        color = Color.Red,
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                    )
+                                }
+                            }
+                            TextField(
+                                value = newTransactionLabel.value,
+                                onValueChange = { newTransactionLabel.value = it },
+                                label = { Text("Titre") },
+                                colors = orangeTextFieldColors,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            var expanded by remember { mutableStateOf(false) }
+                            var selectedCategory by remember { mutableStateOf<Category?>(null) }
+
+                            Box {
+                                TextField(
+                                    value = selectedCategory?.label ?: "Catégorie",
+                                    onValueChange = { },
+                                    modifier = Modifier
+                                        .clickable { expanded = true }
+                                        .onFocusChanged { if (it.isFocused) expanded = true }
+                                        .focusable(false)
+                                        .padding(bottom = 16.dp),
+                                    colors = orangeTextFieldColors
+                                )
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                ) {
+                                    categories.forEach { category ->
+                                        DropdownMenuItem(onClick = {
+                                            newTransactionCategoryId.value =
+                                                category.id?.toFloat() ?: 0.0f
+                                            selectedCategory = category
+                                            expanded = false
+                                        }) {
+                                            category.label?.let { Text(text = it) }
+                                        }
+                                    }
+                                }
+                            }
+                            TextField(
+                                value = newTransactionTotalAmount.value.toString(),
+                                onValueChange = { newTransactionTotalAmount.value = it.toFloat() },
+                                label = { Text("Montant") },
+                                colors = orangeTextFieldColors,
+                                readOnly = true,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            var dateDialogShown by remember { mutableStateOf(false) }
+
+                            if (dateDialogShown) {
+                                DatePickerDialog(
+                                    LocalContext.current,
+                                    { _, year, month, dayOfMonth ->
+                                        newTransactionDate.value =
+                                            LocalDate.of(year, month + 1, dayOfMonth)
+                                        dateDialogShown = false
+                                    },
+                                    newTransactionDate.value.year,
+                                    newTransactionDate.value.monthValue - 1,
+                                    newTransactionDate.value.dayOfMonth
+                                ).show()
+                            }
+
+                            TextField(
+                                value = newTransactionDate.value.format(
+                                    DateTimeFormatter.ofPattern(
+                                        "dd/MM/yyyy"
+                                    )
+                                ),
+                                onValueChange = {
+                                    newTransactionDate.value =
+                                        LocalDate.parse(
+                                            it,
+                                            DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                                        )
+                                },
+                                readOnly = true,
+                                label = { Text("Date") },
+                                modifier = Modifier.clickable { dateDialogShown = true }.padding(bottom = 16.dp),
+                                colors = orangeTextFieldColors
+                            )
+                            for (user in users) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(top = 16.dp, bottom = 16.dp)
+                                        .fillMaxWidth(0.75f),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    if (user.profile_picture?.get(0)
+                                            ?.isNotBlank() == true && user.profile_picture[0] != "null"
+                                    ) {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(
+                                                ImageRequest.Builder(LocalContext.current)
+                                                    .data(data = user.profile_picture[0])
+                                                    .apply(block = fun ImageRequest.Builder.() {
+                                                        transformations(CircleCropTransformation())
+                                                    }).build()
+                                            ),
+                                            contentDescription = "User Profile Picture",
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                        )
+                                    } else {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(
+                                                ImageRequest.Builder(LocalContext.current)
+                                                    .data(data = R.drawable.userdefault)
+                                                    .apply(block = fun ImageRequest.Builder.() {
+                                                        transformations(CircleCropTransformation())
+                                                    }).build()
+                                            ),
+                                            contentDescription = "User Profile Picture",
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                        )
+                                    }
+                                    val username = user.username
+                                    if (username != null) {
+                                        Text(
+                                            text = username,
+                                            color = Color.White,
+                                            style = TextStyle(
+                                                fontSize = 16.sp
+                                            )
+                                        )
+                                    }
+                                }
+                                Row {
+                                    var text by remember { mutableStateOf("") }
+                                    OutlinedTextField(
+                                        value = text,
+                                        onValueChange = { newText ->
+                                            if (newText.isEmpty() || newText.toFloatOrNull() != null) {
+                                                text = newText
+                                            }
+                                            if (newTransactionDetails.value.find { it.userId == user.id } != null) {
+                                                newTransactionDetails.value =
+                                                    newTransactionDetails.value.map {
+                                                        if (it.userId == user.id) {
+                                                            it.copy(amount = text.toDouble())
+                                                        } else {
+                                                            it
+                                                        }
+                                                    }
+                                            } else {
+                                                newTransactionDetails.value += TransactionUser(
+                                                    userId = user.id,
+                                                    amount = text.toDouble()
+                                                )
+                                            }
+                                            newTransactionTotalAmount.value =
+                                                newTransactionDetails.value.sumOf { it.amount!!.toDouble() }
+                                                    .toFloat()
+                                        },
+                                        label = { Text("Montant") },
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                        colors = orangeTextFieldColors
+                                    )
                                 }
                             }
                         }
                     }
-                    TextField(
-                        value = newTransactionTotalAmount.value.toString(),
-                        onValueChange = { newTransactionTotalAmount.value = it.toFloat() },
-                        label = { Text("Montant") },
-                        colors = orangeTextFieldColors,
-                        readOnly = true
-                    )
-                    var dateDialogShown by remember { mutableStateOf(false) }
-
-                    if (dateDialogShown) {
-                        DatePickerDialog(
-                            LocalContext.current,
-                            { _, year, month, dayOfMonth ->
-                                newTransactionDate.value = LocalDate.of(year, month + 1, dayOfMonth)
-                                dateDialogShown = false
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Button(
+                            onClick = {
+                                resetTransactionCreationPopUp()
+                                isErrorPopUpDisplayed.value = false
+                                error.value = ""
+                                isTransactionCreationPopUpDisplayed.value = false
                             },
-                            newTransactionDate.value.year,
-                            newTransactionDate.value.monthValue - 1,
-                            newTransactionDate.value.dayOfMonth
-                        ).show()
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Fermer")
+                        }
+                        Button(
+                            onClick = {
+                                var succes = ""
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    succes = TransactionRepository(HttpClient()).createTransaction(
+                                        groupId.toInt(),
+                                        jwtToken,
+                                        newTransactionLabel.value,
+                                        newTransactionTotalAmount.value,
+                                        newTransactionDate.value,
+                                        "",
+                                        userId.toInt(),
+                                        newTransactionCategoryId.value.toInt(),
+                                        newTransactionDetails.value
+                                    )
+                                    if (succes == "true") {
+                                        resetTransactionCreationPopUp()
+                                        isTransactionCreationPopUpDisplayed.value = false
+                                        isErrorPopUpDisplayed.value = false
+                                        error.value = ""
+                                    } else {
+                                        isErrorPopUpDisplayed.value = true
+                                        error.value = succes
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Valider")
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Solde / Transactions / Remboursement
+            Row(
+                modifier = Modifier
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Column {
+                    // Titre
+                    Row {
+                        Column(
+                            modifier = Modifier
+                                .weight(2F)
+                                .clickable {
+                                    isBalanceDisplayed.value = true
+                                    isTransactionsDisplayed.value = false
+                                    isRefundDisplayed.value = false
+                                },
+                            horizontalAlignment = CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Solde",
+                                color = if (isBalanceDisplayed.value) Color.Black else Color.White,
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .weight(3F)
+                                .clickable {
+                                    isBalanceDisplayed.value = false
+                                    isTransactionsDisplayed.value = true
+                                    isRefundDisplayed.value = false
+                                },
+                            horizontalAlignment = CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Transactions",
+                                color = if (isTransactionsDisplayed.value) Color.Black else Color.White,
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .weight(3F)
+                                .clickable {
+                                    isBalanceDisplayed.value = false
+                                    isTransactionsDisplayed.value = false
+                                    isRefundDisplayed.value = true
+                                },
+                            horizontalAlignment = CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Remboursement",
+                                color = if (isRefundDisplayed.value) Color.Black else Color.White,
+                            )
+                        }
                     }
 
-                    TextField (
-                        value = newTransactionDate.value.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        onValueChange = { newTransactionDate.value = LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy/MM/dd")) },
-                        readOnly = true,
-                        label = { Text("Date") },
-                        modifier = Modifier.clickable { dateDialogShown = true },
-                        colors = orangeTextFieldColors
-                    )
-                    for (user in users) {
-                        Row (
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 16.dp)
+                    ) {
+                        Surface(
+                            color = Color.White,
                             modifier = Modifier
-                                .padding(top = 16.dp, bottom = 16.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (user.profile_picture?.get(0)
-                                    ?.isNotBlank() == true && user.profile_picture?.get(0) != "null"
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = user.profile_picture[0])
-                                            .apply(block = fun ImageRequest.Builder.() {
-                                                transformations(CircleCropTransformation())
-                                            }).build()
-                                    ),
-                                    contentDescription = "User Profile Picture",
-                                    modifier = Modifier
-                                        .size(40.dp)
+                                .fillMaxWidth()
+                                .height(2.dp),
+                            elevation = 2.dp,
+                            border = BorderStroke(1.dp, Color.White)
+                        ) {}
+                    }
+
+
+                    // Solde
+                    if (isBalanceDisplayed.value) {
+                        val rowNumber = if (users.size % 3 == 0) {
+                            users.size / 3
+                        } else {
+                            users.size / 3 + 1
+                        }
+                        val boxHeight = rowNumber * 170
+                        Box(modifier = Modifier.height(boxHeight.dp)) {
+                            LazyColumn {
+                                items(users.chunked(3)) { rowUsers ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp, bottom = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        for (user in rowUsers) {
+                                            Card(
+                                                backgroundColor = Color.Black
+                                            ) {
+                                                Column {
+                                                    Image(
+                                                        painter = if (user.profile_picture?.isEmpty() == false) {
+                                                            rememberAsyncImagePainter(
+                                                                ImageRequest.Builder(LocalContext.current)
+                                                                    .data(data = user.profile_picture[0])
+                                                                    .build()
+                                                            )
+                                                        } else {
+                                                            rememberAsyncImagePainter(
+                                                                ImageRequest.Builder(LocalContext.current)
+                                                                    .data(data = R.drawable.userdefault)
+                                                                    .build()
+                                                            )
+                                                        },
+                                                        contentDescription = "User Picture",
+                                                        modifier = Modifier.size(100.dp)
+                                                    )
+
+                                                    user.username?.let {
+                                                        val truncatedUsername =
+                                                            if (it.length > 11) it.substring(
+                                                                0,
+                                                                8
+                                                            ) + "..." else it
+                                                        Text(
+                                                            text = truncatedUsername,
+                                                            color = Color.White,
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            modifier = Modifier
+                                                                .align(CenterHorizontally)
+                                                                .padding(top = 4.dp)
+                                                        )
+                                                    }
+
+                                                    Text(
+                                                        if (user.UserGroup.balance != null) {
+                                                            user.UserGroup.balance.toString() + " €"
+                                                        } else {
+                                                            "0 €"
+                                                        },
+                                                        modifier = Modifier
+                                                            .align(CenterHorizontally)
+                                                            .padding(bottom = 4.dp),
+                                                        color = Color.White
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Transactions
+                    if (isTransactionsDisplayed.value) {
+                        Row {
+                            if (transactions.isEmpty()) {
+                                Text(
+                                    text = "Aucune transaction",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 24.sp
+                                    )
                                 )
                             } else {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = R.drawable.userdefault)
-                                            .apply(block = fun ImageRequest.Builder.() {
-                                                transformations(CircleCropTransformation())
-                                            }).build()
-                                    ),
-                                    contentDescription = "User Profile Picture",
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                )
+                                Column {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Button(
+                                            onClick = {
+                                                isTransactionCreationPopUpDisplayed.value = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                backgroundColor = Color(
+                                                    android.graphics.Color.parseColor(
+                                                        "#ffa31a"
+                                                    )
+                                                ),
+                                                contentColor = Color.White
+                                            )
+                                        ) {
+                                            Text("Ajouter une transaction")
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_cross),
+                                                contentDescription = "Create Transaction",
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        }
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 8.dp)
+
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .weight(1f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Type",
+                                                color = Color.White
+                                            )
+                                        }
+                                        Column(
+                                            modifier = Modifier
+                                                .weight(3f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Titre",
+                                                color = Color.White
+                                            )
+                                        }
+                                        Column(
+                                            modifier = Modifier
+                                                .weight(2f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Montant",
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+                                    Surface(
+                                        color = Color(R.color.accent),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 16.dp)
+                                            .height(1.dp),
+                                        elevation = 1.dp,
+                                        border = BorderStroke(1.dp, Color(R.color.accent))
+                                    ) {}
+                                    for (transaction in transactions) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable {
+                                                    isPopUpTransactionDisplayed.value =
+                                                        true; transactionDetails.value = transaction
+                                                },
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .weight(1f),
+                                                horizontalAlignment = CenterHorizontally,
+                                            ) {
+                                                val category =
+                                                    categories.find { it.id == transaction.categoryId }
+                                                if (category?.icon != null) {
+                                                    val resourceId =
+                                                        LocalContext.current.resources.getIdentifier(
+                                                            category.icon,
+                                                            "drawable",
+                                                            LocalContext.current.packageName
+                                                        )
+                                                    Image(
+                                                        painter = rememberAsyncImagePainter(
+                                                            ImageRequest.Builder(LocalContext.current)
+                                                                .data(data = resourceId)
+                                                                .build()
+                                                        ),
+                                                        contentDescription = "Category Icon",
+                                                        modifier = Modifier
+                                                            .size(60.dp)
+                                                            .padding(4.dp)
+                                                            .clip(shape = androidx.compose.foundation.shape.CircleShape)
+                                                            .background(
+                                                                Color(
+                                                                    android.graphics.Color.parseColor(
+                                                                        category.color
+                                                                    )
+                                                                )
+                                                            )
+                                                    )
+                                                }
+                                            }
+                                            Column(
+                                                modifier = Modifier
+                                                    .weight(3f),
+                                                horizontalAlignment = CenterHorizontally,
+                                            ) {
+                                                Text(
+                                                    text = transaction.label.toString(),
+                                                    color = Color.White
+                                                )
+                                            }
+                                            Column(
+                                                modifier = Modifier
+                                                    .weight(2f),
+                                                horizontalAlignment = CenterHorizontally,
+                                            ) {
+                                                Text(
+                                                    text = transaction.total_amount.toString() + " €",
+                                                    color = Color.White
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            val username = user.username
-                            if (username != null) {
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isPopUpTransactionDisplayed.value) {
+            AlertDialog(
+                onDismissRequest = { isPopUpTransactionDisplayed.value = false },
+                title = {
+                    Row {
+                        Text(
+                            transactionDetails.value.label.toString(),
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 24.sp
+                            )
+                        )
+                    }
+                },
+                text = {
+                    Column(
+                        modifier = Modifier
+                            .padding(bottom = 16.dp, top = 16.dp),
+                    ) {
+                        Text(
+                            "Montant : " + transactionDetails.value.total_amount.toString() + " €",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 16.sp
+                            )
+                        )
+                        Text(
+                            "Catégorie : " + categories.find { it.id == transactionDetails.value.categoryId }?.label,
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 16.sp
+                            )
+                        )
+                        Text(
+                            "Créé par : " + users.find { it.id == transactionDetails.value.senderId }?.username + " le " + ZonedDateTime.parse(
+                                transactionDetails.value.date
+                            ).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 16.sp
+                            )
+                        )
+                        for (user in transactionDetails.value.TransactionUsers!!) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(top = 16.dp, bottom = 16.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (users.find { it.id == user.userId }?.profile_picture?.get(0)
+                                        ?.isNotBlank() == true && users.find { it.id == user.userId }?.profile_picture?.get(
+                                        0
+                                    ) != "null"
+                                ) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(
+                                            ImageRequest.Builder(LocalContext.current)
+                                                .data(
+                                                    data = users.find { it.id == user.userId }?.profile_picture?.get(
+                                                        0
+                                                    )
+                                                )
+                                                .apply(block = fun ImageRequest.Builder.() {
+                                                    transformations(CircleCropTransformation())
+                                                }).build()
+                                        ),
+                                        contentDescription = "User Profile Picture",
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                    )
+                                } else {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(
+                                            ImageRequest.Builder(LocalContext.current)
+                                                .data(data = R.drawable.userdefault)
+                                                .apply(block = fun ImageRequest.Builder.() {
+                                                    transformations(CircleCropTransformation())
+                                                }).build()
+                                        ),
+                                        contentDescription = "User Profile Picture",
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                    )
+                                }
+                                val username = users.find { it.id == user.userId }?.username
+                                if (username != null) {
+                                    Text(
+                                        text = if (username.length > 11) username.substring(
+                                            0,
+                                            8
+                                        ) + "..." else username.toString(),
+                                        color = Color.White,
+                                        style = TextStyle(
+                                            fontSize = 16.sp
+                                        )
+                                    )
+                                }
                                 Text(
-                                    text =  username,
+                                    text = user.amount.toString() + " €",
                                     color = Color.White,
                                     style = TextStyle(
                                         fontSize = 16.sp
                                     )
                                 )
+
                             }
-                        }
-                        Row {
-                            var text by remember { mutableStateOf("") }
-                            OutlinedTextField(
-                                value = text,
-                                onValueChange = { newText ->
-                                    if (newText.isEmpty() || newText.toFloatOrNull() != null) {
-                                        text = newText
-                                    }
-                                    if (newTransactionDetails.value.find { it.userId == user.id } != null) {
-                                        newTransactionDetails.value = newTransactionDetails.value.map {
-                                            if (it.userId == user.id) {
-                                                it.copy(amount = text.toDouble())
-                                            } else {
-                                                it
-                                            }
-                                        }
-                                    } else {
-                                        newTransactionDetails.value += TransactionUser(
-                                            userId = user.id,
-                                            amount = text.toDouble()
-                                        )
-                                    }
-                                    newTransactionTotalAmount.value = newTransactionDetails.value.sumOf { it.amount!!.toDouble() }.toFloat()
-                                },
-                                label = { Text("Montant") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                colors = orangeTextFieldColors
-                            )
+                            Surface(
+                                color = Color(android.graphics.Color.parseColor("#ffa31a")),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp),
+                                elevation = 1.dp,
+                                border = BorderStroke(
+                                    1.dp,
+                                    Color(android.graphics.Color.parseColor("#ffa31a"))
+                                )
+                            ) {}
                         }
                     }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        var succes = ""
-                        CoroutineScope(Dispatchers.Main).launch {
-                            succes = TransactionRepository(HttpClient()).createTransaction(groupId.toInt(), jwtToken, newTransactionLabel.value, newTransactionTotalAmount.value, newTransactionDate.value, "", userId.toInt(), newTransactionCategoryId.value.toInt(), newTransactionDetails.value)
-                            if (succes == "true") {
-                                resetTransactionCreationPopUp()
-                                isTransactionCreationPopUpDisplayed.value = false
-                                isErrorPopUpDisplayed.value = false
-                                error.value = ""
-                            } else {
-                                isErrorPopUpDisplayed.value = true
-                                error.value = succes
-                            }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("Valider")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        resetTransactionCreationPopUp()
-                        isErrorPopUpDisplayed.value = false
-                        error.value = ""
-                        isTransactionCreationPopUpDisplayed.value = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("Fermer")
-                }
-            },
-            backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
-        )
-    }
-
-    if ( isRefundDisplayed.value ) {
-        Text(
-            text = "Remboursement",
-            color = Color.White,
-            style = TextStyle(
-                fontSize = 24.sp
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            isPopUpTransactionDisplayed.value = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Fermer")
+                    }
+                },
+                backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
             )
-        )
+        }
+
+        if (isRefundDisplayed.value) {
+            Text(
+                text = "Remboursement",
+                color = Color.White,
+                style = TextStyle(
+                    fontSize = 24.sp
+                )
+            )
+        }
     }
 }
