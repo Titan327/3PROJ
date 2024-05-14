@@ -31,6 +31,8 @@ let group = ref(DefaultGroup());
 let width = ref(0);
 let dialogCreateMessage = ref(false);
 
+let loadingBalance = ref(false);
+
 
 const props = defineProps({
   groupId: Number,
@@ -41,7 +43,10 @@ onMounted(async () => {
   await getTransactionList()
   await getOptimalRefundList();
   await getCat();
+
+  loadingBalance.value = true;
   group.value = await getGroup(props.groupId);
+  loadingBalance.value = false;
 
   function getWidth() {
     width.value = window.innerWidth;
@@ -59,6 +64,10 @@ socket.on('connect', () => {
 socket.on(`new-transaction-${props.groupId}`, () => {
   getTransactionList();
   getOptimalRefundList();
+
+  loadingBalance.value = true;
+  group.value = getGroup(props.groupId);
+  loadingBalance.value = false;
   NotificationBus.emit('new-notif');
 });
 
@@ -441,8 +450,7 @@ function openDialogPrivateMessage(user2:number){
                   <q-space></q-space>
                   <q-space></q-space>
                   <q-item-section class="q-mx-auto">
-                    <q-btn outline class="w-60 q-mx-auto" color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
-                    <span v-else class="q-mx-auto">Rien à effectuer</span>
+                    <span class="q-mx-auto">Remboursé</span>
                   </q-item-section>
 
                 </q-item>
@@ -463,6 +471,11 @@ function openDialogPrivateMessage(user2:number){
                     <q-btn :disable="user.id == props.userId" flat round color="secondary" icon="message" @click="openDialogPrivateMessage(Number(user?.id))"><q-tooltip v-if="props.userId != user.id">Envoyer un message privé à {{user.username}}</q-tooltip><q-tooltip class="bg-red" v-if="props.userId == user.id">Vous ne pouvez pas envoyer de messages à vous même</q-tooltip></q-btn>
                   </q-card-actions>
                 </q-card>
+              <div class="row" v-if="loadingBalance">
+                <q-space></q-space>
+                <q-spinner size="50px" class="q-pa-xs q-mx-auto" color="secondary" />
+                <q-space></q-space>
+              </div>
             </div>
           </q-tab-panel>
         </q-tab-panels>
