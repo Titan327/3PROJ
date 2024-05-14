@@ -67,8 +67,18 @@ fun AppNavHost() {
         Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF1b1b1b)) {
             NavHost(navController = navController, startDestination = "splash") {
                 composable("splash") { SplashScreen(navController) }
-                composable("register") { RegisterScreen(navController, HttpClient()) }
-                composable("login") { LoginScreen(navController, HttpClient(), jwtToken, user) }
+                composable("register") { RegisterScreen(navController, HttpClient(), jwtToken, user) }
+                composable("login/{username}/{password}") { backStackEntry ->
+                    val username = backStackEntry.arguments?.getString("username") ?: ""
+                    val password = backStackEntry.arguments?.getString("password") ?: ""
+                    LoginScreen(navController, HttpClient(), jwtToken, user, username, password)
+                }
+                composable("login") {
+                    LoginScreen(navController, HttpClient(), jwtToken, user, "", "")
+                }
+
+
+
                 composable("home") {
                     MainScreen(navController) {
                         HomeScreen(HttpClient(), navController)

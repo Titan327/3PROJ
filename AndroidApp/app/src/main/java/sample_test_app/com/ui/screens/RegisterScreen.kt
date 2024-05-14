@@ -14,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,6 +25,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -36,8 +39,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import sample_test_app.com.http.Security.JwtUtils.JwtUtils
+import sample_test_app.com.models.User
 import java.text.SimpleDateFormat
 
 @Serializable
@@ -52,7 +60,12 @@ data class UserInfos(
 
 @OptIn(InternalAPI::class)
 @Composable
-fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
+fun RegisterScreen(
+    navController: NavHostController,
+    httpClient: HttpClient,
+    jwtToken: MutableState<String>,
+    user: MutableState<User>
+) {
     val firstnameState = remember { mutableStateOf("") }
     val lastnameState = remember { mutableStateOf("") }
     val usernameState = remember { mutableStateOf("") }
@@ -60,6 +73,8 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
     val passwordState = remember { mutableStateOf("") }
     val passwordConfirmationState = remember { mutableStateOf("") }
     val dateOfBirthState = remember { mutableStateOf("") }
+    val jwtToken = remember { mutableStateOf("") } // Add this line
+    val user = remember { mutableStateOf(User()) } // Add this line
 
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordErrorState = remember { mutableStateOf(false) }
@@ -164,10 +179,12 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
                             contentType(ContentType.Application.Json)
                             body = userInfoJson
                         }
-                    if (response.status == HttpStatusCode.OK) {
-                        val responseBody = response.bodyAsText()
+                    if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
                         withContext(Dispatchers.Main) {
-                            println("Registration succeeded. Response: $responseBody")
+                            println("Registration succeeded.")
+
+                            // After successful registration, navigate to login screen with username and password
+                            navController.navigate("login/${usernameState.value}/${passwordState.value}")
                         }
                     } else {
                         withContext(Dispatchers.Main) {
@@ -182,7 +199,6 @@ fun RegisterScreen(navController: NavHostController, httpClient: HttpClient) {
             }
         }) {
             Text("Register")
-
         }
     }
 }

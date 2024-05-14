@@ -49,12 +49,17 @@ data class TokenResponse(
 
 @OptIn(InternalAPI::class)
 @Composable
-fun LoginScreen(navController: NavHostController, httpClient: HttpClient, jwtToken: MutableState<String>, user: MutableState<User>) {
-    // État pour stocker la valeur du champ de texte "Username"
-    val usernameState = remember { mutableStateOf("") }
+fun LoginScreen(
+    navController: NavHostController,
+    httpClient: HttpClient,
+    jwtToken: MutableState<String>,
+    user: MutableState<User>,
+    username: String,
+    password: String
+) {
+    val usernameState = remember { mutableStateOf(username) }
+    val passwordState = remember { mutableStateOf(password) }
 
-    // État pour stocker la valeur du champ de texte "Password"
-    val passwordState = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
