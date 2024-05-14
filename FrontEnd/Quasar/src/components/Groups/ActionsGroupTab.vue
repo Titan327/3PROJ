@@ -15,7 +15,6 @@ import { io } from 'socket.io-client';
 import { NotificationBus} from 'boot/eventBus';
 import DialogPrivateMessage from "components/Common/DialogPrivateMessage.vue";
 
-
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
 let refundsList = ref<Refund[]>([]);
@@ -30,6 +29,7 @@ let catList = ref([]);
 const router = useRouter();
 let group = ref(DefaultGroup());
 let width = ref(0);
+let dialogCreateMessage = ref(false);
 
 
 const props = defineProps({
@@ -191,6 +191,25 @@ function getCatIcon(catId: number) {
 }
 function getCatColor(catId: number) {
   return catList.value.find(cat => cat.id === catId)?.color;
+}
+
+function openDialogPrivateMessage(user2:number){
+  dialogCreateMessage.value = true;
+  $q.dialog({
+    component: DialogPrivateMessage,
+
+    componentProps: {
+      isOpen: dialogCreateMessage,
+      groupId: props.groupId,
+      user2id: user2,
+    }
+  }).onOk(() => {
+    console.log('OK')
+  }).onCancel(() => {
+    console.log('Cancel')
+  }).onDismiss(() => {
+    dialogCreateMessage.value = false;
+  })
 }
 
 </script>
@@ -440,6 +459,9 @@ function getCatColor(catId: number) {
                     <div class="text-h6"> {{user.username}}</div>
                     <div class="text-subtitle2"> {{formatNumber(user.UserGroup.balance)}}€</div>
                   </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn :disable="user.id == props.userId" flat round color="secondary" icon="message" @click="openDialogPrivateMessage(Number(user?.id))"><q-tooltip v-if="props.userId != user.id">Envoyer un message privé à {{user.username}}</q-tooltip><q-tooltip class="bg-red" v-if="props.userId == user.id">Vous ne pouvez pas envoyer de messages à vous même</q-tooltip></q-btn>
+                  </q-card-actions>
                 </q-card>
             </div>
           </q-tab-panel>
