@@ -61,7 +61,8 @@ const oauthGoogle = async (req,res) => {
 
         }
     } catch (error) {
-        res.status(500).send(error);
+        console.log(error);
+        return res.status(500).send("ca marche pas");
     }
 }
 
