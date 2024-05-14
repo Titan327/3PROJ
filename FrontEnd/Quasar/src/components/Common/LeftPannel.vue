@@ -125,7 +125,7 @@ async function getCountNotifs(){
       </q-item-section>
     </q-item>
     <q-item class="absolute-bottom user-drawer" v-if="miniState && height>500">
-      <q-item-section top avatar>
+      <q-item-section v-ripple top avatar clickable @click="disconnect" >
         <q-avatar>
           <q-icon color="red" name="logout" />
         </q-avatar>

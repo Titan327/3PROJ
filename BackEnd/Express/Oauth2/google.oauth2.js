@@ -9,11 +9,12 @@ const oauthGoogle = async (req,res) => {
     const { token,type } = req.body;
 
     try {
-        const idClient = '';
+        let idClient = '';
+
         if (type === "web"){
-            const idClient = '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com';
+            idClient = '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com';
         }else if (type === "android"){
-            const idClient = '1081302926939-86a0mhsm52mqlb9t9g5huehvn31s3r9l.apps.googleusercontent.com';
+            idClient = '1081302926939-86a0mhsm52mqlb9t9g5huehvn31s3r9l.apps.googleusercontent.com';
         }
 
         const client = new OAuth2Client(idClient);
@@ -60,7 +61,7 @@ const oauthGoogle = async (req,res) => {
 
         }
     } catch (error) {
-        res.status(500).send('internal server error');
+        res.status(500).send(error);
     }
 }
 

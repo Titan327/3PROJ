@@ -36,10 +36,10 @@ async function getGroups(fav = false, set = false) {
       },
     });
     groupList.value = response.data;
-    loading.value = false;
   } catch (e) {
     console.error(e);
   }
+  loading.value = false;
 }
 
 function openDialogCreate() {
@@ -105,6 +105,12 @@ function openDialogCreate() {
             {{ group.name }}
           </q-tooltip>
         </q-avatar>
+      </div>
+    </q-card-section>
+    <q-card-section v-if="!loading && groupList.length == 0">
+      <div class="q-gutter-md q-ml-none cursor-pointer">
+       <q-item-label v-if="favEnabled" class="text-h6">Aucun groupe favoris</q-item-label>
+        <q-item-label v-else class="text-h6">Rien à afficher</q-item-label>
       </div>
     </q-card-section>
     <div class="row" v-if="loading">
