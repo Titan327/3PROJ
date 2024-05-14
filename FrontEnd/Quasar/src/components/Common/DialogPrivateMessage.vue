@@ -44,6 +44,8 @@ onMounted(async () => {
 });
 
 function checkScroll() {
+  if(topLoading.value || bottomLoading.value) return;
+  if(msgPage.value == 1 && messages.value.length < 100) return;
   const scrollArea = scrollAreaRef.value;
   if (scrollArea !== null) {
     const scrollPercentage = scrollArea.getScrollPercentage('vertical');
@@ -90,7 +92,7 @@ function CloseDrawer() {
 async function getMessages() {
   bottomLoading.value = true;
   try {
-    const response = await api.get(`/messages/private/${props.groupId}/${User.value.id}/${props.user2id}/?limit=50&page=${msgPage.value}`);
+    const response = await api.get(`/messages/private/${props.groupId}/${User.value.id}/${props.user2id}/?limit=100&page=${msgPage.value}`);
     messages.value = response.data.messages
     messages.value.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   } catch (error) {
