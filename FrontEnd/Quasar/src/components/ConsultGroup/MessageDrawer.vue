@@ -50,6 +50,8 @@ onMounted(async () => {
 
 function checkScroll() {
   const scrollArea = scrollAreaRef.value;
+  if(topLoading.value || bottomLoading.value) return;
+  if(msgPage.value == 1 && messages.value.length < 100) return;
   if (scrollArea !== null) {
     const scrollPercentage = scrollArea.getScrollPercentage('vertical');
     if (scrollPercentage.top == 0) {
