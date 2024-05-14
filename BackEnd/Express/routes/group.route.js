@@ -23,6 +23,8 @@ router.get("/:groupId/users/:userId/paymentMethode", securityMiddleware.verifyIs
 
 //GET http://localhost:9002/api/groups/refunds
 router.get("/:groupId/refunds", securityMiddleware.verifyIsAuth, RefundController.getGroupRefunds);
+//GET http://localhost:9002/api/groups/doneRefunds
+router.get("/:groupId/refunds/done", securityMiddleware.verifyIsAuth, RefundController.getGroupDoneRefunds);
 //POST http://localhost:9002/api/groups/{groupId}/refund/{refundId}
 router.post("/:groupId/refund/:refundId", securityMiddleware.verifyIsAuth, RefundController.processRefund);
 
