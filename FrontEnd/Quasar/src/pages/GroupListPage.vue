@@ -16,6 +16,7 @@ const width = ref(0);
 
 let DialogCreate = ref(false);
 let DialogInvite = ref(false);
+let loading = ref(false);
 
 onMounted(async () => {
 
@@ -30,13 +31,19 @@ onMounted(async () => {
 });
 
 async function getGroups() {
-  const userData = await getUser();
-  const response = await api.get(`/users/${userData.id}/groups?limit=50`);
-  groupList.value = response.data;
+  loading.value = true;
+  try {
+    const userData = await getUser();
+    const response = await api.get(`/users/${userData.id}/groups?limit=50`);
+    groupList.value = response.data;
 
-  groupList.value.sort((a, b) => {
-    return new Date(b.updatedAt) - new Date(a.updatedAt); //ts error
-  });
+    groupList.value.sort((a, b) => {
+      return new Date(b.updatedAt) - new Date(a.updatedAt); //ts error
+    });
+    loading.value = false;
+  }
+  catch (e) {
+    console.error('Error')}
 }
 
 function openDialogCreate(){
@@ -168,11 +175,16 @@ async function setFavorite(groupID:number, favorite:boolean){
         </q-item>
       </q-card-section>
     </q-card>
-    <q-card-section v-if="groupList.length == 0">
+    <q-card-section v-if="groupList.length == 0 && !loading">
       <q-item-section>
         <q-item-label class="text-h6">Rien à afficher</q-item-label>
       </q-item-section>
     </q-card-section>
+    <q-inner-loading>
+      <template v-if="loading">
+        <q-spinner color="secondary" size="50px"/>
+      </template>
+    </q-inner-loading>
   </q-page>
 </template>
 <style scoped>

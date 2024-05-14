@@ -12,6 +12,7 @@ const operations = ref(0);
 const icon = ref();
 const User = ref(DefaultUser());
 const width = ref(0);
+let loading = ref(false);
 
 const props = defineProps<{
   etat: EtatTotalPaidComponent;
@@ -20,6 +21,7 @@ const props = defineProps<{
 onMounted(async () => {
   User.value = await getUser()
   try {
+  loading.value = true;
     if (props.etat !== EtatTotalPaidComponent.Positive) {
       displayColor.value = 'red';
       titleText.value = 'Reste à payer';
@@ -36,6 +38,7 @@ onMounted(async () => {
       montantTotal.value = response.data.amount;
       operations.value = response.data.transactions;
     }
+    loading.value = false;
   } catch (error) {
     console.error("Une erreur s'est produite lors de la récupération des données :", error);
   }
@@ -53,7 +56,7 @@ onMounted(async () => {
 <template>
 
   <q-card class="bloc-paye bg-accent">
-    <q-card-section >
+    <q-card-section v-if="!loading">
       <q-item>
         <q-item-section avatar>
           <q-avatar rounded color="secondary" text-color="white" :icon="icon" />
@@ -67,6 +70,13 @@ onMounted(async () => {
         <q-chip v-if="operations>0 && width>500" class="chip-status" :color="displayColor" text-color="white">{{operations}} Opérations</q-chip>
         <q-chip v-if="operations==0 && width>500" class="chip-status" :color="displayColor" text-color="white">Pas d'opération</q-chip>
       </q-item>
+    </q-card-section>
+    <q-card-section v-else>
+      <div class="row" v-if="loading">
+        <q-space></q-space>
+          <q-spinner size="50px" class="q-pa-xs q-mx-auto" color="secondary" />
+        <q-space></q-space>
+      </div>
     </q-card-section>
   </q-card>
 </template>
