@@ -19,6 +19,7 @@ import DialogPrivateMessage from "components/Common/DialogPrivateMessage.vue";
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
 let refundsList = ref<Refund[]>([]);
+let doneRefundList = ref<Refund[]>([]);
 let sortedTransactionList = ref<Transaction[]>([]);
 let dialogCreateTransaction = ref(false);
 let dialogConsultTransaction = ref(false);
@@ -64,14 +65,27 @@ socket.on(`new-transaction-${props.groupId}`, () => {
 });
 
 async function getTransactionList(){
-  const response = await api.get(`groups/${props.groupId}/transactions`);
-  transactionList.value = response.data;
-  sortTransaction('date');
+  try{
+    const response = await api.get(`groups/${props.groupId}/transactions`);
+    transactionList.value = response.data;
+    sortTransaction('date');
+  }
+  catch (e){
+    console.error(e)
+  }
 }
 
 async function getOptimalRefundList(){
-  const response = await api.get(`groups/${props.groupId}/refunds`);
-  refundsList.value = response.data;
+  try {
+    const response = await api.get(`groups/${props.groupId}/refunds`);
+    refundsList.value = response.data;
+
+    const refundedResponse = await api.get(`groups/${props.groupId}/refunds/done`);
+    doneRefundList.value = refundedResponse.data;
+  }
+  catch (e){
+    console.error(e)
+  }
 }
 
 function openDialogCreateTransaction(){
@@ -392,6 +406,45 @@ function getCatColor(catId: number) {
                   <q-item-section class="q-mx-auto">
                   <q-btn outline class="w-60 q-mx-auto" color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
                   <span v-else class="q-mx-auto">Rien à effectuer</span>
+                  </q-item-section>
+
+                </q-item>
+                <q-item-section class="text-h6" v-if="doneRefundList.length > 0">Remboursements effectués</q-item-section>
+                <q-item v-for="refund in doneRefundList" :key="refund.id">
+                  <q-item-section avatar>
+                    <q-avatar
+                      size="40px"
+                      class="overlapping"
+                      :style="`left: ${1 * 20}px`"
+                    >
+                      <img :src="getUserGroupData(refund.refundingUserId)?.profile_picture ? getUserGroupData(refund.refundingUserId)?.profile_picture[2] : 'assets/defaults/user-default.webp'">
+                    </q-avatar>
+                    <q-avatar
+                      size="40px"
+                      class="overlapping"
+                      :style="`left: ${2 * 20}px`"
+                    >
+                      <img :src="getUserGroupData(refund.refundedUserId)?.profile_picture ? getUserGroupData(refund.refundedUserId)?.profile_picture[2] : 'assets/defaults/user-default.webp'">
+                    </q-avatar>
+                  </q-item-section>
+                  <q-space></q-space>
+                  <q-item-section v-if="width>800">
+                    <q-item-label class="q-mx-xl">{{getUserGroupData(refund.refundingUserId)?.username}}
+                      <q-icon
+                        size="xs"
+                        name="arrow_forward"
+                      />
+                      {{getUserGroupData(refund.refundedUserId)?.username}}</q-item-label>
+                  </q-item-section>
+                  <q-space></q-space>
+                  <q-item-section>
+                    <q-item-label class="q-mx-xl">{{formatNumber(refund.amount)}}€</q-item-label>
+                  </q-item-section>
+                  <q-space></q-space>
+                  <q-space></q-space>
+                  <q-item-section class="q-mx-auto">
+                    <q-btn outline class="w-60 q-mx-auto" color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
+                    <span v-else class="q-mx-auto">Rien à effectuer</span>
                   </q-item-section>
 
                 </q-item>
