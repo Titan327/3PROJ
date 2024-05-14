@@ -145,7 +145,6 @@ class TransactionRepository(private val httpClient: HttpClient) {
                     }.toString()
                 }
             }
-            println("Response: ${response.status}")
             if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
                 "true"
             } else {

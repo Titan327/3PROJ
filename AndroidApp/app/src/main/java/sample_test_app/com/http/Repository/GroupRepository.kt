@@ -69,8 +69,6 @@ class GroupRepository(private val httpClient: HttpClient) {
                 }
                 """.trimIndent()
                 }
-                // Utilisez la réponse ici
-                println("Response: ${response.status}")
             }
         } catch (e: Exception) {
             println("Error: $e")

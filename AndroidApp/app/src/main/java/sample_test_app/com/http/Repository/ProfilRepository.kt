@@ -14,7 +14,6 @@ class ProfilRepository(private val httpClient: HttpClient, navController: NavHos
     @OptIn(InternalAPI::class)
     suspend fun updateUser(userId: String, user: User, jwtToken: String): HttpResponse {
         val url = "https://3proj-back.tristan-tourbier.com/api/users/$userId"
-        println("User ID: $userId")
 
         val userInfos = mapOf(
             "firstname" to user.firstname,
