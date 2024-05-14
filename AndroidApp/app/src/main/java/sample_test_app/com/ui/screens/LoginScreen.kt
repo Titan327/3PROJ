@@ -32,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -39,6 +40,12 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import sample_test_app.com.http.Security.JwtUtils.JwtUtils
 import sample_test_app.com.models.User
+
+@Serializable
+data class TokenResponse(
+    val token: String?,
+    val oauth: String?
+)
 
 @OptIn(InternalAPI::class)
 @Composable
@@ -99,10 +106,11 @@ fun LoginScreen(navController: NavHostController, httpClient: HttpClient, jwtTok
                         val responseBody = response.bodyAsText()
                         withContext(Dispatchers.Main) {
 
-                            val jwtPayload = JwtUtils.decodeJWT(responseBody)
-                            jwtToken.value = responseBody
 
+                            val tokenResponse = Json.decodeFromString<TokenResponse>(responseBody)
+                            jwtToken.value = tokenResponse.token.toString()
 
+                            val jwtPayload = JwtUtils.decodeJWT(jwtToken.value)
                             val jwtPayloadJson = Json.parseToJsonElement(jwtPayload).jsonObject
                             val userId = jwtPayloadJson["userId"]?.jsonPrimitive?.content
 
