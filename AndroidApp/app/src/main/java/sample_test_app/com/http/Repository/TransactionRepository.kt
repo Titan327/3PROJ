@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.json.JSONArray
 import org.json.JSONObject
 import sample_test_app.com.models.Transaction
 import sample_test_app.com.models.TransactionUser
@@ -125,6 +126,14 @@ class TransactionRepository(private val httpClient: HttpClient) {
                 httpClient.post("https://3proj-back.tristan-tourbier.com/api/groups/${groupId}/transactions") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
+                    val detailsJsonArray = JSONArray()
+                    for (detail in details) {
+                        val detailJsonObject = JSONObject().apply {
+                            put("userId", detail.userId)
+                            put("amount", detail.amount)
+                        }
+                        detailsJsonArray.put(detailJsonObject)
+                    }
                     body = JSONObject().apply {
                         put("label", label)
                         put("total_amount", total_amount)
@@ -132,11 +141,12 @@ class TransactionRepository(private val httpClient: HttpClient) {
                         put("receipt", receipt)
                         put("senderId", senderId)
                         put("categoryId", categoryId)
+                        put("details", detailsJsonArray)
                     }.toString()
                 }
             }
             println("Response: ${response.status}")
-            if (response.status == HttpStatusCode.OK) {
+            if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
                 "true"
             } else {
                 response.body()
