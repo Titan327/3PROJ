@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace 'sample_test_app.com'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "sample_test_app.com"
@@ -88,4 +88,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.3")
     implementation("io.ktor:ktor-client-serialization:2.2.3")
     implementation("io.ktor:ktor-client-json:2.2.3")
+
+    // Oauth2 google
+    implementation("com.github.stevdza-san:OneTapCompose:1.0.12")
+
 }

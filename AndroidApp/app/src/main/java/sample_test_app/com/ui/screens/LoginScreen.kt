@@ -1,5 +1,9 @@
 package sample_test_app.com.ui.screens
 
+
+import GoogleOauthBtn
+import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,6 +50,8 @@ data class TokenResponse(
     val token: String?,
     val oauth: String?
 )
+
+
 
 @OptIn(InternalAPI::class)
 @Composable
@@ -153,6 +159,8 @@ fun LoginScreen(
             }
         }) {
             Text("Login")
+
         }
+        GoogleOauthBtn()
     }
 }
