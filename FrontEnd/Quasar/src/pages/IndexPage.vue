@@ -33,7 +33,9 @@ function openDialogJoin(tokenGroup: string){
       componentProps: {
         tokenGroup: tokenGroup,
       }
-    })
+    }).onDismiss(() => {
+      window.location.reload();
+  })
 }
 
 function CheckIs0Auth(){

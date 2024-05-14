@@ -12,6 +12,7 @@ import ActionsGroupTab from "components/Groups/ActionsGroupTab.vue";
 import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 import DialogCustomInvitintoGroup from "src/components/Groups/DialogCustomInvitintoGroup.vue";
 import DialogConsultTransaction from "components/Groups/DialogConsultTransaction.vue";
+import DialogPrivateMessage from "components/Common/DialogPrivateMessage.vue";
 
 const router = useRouter();
 let User = ref(DefaultUser());
@@ -30,6 +31,7 @@ let isFavorite = ref(false);
 const dialogConsultTransaction = ref(false);
 
 let isOpenDialogInvite = ref(false);
+let dialogCreateMessage = ref(false);
 
 onMounted(async () => {
   await getGroup()
@@ -161,6 +163,24 @@ function openDialogConsultTransaction(transactionId:number){
   })
 }
 
+function openDialogPrivateMessage(user2:number){
+  dialogCreateMessage.value = true;
+  $q.dialog({
+    component: DialogPrivateMessage,
+
+    componentProps: {
+      isOpen: dialogCreateMessage,
+      groupId: groupId,
+      user2id: user2,
+    }
+  }).onOk(() => {
+    console.log('OK')
+  }).onCancel(() => {
+    console.log('Cancel')
+  }).onDismiss(() => {
+    dialogCreateMessage.value = false;
+  })
+}
 </script>
 
 <template>
@@ -247,7 +267,7 @@ function openDialogConsultTransaction(transactionId:number){
                @click="openDialogInvite"
                flat
                outline
-        >  <q-tooltip>
+        > <q-tooltip>
          Inviter d'autres membres
         </q-tooltip></q-btn>
       </q-item-label>
@@ -263,6 +283,13 @@ function openDialogConsultTransaction(transactionId:number){
         <q-tooltip>
           {{ user.username }}
         </q-tooltip>
+        <q-menu dark :offset="[-30, 10]" v-if="user.id != User.id">
+          <q-list style="min-width: 100px">
+            <q-item clickable v-close-popup @click="openDialogPrivateMessage(Number(user.id))">
+              <q-item-section>Message privé</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
       </q-avatar>
     </div>
     </div>

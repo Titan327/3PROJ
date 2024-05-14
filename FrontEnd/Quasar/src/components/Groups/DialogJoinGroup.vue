@@ -26,8 +26,8 @@ async function joinGroup() {
         type: 'positive',
         message: 'Vous avez rejoint le groupe'
       })
-      deleteCookie('nomDuCookie');
-      router.push('/#/groups');
+      deleteCookie('join-group');
+      isOpen.value = false;
     }
   }
   catch (error) {

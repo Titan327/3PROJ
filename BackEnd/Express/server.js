@@ -20,8 +20,6 @@ const io = socketIo(server, {
     }
 });
 
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // Middleware
 app.use(express.json());
@@ -49,6 +47,9 @@ io.on('connection', function(socket){
     socket.on('chat message', function (msg, group){
         io.emit(`chat-group-${group}`, msg, group);
     });
+    socket.on('private message', function (msg, group){
+        io.emit(`chat-private-${group}`, msg, group);
+    });
 
     socket.on('new-transaction', function (group){
         io.emit(`new-transaction-${group}`);
@@ -61,7 +62,6 @@ app.post('/api/messages', (req, res) => {
     res.status(200).send('Message sent successfully');
 });
 
-app.use(passport.initialize());
 
 
 const PORT = process.env.PORT;
