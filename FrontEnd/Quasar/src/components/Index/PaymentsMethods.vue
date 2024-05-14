@@ -1,14 +1,10 @@
-<script setup lang="ts"> import {EtatTotalPaidComponent} from "src/interfaces/types";
-
-import { defineProps, onMounted, ref } from "vue";
-import {Group} from "src/interfaces/group.interface";
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
 import {getUser} from "stores/userStore";
 import {api} from "boot/axios";
-import DialogUpdateImage from "components/Common/DialogUpdateImage.vue";
 import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
-import {DefaultPaymentMethod, DefaultRib} from "src/interfaces/paymentMethod.interface";
 import {convertIBAN, redirectBankWebSite, redirectToPaypal} from "stores/globalFunctionsStore";
 
 const  slide = ref('slide-0');
@@ -17,7 +13,7 @@ let dialogIsOpen = ref(false);
 let User = ref(DefaultUser());
 const $q = useQuasar();
 let mounted = ref(false);
-
+let loading = ref(false);
 
 onMounted(async () => {
   User.value = await getUser();
@@ -26,10 +22,11 @@ onMounted(async () => {
 });
 
 async function getMethod(){
+  loading.value = true;
   try {
-    console.log(paiementsMethod.value)
     const response = await api.get(`/users/me/paymentMethode`)
     paiementsMethod.value = response.data
+    loading.value = false;
   }
   catch(e){
     console.error(e)
@@ -126,7 +123,7 @@ async function openDialgAddPayment(type:string){
       </q-carousel>
     </q-card-section>
     <q-card-section
-      v-if="paiementsMethod.length == 0"
+      v-if="paiementsMethod.length == 0 && !loading"
       class="q-mx-auto q-pa-md">
 
       <div class="q-mx-auto q-pa-md column">
@@ -151,6 +148,11 @@ async function openDialgAddPayment(type:string){
         </q-btn>
       </div>
     </q-card-section>
+    <div class="row" v-if="loading">
+      <q-space></q-space>
+      <q-spinner size="50px" class="q-pa-xs q-mx-auto" color="secondary" />
+      <q-space></q-space>
+    </div>
   </q-card>
 </template>
 

@@ -12,12 +12,14 @@ const router = useRouter();
 let dialogCreate = ref(false);
 const $q = useQuasar();
 let favEnabled = ref(false);
+let loading = ref(false);
 
 onMounted(async () => {
   await getGroups();
 });
 
 async function getGroups(fav = false, set = false) {
+  loading.value = true;
   if (!set) {
     fav = localStorage.getItem("fav-homepage") === "true";
   }
@@ -34,6 +36,7 @@ async function getGroups(fav = false, set = false) {
       },
     });
     groupList.value = response.data;
+    loading.value = false;
   } catch (e) {
     console.error(e);
   }
@@ -89,7 +92,7 @@ function openDialogCreate() {
         </q-icon>
       </div>
     </q-card-section>
-    <q-card-section>
+    <q-card-section v-if="!loading">
       <div class="q-gutter-md q-ml-none cursor-pointer">
         <q-avatar
           v-for="group in groupList"
@@ -97,13 +100,18 @@ function openDialogCreate() {
           size="100px"
           @click="router.push(`/groups/${group.id}`)"
         >
-          <img :src="group.picture ? group.picture[1] : 'assets/defaults/group-default.webp'" />
+          <q-img :src="group.picture ? group.picture[1] : 'assets/defaults/group-default.webp'" />
           <q-tooltip>
             {{ group.name }}
           </q-tooltip>
         </q-avatar>
       </div>
     </q-card-section>
+    <div class="row" v-if="loading">
+      <q-space></q-space>
+      <q-spinner size="50px" class="q-pa-xs q-mx-auto" color="secondary" />
+      <q-space></q-space>
+    </div>
     <q-separator />
   </q-card>
 </template>

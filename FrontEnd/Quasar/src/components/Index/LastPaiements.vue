@@ -7,19 +7,25 @@ import {Transaction} from "src/interfaces/transactions.interface";
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useRouter} from "vue-router";
 import {formatDate, formatNumber} from "stores/globalFunctionsStore";
-import {useQuasar} from "quasar";
 
 const transactionList = ref<Transaction[]>([]);
 const User = ref(DefaultUser());
 const router = useRouter();
-const $q = useQuasar();
 const width = ref(0);
+let loading = ref(false);
 
 onMounted(async () => {
 
-  User.value = await getUser();
-  const response = await api.get(`users/${User.value.id}/lastTransactions?limit=5`);
-  transactionList.value = response.data;
+  loading.value = true;
+  try {
+    User.value = await getUser();
+    const response = await api.get(`users/${User.value.id}/lastTransactions?limit=5`);
+    transactionList.value = response.data;
+    loading.value = false;
+  }
+  catch (e) {
+    console.error('Error')
+  }
 
   function getWidth() {
     width.value = window.innerWidth;
@@ -89,11 +95,16 @@ function goToTransaction(groupId, transactionId) {
 
       </q-item>
     </q-card-section>
-    <q-card-section v-if="transactionList.length == 0">
+    <q-card-section v-if="transactionList.length == 0 && !loading">
       <q-item-section>
         <q-item-label class="text-h6">Rien à afficher</q-item-label>
       </q-item-section>
     </q-card-section>
+    <div class="row" v-if="loading">
+      <q-space></q-space>
+      <q-spinner size="50px" class="q-pa-xs q-mx-auto" color="secondary" />
+      <q-space></q-space>
+    </div>
   </q-card>
 </template>
 
