@@ -42,7 +42,7 @@ const authentication = async (req, res) => {
     }
     if (credentialsAreValid){
         const token = Token.createToken(user);
-        return res.status(200).send(token);
+        return res.status(200).send({token:token,oauth:"false"});
     }
     return res.status(400).send("Credentials incorrect");
 }
@@ -137,6 +137,8 @@ function loginWithEmail(email, password) {
             .then(async user => {
                 if (!user) {
                     resolve(false); // Utilisateur non trouvé, informations d'identification invalides
+                }else if (user.password === null){
+                    resolve(false); // oauth donc pas de password
                 } else {
                     const isPasswordValid = await compare(password, user.password)
                         .then(isPasswordValid => {
@@ -156,6 +158,8 @@ function loginWithUsername(username, password) {
             .then(async user => {
                 if (!user) {
                     resolve(false); // Utilisateur non trouvé, informations d'identification invalides
+                }else if (user.password === null){
+                    resolve(false); // oauth donc pas de password
                 } else {
                     const isPasswordValid = await compare(password, user.password)
                         .then(isPasswordValid => {
