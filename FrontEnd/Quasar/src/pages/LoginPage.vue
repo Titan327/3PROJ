@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {onUnmounted, ref} from 'vue';
-import {api} from "boot/axios";
-import {LocalStorage, useQuasar} from 'quasar'
-import {useRouter} from "vue-router";
-import {getUser, updateUser} from "stores/userStore";
-import * as process from "node:process";
+import {ref} from 'vue';
+import {api} from 'boot/axios';
+import {useQuasar} from 'quasar'
+import {useRouter} from 'vue-router';
+import {updateUser} from 'stores/userStore';
+import * as process from 'node:process';
+import GoogleOauth2 from 'components/Oauth2/GoogleOauth2.vue';
 
 const $q = useQuasar();
 let loading = ref(false)
@@ -41,7 +42,7 @@ async function login() {
       } else {
         sendUserLogin = userName.value;
       }
-      const response = await api.post("auth/login", {
+      const response = await api.post('auth/login', {
         username: sendUserLogin,
         password: password.value,
         email: email.value,
@@ -76,22 +77,6 @@ async function login() {
   }
   loading.value = false;
 }
-
-async function loginGoogle() {
-
-  const authWindow = window.open(`${process.env.URL_BACKEND}api/oauth2/google`, '_blank', 'height=600,width=600');
-
-  window.addEventListener('message', (event) => {
-
-    if (event.data.token){
-      console.log('Message reçu de la fenêtre enfant :', event.data.token);
-      sessionStorage.setItem('userToken', event.data.token);
-      window.location.href = '/';
-    }
-
-  });
-}
-
 
 </script>
 
@@ -152,29 +137,12 @@ async function loginGoogle() {
         :loading="loading"
       />
       <div class="external-services">
-        <q-item-label class="text-secondary">Connexion avec:</q-item-label>
+        <q-item-label class="text-secondary q-pa-md">Connexion avec:</q-item-label>
 
         <div class="btns">
-          <q-btn
-            @click="loginGoogle"
-            class="btn-log shadow-6 bg-white">
-            <img src="assets/icons/googleIcon.svg" alt="Google"/>
-          </q-btn>
-          <q-btn
-            @click="console.log('Apple')"
-            class="btn-log shadow-6 bg-white">
-            <img src="assets/icons/appleIcon.svg" alt="Apple"/>
-          </q-btn>
-          <q-btn
-            @click="console.log('Microsoft')"
-            class="btn-log shadow-6 bg-white">
-            <img src="assets/icons/microsoftIcon.svg" alt="Microsoft"/>
-          </q-btn>
-          <q-btn
-            @click="console.log('Facebook')"
-            class="btn-log shadow-6 bg-white">
-            <img src="assets/icons/facebookIcon.svg" alt="Facebook"/>
-          </q-btn>
+
+          <GoogleOauth2></GoogleOauth2>
+
         </div>
       </div>
     </div>
@@ -192,7 +160,7 @@ async function loginGoogle() {
   flex-direction: column;
 }
 
-.form .input, .form .logo, .form .external-services {
+.form .input, .form .logo, .form {
   margin-top: 20px;
 }
 
@@ -211,20 +179,9 @@ async function loginGoogle() {
   margin: 10px 15%;
 }
 
-.text-primary {
-  font-family: 'lato', sans-serif;
-  font-weight: bold;
-}
-
 .links * {
   text-decoration: none;
   color: #ffa31a;
-}
-
-.btn-log {
-  width: 48px;
-  height: 48px;
-  margin: 10px 10px;
 }
 
 .btn-log img {
