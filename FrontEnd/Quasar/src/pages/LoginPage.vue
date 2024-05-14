@@ -48,7 +48,7 @@ async function login() {
       });
 
       if (response.data) {
-        updateUser(response.data);
+        updateUser(response.data.token);
         await router.push('../');
       }
     }
