@@ -34,7 +34,7 @@ const oauthGoogle = async (req,res) => {
         let usernameAlreadyExist = await User.findOne({where: { username: name }});
 
         if (!emailAlreadyExist){
-            while (!usernameAlreadyExist){
+            while (usernameAlreadyExist){
                 name = randomPseudo();
                 usernameAlreadyExist = await User.findOne({where: { username: name }});
             }
