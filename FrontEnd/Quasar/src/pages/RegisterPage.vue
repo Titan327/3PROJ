@@ -5,6 +5,7 @@ import {api} from 'boot/axios';
 import {useQuasar} from 'quasar';
 import {useRouter} from 'vue-router';
 import process from "node:process";
+import GoogleOauth2 from "components/Oauth2/GoogleOauth2.vue";
 
 const $q = useQuasar();
 let loading = ref(false)
@@ -224,29 +225,10 @@ async function loginGoogle() {
             :loading="loading"
           />
           <div class="external-services">
-            <q-item-label class="text-secondary">Inscription avec:</q-item-label>
+            <q-item-label class="text-secondary q-pa-md">Inscription avec:</q-item-label>
 
             <div class="btns">
-              <q-btn
-                @click="loginGoogle()"
-                class="btn-log shadow-6 bg-white">
-                <img src="assets/icons/googleIcon.svg" alt="Google"/>
-              </q-btn>
-              <q-btn
-                @click="console.log('Apple')"
-                class="btn-log shadow-6 bg-white">
-                <img src="assets/icons/appleIcon.svg" alt="Apple"/>
-              </q-btn>
-              <q-btn
-                @click="console.log('Microsoft')"
-                class="btn-log shadow-6 bg-white">
-                <img src="assets/icons/microsoftIcon.svg" alt="Microsoft"/>
-              </q-btn>
-              <q-btn
-                @click="console.log('Facebook')"
-                class="btn-log shadow-6 bg-white">
-                <img src="assets/icons/facebookIcon.svg" alt="Facebook"/>
-              </q-btn>
+              <GoogleOauth2></GoogleOauth2>
             </div>
           </div>
         </q-form>
