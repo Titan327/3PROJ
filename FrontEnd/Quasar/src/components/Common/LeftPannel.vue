@@ -13,6 +13,7 @@ const pictureUrl = ref('');
 const notifCount = ref(0);
 
 let width = ref(350);
+let height = ref(350);
 
 onMounted(async () => {
   const userData = await getUser();
@@ -23,6 +24,7 @@ onMounted(async () => {
     }
   }
   function setDrawerState() {
+    height.value = window.innerHeight;
     if (window.innerWidth < 1000) {
       miniState.value = true;
     } else {
@@ -108,7 +110,7 @@ async function getCountNotifs(){
         </q-item>
       </q-list>
 
-    <q-item class="absolute-bottom user-drawer">
+    <q-item class="absolute-bottom user-drawer" v-if="!miniState && height>500">
       <q-item-section top avatar>
         <q-avatar>
           <img :src="pictureUrl ? pictureUrl : 'assets/defaults/user-default.webp' ">
@@ -121,6 +123,14 @@ async function getCountNotifs(){
           Se déconnecter
         </q-tooltip>
       </q-item-section>
+    </q-item>
+    <q-item class="absolute-bottom user-drawer" v-if="miniState && height>500">
+      <q-item-section top avatar>
+        <q-avatar>
+          <q-icon color="red" name="logout" />
+        </q-avatar>
+      </q-item-section>
+      <q-item-section>{{ userString }}</q-item-section>
     </q-item>
   </q-drawer>
 

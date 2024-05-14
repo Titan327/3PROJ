@@ -49,6 +49,22 @@ const getGroupRefunds = async (req, res) => {
     }
 }
 
+const getGroupDoneRefunds = async (req, res) => {
+    console.log(`REST getGroupDoneRefunds`);
+    const {groupId} = req.params;
+    try {
+        let refunds = await Refund.findAll({
+            where: {groupId, processed: true},
+            attributes: ['id', 'refundingUserId', 'refundedUserId', 'amount']
+        });
+        return res.status(200).send(refunds);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Internal Server Error');
+    }
+
+}
+
 const calculateMinimalRefunds = async (groupId) => {
     try {
         console.log(`REST calculateMinimalRefunds`);
@@ -127,4 +143,5 @@ module.exports = {
     processRefund,
     calculateMinimalRefunds,
     getGroupRefunds,
+    getGroupDoneRefunds
 }

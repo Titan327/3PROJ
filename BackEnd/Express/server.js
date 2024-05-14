@@ -57,6 +57,7 @@ io.on('connection', function(socket){
 });
 app.post('/api/messages', (req, res) => {
     const { message } = req.body;
+    // Diffuser le message à tous les utilisateurs connectés
     io.emit('chat message', message);
     res.status(200).send('Message sent successfully');
 });
