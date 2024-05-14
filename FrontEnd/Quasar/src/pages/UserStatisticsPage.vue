@@ -229,38 +229,38 @@ async function getStats(){
             <q-separator />
             <q-card-section v-if="mounted">
               <q-item-label class="text-h6">{{ stats.transactions }} Transactions au total</q-item-label>
-              <q-item-label class="text-h6">Dépense moyenne {{ stats.average }}€</q-item-label>
+              <q-item-label class="text-h6" v-if="stats.average > 0">Dépense moyenne {{ stats.average }}€</q-item-label>
             </q-card-section>
             <q-card-section  v-if="mounted" class="row chart-container">
-              <q-card  flat dark  bordered class="card-chart">
+              <q-card  flat dark  bordered class="card-chart" v-if="chartCatdata.lenght>0">
                 <div class="q-pa-md q-mx-auto">
                   <q-item-label class="text-h6">Dépenses totale par catégorie (€) :</q-item-label>
                   <Doughnut class="q-mx-auto chart" :data="chartCatdata" :options="options"/>
                 </div>
               </q-card>
 
-              <q-card  flat dark  bordered class="card-chart">
+              <q-card  flat dark  bordered class="card-chart" v-if="chartCountCatdata.lenght>0">
                 <div class="q-pa-md q-mx-auto">
                   <q-item-label class="text-h6">Quantité de dépenses par catégorie :</q-item-label>
                   <Doughnut class="q-mx-auto chart" :data="chartCountCatdata" :options="options"/>
                 </div>
               </q-card>
 
-              <q-card  flat dark  bordered class="card-chart">
+              <q-card  flat dark  bordered class="card-chart" v-if="chartAverageCatdata.lenght>0">
                 <div class="q-pa-md q-mx-auto">
                   <q-item-label class="text-h6">Dépenses moyennes par catégorie (€)  :</q-item-label>
                   <Doughnut class="q-mx-auto chart" :data="chartAverageCatdata" :options="options"/>
                 </div>
               </q-card>
 
-              <q-card  flat dark  bordered class="card-chart">
+              <q-card  flat dark  bordered class="card-chart" v-if="chartTotalDepenssePerMonth.lenght>0">
                 <div class="q-pa-md q-mx-auto">
                   <q-item-label class="text-h6">Total des dépenses par mois (€):</q-item-label>
                   <Bar class="q-mx-auto w-70 chart chart-center" :data="chartTotalDepenssePerMonth" :options="optionsBar"/>
                 </div>
               </q-card>
 
-              <q-card  flat dark  bordered class="card-chart">
+              <q-card  flat dark  bordered class="card-chart" v-if="chartDepenssePerMonth.lenght>0">
                 <div class="q-pa-md q-mx-auto">
                   <q-item-label class="text-h6">Nombre de dépenses par mois :</q-item-label>
                   <Bar class="q-mx-auto w-70 chart chart-center" :data="chartDepenssePerMonth" :options="optionsBar"/>

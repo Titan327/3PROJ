@@ -40,10 +40,10 @@ async function getGroups() {
     groupList.value.sort((a, b) => {
       return new Date(b.updatedAt) - new Date(a.updatedAt); //ts error
     });
-    loading.value = false;
   }
   catch (e) {
     console.error('Error')}
+  loading.value = false;
 }
 
 function openDialogCreate(){
