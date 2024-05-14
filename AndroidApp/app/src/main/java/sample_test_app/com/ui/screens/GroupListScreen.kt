@@ -96,7 +96,7 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                     Text(
                         text = "Mes groupes :",
                         modifier = Modifier.height(64.dp),
-                        color = androidx.compose.ui.graphics.Color.White,
+                        color = Color.White,
                         style = TextStyle(
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
@@ -168,10 +168,8 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                     } else {
                         for (group in groups.value) {
                             Row(
-
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .padding(8.dp) // Ajouter de l'espace entre chaque groupe
                                     .fillMaxWidth(0.9f)
                                     .background(Color.Gray) // Définir un fond gris
                                     .clip(RoundedCornerShape(40.dp))
@@ -190,7 +188,6 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                                         contentDescription = "Group Picture",
                                         modifier = Modifier
                                             .size(80.dp)
-                                            .padding(top = 16.dp)
                                             .clickable {
                                                 navController.navigate("group/${group.id}")
                                             }

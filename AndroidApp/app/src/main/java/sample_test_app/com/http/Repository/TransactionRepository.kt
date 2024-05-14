@@ -1,5 +1,7 @@
 package sample_test_app.com.http.Repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -14,10 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.json.JSONArray
 import org.json.JSONObject
 import sample_test_app.com.models.Transaction
 import sample_test_app.com.models.TransactionUser
+import java.time.LocalDate
 
 
 class TransactionRepository(private val httpClient: HttpClient) {
@@ -115,8 +117,9 @@ class TransactionRepository(private val httpClient: HttpClient) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(InternalAPI::class)
-    suspend fun createTransaction(groupId: Double, jwtToken: String, label: String, total_amount: Float, date: String, receipt: String, senderId: Double, categoryId: Double, details: List<TransactionUser>): String {
+    suspend fun createTransaction(groupId: Int, jwtToken: String, label: String, total_amount: Float, date: LocalDate, receipt: String, senderId: Int, categoryId: Int, details: List<TransactionUser>): String {
         return try {
             val response: HttpResponse = withContext(Dispatchers.IO) {
                 httpClient.post("https://3proj-back.tristan-tourbier.com/api/groups/${groupId}/transactions") {
@@ -132,6 +135,7 @@ class TransactionRepository(private val httpClient: HttpClient) {
                     }.toString()
                 }
             }
+            println("Response: ${response.status}")
             if (response.status == HttpStatusCode.OK) {
                 "true"
             } else {

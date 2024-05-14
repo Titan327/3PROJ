@@ -1,6 +1,7 @@
 package sample_test_app.com.ui.screens
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -14,13 +15,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -28,6 +31,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -44,9 +48,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,6 +75,7 @@ import sample_test_app.com.models.Group
 import sample_test_app.com.models.Transaction
 import sample_test_app.com.models.TransactionUser
 import sample_test_app.com.models.User
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -542,7 +549,7 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
     if (isTransactionCreationPopUpDisplayed.value) {
         val newTransactionLabel = remember { mutableStateOf("") }
         val newTransactionTotalAmount = remember { mutableStateOf(0.0f) }
-        val newTransactionDate = remember { mutableStateOf("") }
+        val newTransactionDate = remember { mutableStateOf(LocalDate.now()) }
         val newTransactionReceipt = remember { mutableStateOf("") }
         val newTransactionCategoryId = remember { mutableStateOf(0.0f) }
         val newTransactionDetails = remember { mutableStateOf(emptyList<TransactionUser>()) }
@@ -550,7 +557,7 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
         fun resetTransactionCreationPopUp() {
             newTransactionLabel.value = ""
             newTransactionTotalAmount.value = 0.0f
-            newTransactionDate.value = ""
+            newTransactionDate.value = LocalDate.now()
             newTransactionReceipt.value = ""
             newTransactionCategoryId.value = 0.0f
             newTransactionDetails.value = emptyList()
@@ -564,6 +571,8 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
             text = {
                 Column (
                     modifier = Modifier
+                        .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.8f)
+                        .wrapContentHeight()
                         .padding(bottom = 16.dp, top = 16.dp)
                         .verticalScroll(rememberScrollState())
 
@@ -627,6 +636,107 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
                         colors = orangeTextFieldColors,
                         readOnly = true
                     )
+                    var dateDialogShown by remember { mutableStateOf(false) }
+
+                    if (dateDialogShown) {
+                        DatePickerDialog(
+                            LocalContext.current,
+                            { _, year, month, dayOfMonth ->
+                                newTransactionDate.value = LocalDate.of(year, month + 1, dayOfMonth)
+                                dateDialogShown = false
+                            },
+                            newTransactionDate.value.year,
+                            newTransactionDate.value.monthValue - 1,
+                            newTransactionDate.value.dayOfMonth
+                        ).show()
+                    }
+
+                    TextField (
+                        value = newTransactionDate.value.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        onValueChange = { newTransactionDate.value = LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy/MM/dd")) },
+                        readOnly = true,
+                        label = { Text("Date") },
+                        modifier = Modifier.clickable { dateDialogShown = true },
+                        colors = orangeTextFieldColors
+                    )
+                    for (user in users) {
+                        Row (
+                            modifier = Modifier
+                                .padding(top = 16.dp, bottom = 16.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (user.profile_picture?.get(0)
+                                    ?.isNotBlank() == true && user.profile_picture?.get(0) != "null"
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(data = user.profile_picture[0])
+                                            .apply(block = fun ImageRequest.Builder.() {
+                                                transformations(CircleCropTransformation())
+                                            }).build()
+                                    ),
+                                    contentDescription = "User Profile Picture",
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                )
+                            } else {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(data = R.drawable.userdefault)
+                                            .apply(block = fun ImageRequest.Builder.() {
+                                                transformations(CircleCropTransformation())
+                                            }).build()
+                                    ),
+                                    contentDescription = "User Profile Picture",
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                )
+                            }
+                            val username = user.username
+                            if (username != null) {
+                                Text(
+                                    text =  username,
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 16.sp
+                                    )
+                                )
+                            }
+                        }
+                        Row {
+                            var text by remember { mutableStateOf("") }
+                            OutlinedTextField(
+                                value = text,
+                                onValueChange = { newText ->
+                                    if (newText.isEmpty() || newText.toFloatOrNull() != null) {
+                                        text = newText
+                                    }
+                                    if (newTransactionDetails.value.find { it.userId == user.id } != null) {
+                                        newTransactionDetails.value = newTransactionDetails.value.map {
+                                            if (it.userId == user.id) {
+                                                it.copy(amount = text.toDouble())
+                                            } else {
+                                                it
+                                            }
+                                        }
+                                    } else {
+                                        newTransactionDetails.value += TransactionUser(
+                                            userId = user.id,
+                                            amount = text.toDouble()
+                                        )
+                                    }
+                                    newTransactionTotalAmount.value = newTransactionDetails.value.sumOf { it.amount!!.toDouble() }.toFloat()
+                                },
+                                label = { Text("Montant") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                colors = orangeTextFieldColors
+                            )
+                        }
+                    }
                 }
             },
             confirmButton = {
@@ -634,7 +744,7 @@ fun GroupScreenContent(users: List<User>, transactions: List<Transaction>, group
                     onClick = {
                         var succes = ""
                         CoroutineScope(Dispatchers.Main).launch {
-                            succes = TransactionRepository(HttpClient()).createTransaction(groupId.toDouble(), jwtToken, newTransactionLabel.toString(), newTransactionTotalAmount.value, newTransactionDate.value, "", userId.toDouble(), newTransactionCategoryId.value.toDouble(), newTransactionDetails.value)
+                            succes = TransactionRepository(HttpClient()).createTransaction(groupId.toInt(), jwtToken, newTransactionLabel.value, newTransactionTotalAmount.value, newTransactionDate.value, "", userId.toInt(), newTransactionCategoryId.value.toInt(), newTransactionDetails.value)
                             if (succes == "true") {
                                 resetTransactionCreationPopUp()
                                 isTransactionCreationPopUpDisplayed.value = false
