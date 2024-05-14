@@ -4,6 +4,7 @@ import { defineProps, onMounted, ref } from "vue";
 import { getUser } from "stores/userStore";
 import { api } from "boot/axios";
 import {DefaultUser} from "src/interfaces/user.interface";
+import {formatNumber} from "../../stores/globalFunctionsStore";
 
 const montantTotal = ref(0);
 const displayColor = ref('red');
@@ -64,7 +65,7 @@ onMounted(async () => {
 
         <q-item-section>
           <q-item-label class="text-grey-5 text-body1">{{titleText}}</q-item-label>
-          <q-item-label class="text-white text-subtitle1" caption lines="2">{{montantTotal}}€</q-item-label>
+          <q-item-label class="text-white text-subtitle1" caption lines="2">{{formatNumber(montantTotal)}}€</q-item-label>
         </q-item-section>
 
         <q-chip v-if="operations>0 && width>500" class="chip-status" :color="displayColor" text-color="white">{{operations}} Opérations</q-chip>
