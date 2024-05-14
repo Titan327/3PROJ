@@ -6,15 +6,22 @@ const Token = require("../security/token.security");
 
 
 const oauthGoogle = async (req,res) => {
-    const { token } = req.body;
+    const { token,type } = req.body;
 
     try {
-        const client = new OAuth2Client('1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com');
+        const idClient = '';
+        if (type === "web"){
+            const idClient = '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com';
+        }else if (type === "android"){
+            const idClient = '1081302926939-86a0mhsm52mqlb9t9g5huehvn31s3r9l.apps.googleusercontent.com';
+        }
 
+        const client = new OAuth2Client(idClient);
         const ticket = await client.verifyIdToken({
             idToken: token,
-            audience: '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com',
+            audience: idClient,
         });
+
         const payload = ticket.getPayload();
 
         const email = payload['email'];
