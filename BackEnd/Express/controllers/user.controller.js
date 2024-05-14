@@ -164,7 +164,9 @@ const totalBalance = async (req, res) => {
         });
         let amount = 0;
         for (let i = 0; i < userGroups.length; i++) {
-            amount += userGroups[i].balance;
+            if (userGroups[i].balance < 0) {
+                amount += userGroups[i].balance;
+            }
         }
         return req.res.status(200).send({ amount: amount });
     } catch (e) {
