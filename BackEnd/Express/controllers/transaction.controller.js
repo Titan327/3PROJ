@@ -71,9 +71,9 @@ const createTransaction = async (req, res) => {
                     let newBalance = userGroup.balance;
 
                     if (parseInt(detail.userId) !== parseInt(senderId)) {
-                        newBalance = userGroup.balance - parseInt(detail.amount).toFixed(2);
+                        newBalance = userGroup.balance - parseFloat(detail.amount).toFixed(2);
                     } else {
-                        newBalance = userGroup.balance + total_amount - parseInt(detail.amount).toFixed(2);
+                        newBalance = userGroup.balance + total_amount - parseFloat(detail.amount).toFixed(2);
                     }
                     await UserGroup.update(
                         { balance: newBalance },
