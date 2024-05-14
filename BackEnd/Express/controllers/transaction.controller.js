@@ -60,7 +60,7 @@ const createTransaction = async (req, res) => {
                     await TransactionUser.create({
                         transactionId: transaction.id,
                         userId: detail.userId,
-                        amount: parseInt(detail.amount).toFixed(2)
+                        amount: parseFloat(detail.amount).toFixed(2)
                     });
                     let userGroup = await UserGroup.findOne({
                         where: {
