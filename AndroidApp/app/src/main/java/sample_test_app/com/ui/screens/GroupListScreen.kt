@@ -140,7 +140,7 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                 Column (
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally) // Centrer les groupes horizontalement
+                        .align(Alignment.CenterHorizontally)
                 ) {
 
                     if (groups.value.isEmpty()) {
@@ -160,6 +160,9 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                                     .background(color = Color(0xFF808080))
                                     .padding(8.dp)
                                     .fillMaxWidth()
+                                    .clickable {
+                                        navController.navigate("group/${group.id}")
+                                    }
                             ) {
                                 if (group.picture?.isNotEmpty() == true) {
                                     Image(
@@ -174,10 +177,6 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                                         contentDescription = "Group Picture",
                                         modifier = Modifier
                                             .size(80.dp)
-                                            .clickable {
-                                                navController.navigate("group/${group.id}")
-                                            }
-
                                     )
                                 } else {
                                     Image(
@@ -192,10 +191,6 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                                         modifier = Modifier
                                             .size(80.dp)
                                             .padding(top = 16.dp)
-                                            .clickable {
-                                                navController.navigate("group/${group.id}")
-                                            }
-
                                     )
                                 }
                                 Text(
