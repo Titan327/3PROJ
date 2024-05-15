@@ -1,7 +1,8 @@
 package sample_test_app.com.ui.screens
 
 
-import GoogleOauthBtn
+
+import GoogleSignInButton
 import androidx.compose.foundation.Image
 
 import androidx.compose.foundation.layout.Arrangement
@@ -161,6 +162,8 @@ fun LoginScreen(
             Text("Login")
 
         }
-        GoogleOauthBtn()
+
+        GoogleSignInButton()
+
     }
 }
