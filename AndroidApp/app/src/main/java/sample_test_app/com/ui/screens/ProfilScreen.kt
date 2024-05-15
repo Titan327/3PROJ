@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
@@ -53,6 +54,10 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
     var emailState = remember { mutableStateOf(user.email ?: "") }
     var birthDateState = remember { mutableStateOf(user.birth_date ?: "") }
     var selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    var currentPasswordState = remember { mutableStateOf("") }
+    var newPasswordState = remember { mutableStateOf("") }
+    var repeatNewPasswordState = remember { mutableStateOf("") }
+
     val context = LocalContext.current
     val selectImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
         selectedImageUri.value = uri
@@ -147,6 +152,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                     "lastname" to lastnameState.value,
                     "email" to emailState.value,
                     "birth_date" to birthDateState.value
+
                 )
             )
 
@@ -234,5 +240,10 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
         }) {
             Text("Upload Image")
         }
+        PasswordChangeSection(currentPasswordState, newPasswordState, repeatNewPasswordState, httpClient, jwtToken)
     }
-}
+
+        Text("Change Password", style = MaterialTheme.typography.h6)
+
+
+    }
