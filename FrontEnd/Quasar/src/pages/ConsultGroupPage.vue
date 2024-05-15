@@ -47,12 +47,9 @@ onMounted(async () => {
   }
 
   function getWidth() {
-
     width.value = window.innerWidth;
   }
-
   getWidth();
-
   window.addEventListener('resize', getWidth);
 });
 
@@ -61,7 +58,6 @@ async function getGroup() {
   try {
     const response = await api.get(`/groups/${groupId}`);
     group.value = response.data;
-    console.log(group.value)
 
     isGroupFavorite();
   }

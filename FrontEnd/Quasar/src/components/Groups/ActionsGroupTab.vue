@@ -14,6 +14,7 @@ import DialogRefund from 'components/Groups/DialogRefund.vue';
 import { io } from 'socket.io-client';
 import { NotificationBus} from 'boot/eventBus';
 import DialogPrivateMessage from "components/Common/DialogPrivateMessage.vue";
+import {downloadCSV, generateCSV} from "boot/csvGenerator";
 
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
@@ -221,6 +222,11 @@ function openDialogPrivateMessage(user2:number){
   })
 }
 
+function generateAndSaveCsv(){
+  const csvContent = generateCSV(transactionList.value);
+  downloadCSV(csvContent, 'transactions.csv');
+}
+
 </script>
 
 <template>
@@ -284,6 +290,17 @@ function openDialogPrivateMessage(user2:number){
                 label="Nouvelle transaction"
                 @click="openDialogCreateTransaction"
                 no-caps/>
+              <q-btn
+                class="q-mx-md"
+                color="secondary"
+                icon-right="format_list_numbered"
+                outline
+                @click="generateAndSaveCsv"
+                no-caps>
+                <q-tooltip>
+                  Générer un fichier CSV
+                </q-tooltip>
+              </q-btn>
             </div>
             <q-card-section>
               <q-item>
