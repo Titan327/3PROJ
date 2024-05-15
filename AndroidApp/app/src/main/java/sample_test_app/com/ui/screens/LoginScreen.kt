@@ -161,7 +161,7 @@ fun LoginScreen(
 
         }
 
-        GoogleSignInButton()
+        GoogleSignInButton(httpClient)
 
     }
 }

@@ -10,11 +10,15 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import sample_test_app.com.http.Repository.OauthGoogleRepositry
 
 @Composable
-fun GoogleSignInButton () {
+fun GoogleSignInButton (httpClient: HttpClient) {
+
+    val oauthGoogleRepositry = OauthGoogleRepositry(httpClient)
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -45,6 +49,8 @@ fun GoogleSignInButton () {
                    .createFrom(credential.data)
 
                val googleIdToken = googleIdCredential.idToken
+
+               oauthGoogleRepositry.PostTokenGoogle(googleIdToken)
 
                Log.i("google-oauth",googleIdToken)
            }catch (e:Exception) {
