@@ -62,11 +62,8 @@ const getGroupDoneRefunds = async (req, res) => {
             attributes: ['id', 'refundingUserId', 'refundedUserId', 'amount', 'updatedAt']
         });
         let formattedRefunds = refunds.map(refund => {
-            let date = refund.updatedAt;
-            delete refund.updatedAt;
             return {
                 ...refund.toJSON(),
-                date
             };
         });
         return res.status(200).send(formattedRefunds);
