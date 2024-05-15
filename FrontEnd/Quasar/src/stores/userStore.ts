@@ -42,7 +42,7 @@ async function getUserData(): Promise<void> {
 }
 
 async function getUser(): Promise<IUser> {
-  if (!user.value.id) {
+  if (!user.value.id){
     await getUserData();
   }
   return user.value;

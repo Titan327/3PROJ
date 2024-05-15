@@ -18,7 +18,6 @@ async function getNotificationCounts() {
   try {
     const response = await api.get('notifs/count');
     count.value = response.data.count;
-    console.log(count.value);
   } catch (error) {
     console.error(error);
   }
