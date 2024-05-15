@@ -169,11 +169,15 @@ const computeFriendPaypalLink = computed(() => {
             v-if="computeFriendIban"
             label="Rembourser par virement bancaire"
             type="submit"
+            :disable="!computeBankLink"
             :loading="loading"
             hide-bottom-space
             no-caps
-            @click="redirectBankWebSite(computeBankLink)"
-          />
+            @click="redirectBankWebSite(computeBankLink)">
+            <q-tooltip class="bg-red" v-if="!computeBankLink">
+              Vous devez avoir un RIB d'enregistré pour utiliser cette fonctionnalité
+            </q-tooltip>
+          </q-btn>
         </div>
         <div class="q-ma-md row">
           <q-space></q-space>

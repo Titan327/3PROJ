@@ -449,7 +449,7 @@ function openDialogPrivateMessage(user2:number){
                   <q-space></q-space>
                   <q-space></q-space>
                   <q-item-section class="q-mx-auto">
-                    <span class="q-mx-auto">Remboursé</span>
+                    <span class="q-mx-auto">Remboursé le {{formatDate(refund.updatedAt)}}</span>
                   </q-item-section>
                 </q-item>
               </q-scroll-area>

@@ -3,5 +3,6 @@ export interface Refund {
   "refundingUserId": number,
   "refundedUserId": number,
   "amount":  number,
+  "updatedAt": Date,
 }
 
