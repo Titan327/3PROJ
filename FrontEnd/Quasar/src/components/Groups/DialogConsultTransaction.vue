@@ -88,7 +88,7 @@ function getCatColor(catId: number) {
           <br>
           <span>Créé le {{formatDate(_transaction.date)}} par {{getUserGroupData(_transaction.senderId)?.username}}</span>
           <br>
-          <span><a v-if="_transaction.receipt != 'default'" class="text-secondary" :href="_transaction.receipt" target="_blank">Afficher le ticket de caisse</a></span>
+          <span><a v-if="_transaction.receipt != '' " class="text-secondary" :href="_transaction.receipt" target="_blank">Afficher le ticket de caisse</a></span>
 
         </div>
         <div class="picture">
