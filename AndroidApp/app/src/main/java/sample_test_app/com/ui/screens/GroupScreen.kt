@@ -17,16 +17,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -51,15 +49,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -114,7 +111,7 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
 fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, userId: String, httpClient: HttpClient) {
     val transactions = remember { mutableStateOf(emptyList<Transaction>()) }
     val refundsToDo = remember { mutableStateOf(emptyList<Refund>()) }
-    val refundsDone = remember { mutableStateOf(emptyList<Refund>()) }
+    val doneRefunds = remember { mutableStateOf(emptyList<Refund>()) }
 
 
     val isBalanceDisplayed = remember { mutableStateOf(true) }
@@ -132,7 +129,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
         CoroutineScope(Dispatchers.Main).launch {
             transactions.value = TransactionRepository(httpClient).getGroupTransactions(groupId, jwtToken).sortedByDescending { it.date }
             refundsToDo.value = RefundRepository(httpClient).getGroupRefunds(jwtToken, groupId)
-            refundsDone.value = RefundRepository(httpClient).getGroupDoneRefunds(jwtToken, groupId)
+            doneRefunds.value = RefundRepository(httpClient).getGroupDoneRefunds(jwtToken, groupId)
         }
     }
 
@@ -751,7 +748,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                         }
                     }
                     if (isRefundDisplayed.value) {
-                        if (refundsDone.value.isEmpty() && refundsToDo.value.isEmpty()) {
+                        if (doneRefunds.value.isEmpty() && refundsToDo.value.isEmpty()) {
                             Text(
                                 text = "Aucun remboursement n'est à faire ou n'a encore été fait dans ce groupe",
                                 color = Color.White,
@@ -760,23 +757,58 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                 )
                             )
                         } else {
-                            Column () {
+                            Column {
                                 if (refundsToDo.value.isNotEmpty()) {
+                                    Row (modifier = Modifier.padding(bottom = 8.dp)) {
+                                        Text(
+                                            text = "Remboursements à faire",
+                                            color = Color.White,
+                                            style = TextStyle(
+                                                fontSize = 24.sp,
+                                                textDecoration = TextDecoration.Underline
+                                            )
+                                        )
+                                    }
                                     Row (
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .padding(bottom = 8.dp)
                                     ) {
-                                        Column (modifier = Modifier.weight(2f)) {
-                                            Text(text = "Rembourseur")
+                                        Column (
+                                            modifier = Modifier.weight(2f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Rembourseur",
+                                                color = Color.White
+                                            )
                                         }
-                                        Column (modifier = Modifier.weight(2f)) {
-                                            Text(text = "Remboursé")
+                                        Column (
+                                            modifier = Modifier.weight(2f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Remboursé",
+                                                color = Color.White
+                                            )
                                         }
-                                        Column (modifier = Modifier.weight(2f)) {
-                                            Text(text = "Montant")
+                                        Column (
+                                            modifier = Modifier.weight(2f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Montant",
+                                                color = Color.White
+                                            )
                                         }
-                                        Column (modifier = Modifier.weight(1f)) {
-                                            Text(text = "Action")
+                                        Column (
+                                            modifier = Modifier.weight(1f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Action",
+                                                color = Color.White
+                                            )
                                         }
                                     }
                                     for (refund in refundsToDo.value) {
@@ -784,27 +816,177 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                         ) {
-                                            Column (modifier = Modifier.weight(2f)) {
-                                                Text(text = users.find { it.id == refund.refundedUserId }?.username.toString())
+                                            Column (
+                                                modifier = Modifier
+                                                    .weight(2f)
+                                                    .align(Alignment.CenterVertically),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = if (users.find { it.id == refund.refundingUserId }?.username?.length!! > 11)
+                                                        users.find { it.id == refund.refundingUserId }?.username.toString().substring(0, 8) + "..."
+                                                    else
+                                                        users.find { it.id == refund.refundingUserId }?.username.toString(),
+                                                    color = Color.White)
                                             }
-                                            Column (modifier = Modifier.weight(2f)) {
-                                                Text(text = users.find { it.id == refund.refundedUserId }?.username.toString())
+                                            Column (
+                                                modifier = Modifier
+                                                    .weight(2f)
+                                                    .align(Alignment.CenterVertically),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = if (users.find { it.id == refund.refundedUserId }?.username?.length!! > 11)
+                                                        users.find { it.id == refund.refundedUserId }?.username.toString().substring(0, 8) + "..."
+                                                    else
+                                                        users.find { it.id == refund.refundedUserId }?.username.toString(),
+                                                    color = Color.White
+                                                )
                                             }
-                                            Column (modifier = Modifier.weight(2f)) {
-                                                Text(text = refund.amount.toString() + " €")
+                                            Column (
+                                                modifier = Modifier
+                                                    .weight(2f)
+                                                    .align(Alignment.CenterVertically),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = refund.amount.toString() + " €",
+                                                    color = Color.White
+                                                )
                                             }
-                                            Column (modifier = Modifier.weight(1f)) {
-                                                if (refund.refundedUserId == userId) {
+                                            Column (
+                                                modifier = Modifier.weight(1f),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                println(refund.refundingUserId)
+                                                println(userId)
+                                                println(refund.refundingUserId == userId)
+                                                if (refund.refundingUserId == userId) {
                                                     IconButton(onClick = { isRefundPopUpDisplayed.value = true }) {
                                                         Image(
                                                             painter = painterResource(id = R.drawable.rightarrow),
                                                             contentDescription = "Create Group",
                                                             modifier = Modifier
-                                                                .size(48.dp)
-                                                                .background(Color(android.graphics.Color.parseColor("#FFA31A")))
+                                                                .size(24.dp)
+                                                                .clip(CircleShape)
+                                                                .background(
+                                                                    Color(
+                                                                        android.graphics.Color.parseColor(
+                                                                            "#FFA31A"
+                                                                        )
+                                                                    )
+                                                                )
                                                         )
                                                     }
                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (doneRefunds.value.isNotEmpty()) {
+                                    Row (modifier = Modifier.padding(bottom = 8.dp)) {
+                                        Text(
+                                            text = "Remboursements déjà effectués: ",
+                                            color = Color.White,
+                                            style = TextStyle(
+                                                fontSize = 24.sp,
+                                                textDecoration = TextDecoration.Underline
+                                            )
+                                        )
+                                    }
+                                    Row (
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 8.dp)
+                                    ) {
+                                        Column (
+                                            modifier = Modifier.weight(1f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Rembourseur",
+                                                color = Color.White
+                                            )
+                                        }
+                                        Column (
+                                            modifier = Modifier.weight(1f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Remboursé",
+                                                color = Color.White
+                                            )
+                                        }
+                                        Column (
+                                            modifier = Modifier.weight(1f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Montant",
+                                                color = Color.White
+                                            )
+                                        }
+                                        Column (
+                                            modifier = Modifier.weight(1f),
+                                            horizontalAlignment = CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Date",
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+                                    for (refund in doneRefunds.value) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                            Column (
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .align(Alignment.CenterVertically),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = if (users.find { it.id == refund.refundingUserId }?.username?.length!! > 11)
+                                                        users.find { it.id == refund.refundingUserId }?.username.toString().substring(0, 8) + "..."
+                                                    else
+                                                        users.find { it.id == refund.refundingUserId }?.username.toString(),
+                                                    color = Color.White)
+                                            }
+                                            Column (
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .align(Alignment.CenterVertically),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = if (users.find { it.id == refund.refundedUserId }?.username?.length!! > 11)
+                                                        users.find { it.id == refund.refundedUserId }?.username.toString().substring(0, 8) + "..."
+                                                    else
+                                                        users.find { it.id == refund.refundedUserId }?.username.toString(),
+                                                    color = Color.White
+                                                )
+                                            }
+                                            Column (
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .align(Alignment.CenterVertically),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = refund.amount.toString() + " €",
+                                                    color = Color.White
+                                                )
+                                            }
+                                            Column (
+                                                modifier = Modifier.weight(1f),
+                                                horizontalAlignment = CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    text = ZonedDateTime.parse(refund.date).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                                    color = Color.White
+                                                )
                                             }
                                         }
                                     }

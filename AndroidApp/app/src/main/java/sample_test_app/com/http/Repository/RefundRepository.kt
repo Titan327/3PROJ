@@ -18,7 +18,7 @@ class RefundRepository(private val httpClient: HttpClient) {
     suspend fun getGroupRefunds(jwtToken: String, groupId: String): List<Refund> {
         try {
             val userResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/$$groupId/refunds") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/$groupId/refunds") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }
@@ -39,7 +39,7 @@ class RefundRepository(private val httpClient: HttpClient) {
     suspend fun getGroupDoneRefunds(jwtToken: String, groupId: String): List<Refund> {
         try {
             val userResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/$$groupId/refunds/done") {
+                httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/$groupId/refunds/done") {
                     contentType(ContentType.Application.Json)
                     header("Authorization", "Bearer $jwtToken")
                 }
