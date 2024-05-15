@@ -1,7 +1,6 @@
 import { ref, Ref } from 'vue';
 import { api } from "boot/axios";
 import { DefaultGroup, Group } from 'src/interfaces/group.interface';
-import { IUser } from 'src/interfaces/user.interface';
 
 const group = ref(DefaultGroup());
 

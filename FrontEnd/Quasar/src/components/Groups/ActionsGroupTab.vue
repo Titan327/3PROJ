@@ -376,7 +376,7 @@ function openDialogPrivateMessage(user2:number){
               </q-item>
             </q-card-section>
             <q-separator/>
-            <q-card-section v-if="refundsList.length > 0">
+            <q-card-section v-if="refundsList.length > 0 || doneRefundList.length >0">
               <q-scroll-area style="height: 300px">
                 <q-item v-for="refund in refundsList" :key="refund.id">
                   <q-item-section avatar>
@@ -414,7 +414,6 @@ function openDialogPrivateMessage(user2:number){
                   <q-btn outline class="w-60 q-mx-auto" color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
                   <span v-else class="q-mx-auto">Rien à effectuer</span>
                   </q-item-section>
-
                 </q-item>
                 <q-item-section class="text-h6" v-if="doneRefundList.length > 0">Remboursements effectués</q-item-section>
                 <q-item v-for="refund in doneRefundList" :key="refund.id">
@@ -452,7 +451,6 @@ function openDialogPrivateMessage(user2:number){
                   <q-item-section class="q-mx-auto">
                     <span class="q-mx-auto">Remboursé</span>
                   </q-item-section>
-
                 </q-item>
               </q-scroll-area>
             </q-card-section>

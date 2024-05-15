@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 
-import {onMounted,ref} from "vue";
+import {onMounted, ref, watch} from "vue";
 import { useRoute, useRouter } from 'vue-router';
 import LeftPannel from "components/Common/LeftPannel.vue";
 const router = useRouter();
@@ -39,7 +39,15 @@ function setCookie(name, value, minutes) {
   document.cookie = name + "=" + value + ";" + expires + ";path=/";
 }
 
-onMounted(() => {
+watch(route, async () => {
+  await intilalizeData();
+});
+
+onMounted(async () => {
+  await intilalizeData();
+});
+
+async function intilalizeData(){
   try {
     const tokenGroup = route.params.token;
     const token = sessionStorage.getItem('userToken');
@@ -56,7 +64,7 @@ onMounted(() => {
     router.push('/login');
     console.error(error);
   }
-});
+}
 
 </script>
 <style>
