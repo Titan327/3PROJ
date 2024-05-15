@@ -59,14 +59,19 @@ const getGroupDoneRefunds = async (req, res) => {
     try {
         let refunds = await Refund.findAll({
             where: {groupId, processed: true},
-            attributes: ['id', 'refundingUserId', 'refundedUserId', 'amount']
+            attributes: ['id', 'refundingUserId', 'refundedUserId', 'amount', 'updatedAt']
         });
-        return res.status(200).send(refunds);
+        let formattedRefunds = refunds.map(refund => {
+            return {
+                ...refund.toJSON(),
+                date: refund.updatedAt
+            };
+        });
+        return res.status(200).send(formattedRefunds);
     } catch (error) {
         console.error(error);
         return res.status(500).send('Internal Server Error');
     }
-
 }
 
 const calculateMinimalRefunds = async (groupId) => {
