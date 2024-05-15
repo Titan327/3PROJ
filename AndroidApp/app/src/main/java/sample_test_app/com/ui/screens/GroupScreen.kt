@@ -975,8 +975,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                                 horizontalAlignment = CenterHorizontally
                                             ) {
                                                 Text(
-                                                    text = refund.amount.toString() + " €",
-                                                    color = Color.White
+                                                    text = String.format("%.2f €", refund.amount),                                                    color = Color.White
                                                 )
                                             }
                                             Column (
@@ -984,7 +983,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                                 horizontalAlignment = CenterHorizontally
                                             ) {
                                                 Text(
-                                                    text = ZonedDateTime.parse(refund.date).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                                    text = ZonedDateTime.parse(refund.updatedAt).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                                                     color = Color.White
                                                 )
                                             }

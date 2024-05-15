@@ -7,5 +7,6 @@ data class Refund(
     val id: String? = "",
     val refundingUserId: String? = "",
     val refundedUserId: String? = "",
-    val amount: Double? = 0.0
+    val amount: Double? = 0.0,
+    val updatedAt: String? = "",
 )
