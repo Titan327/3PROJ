@@ -63,7 +63,7 @@ const getGroupDoneRefunds = async (req, res) => {
         });
         let formattedRefunds = refunds.map(refund => {
             let date = refund.updatedAt;
-            delete refundObject.updatedAt;
+            delete refund.updatedAt;
             return {
                 ...refund.toJSON(),
                 date
