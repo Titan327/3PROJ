@@ -9,13 +9,15 @@ const oauthGoogle = async (req,res) => {
     const { token,type } = req.body;
 
     try {
-        let idClient = '';
+        let idClient = '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com';
 
+        /*
         if (type === "web"){
             idClient = '1081302926939-apm23gnd9muarl2j6j4l24labnkt6e3r.apps.googleusercontent.com';
         }else if (type === "android"){
             idClient = '1081302926939-86a0mhsm52mqlb9t9g5huehvn31s3r9l.apps.googleusercontent.com';
         }
+         */
 
         const client = new OAuth2Client(idClient);
         const ticket = await client.verifyIdToken({
