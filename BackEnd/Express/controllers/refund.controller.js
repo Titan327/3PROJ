@@ -36,7 +36,7 @@ const processRefund = async (req, res) => {
 
 const getGroupRefunds = async (req, res) => {
     console.log(`REST getGroupRefunds`);
-    const {groupId} = req.params;
+    const {groupId} = Number(req.params.groupId)
     try {
         let refunds = await Refund.findAll({
             where: {groupId, processed: false},
@@ -51,7 +51,7 @@ const getGroupRefunds = async (req, res) => {
 
 const getGroupDoneRefunds = async (req, res) => {
     console.log(`REST getGroupDoneRefunds`);
-    const {groupId} = req.params;
+    const {groupId} = Number(req.params.groupId);
     try {
         let refunds = await Refund.findAll({
             where: {groupId, processed: true},
