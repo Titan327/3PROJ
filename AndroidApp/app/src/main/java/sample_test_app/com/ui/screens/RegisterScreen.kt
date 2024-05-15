@@ -73,8 +73,8 @@ fun RegisterScreen(
     val passwordState = remember { mutableStateOf("") }
     val passwordConfirmationState = remember { mutableStateOf("") }
     val dateOfBirthState = remember { mutableStateOf("") }
-    val jwtToken = remember { mutableStateOf("") } // Add this line
-    val user = remember { mutableStateOf(User()) } // Add this line
+    val jwtToken = remember { mutableStateOf("") }
+    val user = remember { mutableStateOf(User()) }
 
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordErrorState = remember { mutableStateOf(false) }
@@ -181,8 +181,6 @@ fun RegisterScreen(
                     if (response.status == HttpStatusCode.OK || response.status == HttpStatusCode.Created) {
                         withContext(Dispatchers.Main) {
                             println("Registration succeeded.")
-
-                            // After successful registration, navigate to login screen with username and password
                             navController.navigate("login/${usernameState.value}/${passwordState.value}")
                         }
                     } else {

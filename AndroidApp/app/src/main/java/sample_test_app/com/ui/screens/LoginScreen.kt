@@ -74,7 +74,6 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Champ de texte "Username"
         TextField(
             value = usernameState.value,
             onValueChange = { newValue ->
@@ -85,7 +84,6 @@ fun LoginScreen(
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-        // Champ de texte "Password"
         TextField(
             value = passwordState.value,
             onValueChange = { newValue ->

@@ -1,12 +1,17 @@
 package sample_test_app.com.ui.screens
 
+import PaymentMethod
+import PaypalPaymentMethod
+import RIBPaymentMethod
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.ClipData
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,6 +54,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import android.content.ClipboardManager
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -57,6 +65,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -69,6 +78,7 @@ import sample_test_app.com.LocalJwtToken
 import sample_test_app.com.LocalUser
 import sample_test_app.com.R
 import sample_test_app.com.http.Repository.GroupRepository
+import sample_test_app.com.http.Repository.PaymentMethodsRepository
 import sample_test_app.com.http.Repository.RefundRepository
 import sample_test_app.com.http.Repository.TransactionRepository
 import sample_test_app.com.models.Category
@@ -88,12 +98,10 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
     val jwtToken = LocalJwtToken.current
     val userId = LocalUser.current.id.toString()
     val group = remember { mutableStateOf(Group()) }
-    val users = remember { mutableStateOf(emptyList<User>()) }
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
             group.value = groupId?.let { GroupRepository(httpClient).getGroup(it, jwtToken) }!!
-            users.value = group.value.Users
         }
     }
 
@@ -101,18 +109,18 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
         groupPicture = if (group.value.picture?.isEmpty() == false) {
             group.value.picture?.get(1)
         } else null) {
-        GroupScreenContent(users = users.value, groupId = groupId.toString(), jwtToken = jwtToken, userId = userId, httpClient)
+        GroupScreenContent(groupId = groupId.toString(), jwtToken = jwtToken, userId = userId, httpClient)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("DiscouragedApi")
 @Composable
-fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, userId: String, httpClient: HttpClient) {
+fun GroupScreenContent(groupId: String, jwtToken: String, userId: String, httpClient: HttpClient) {
     val transactions = remember { mutableStateOf(emptyList<Transaction>()) }
     val refundsToDo = remember { mutableStateOf(emptyList<Refund>()) }
     val doneRefunds = remember { mutableStateOf(emptyList<Refund>()) }
-
+    val users = remember { mutableStateOf(emptyList<User>()) }
 
     val isBalanceDisplayed = remember { mutableStateOf(true) }
     val isTransactionsDisplayed = remember { mutableStateOf(false) }
@@ -122,16 +130,21 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
     val isTransactionCreationPopUpDisplayed = remember { mutableStateOf(false) }
     val isErrorPopUpDisplayed = remember { mutableStateOf(false) }
     val isRefundPopUpDisplayed = remember { mutableStateOf(false) }
+    val refundToDoDetails = remember { mutableStateOf(Refund()) }
+    val paymentMethodsUserToRefund = remember { mutableStateOf(emptyList<PaymentMethod>()) }
     val error = remember { mutableStateOf("") }
     val categories = CategoryStore.categories
 
-    LaunchedEffect(key1 = userId) {
+    fun getGroupInfos() {
         CoroutineScope(Dispatchers.Main).launch {
             transactions.value = TransactionRepository(httpClient).getGroupTransactions(groupId, jwtToken).sortedByDescending { it.date }
             refundsToDo.value = RefundRepository(httpClient).getGroupRefunds(jwtToken, groupId)
             doneRefunds.value = RefundRepository(httpClient).getGroupDoneRefunds(jwtToken, groupId)
+            users.value = groupId.let { GroupRepository(httpClient).getGroup(it, jwtToken) }.Users
         }
     }
+
+    getGroupInfos()
 
     if (isTransactionCreationPopUpDisplayed.value) {
         val newTransactionLabel = remember { mutableStateOf("") }
@@ -290,7 +303,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                     .padding(bottom = 16.dp),
                                 colors = orangeTextFieldColors
                             )
-                            for (user in users) {
+                            for (user in users.value) {
                                 Row(
                                     modifier = Modifier
                                         .padding(top = 16.dp, bottom = 16.dp)
@@ -411,6 +424,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                     if (succes == "true") {
                                         resetTransactionCreationPopUp()
                                         isTransactionCreationPopUpDisplayed.value = false
+                                        getGroupInfos()
                                         isErrorPopUpDisplayed.value = false
                                         error.value = ""
                                     } else {
@@ -513,15 +527,15 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
 
                     // Solde
                     if (isBalanceDisplayed.value) {
-                        val rowNumber = if (users.size % 3 == 0) {
-                            users.size / 3
+                        val rowNumber = if (users.value.size % 3 == 0) {
+                            users.value.size / 3
                         } else {
-                            users.size / 3 + 1
+                            users.value.size / 3 + 1
                         }
                         val boxHeight = rowNumber * 170
                         Box(modifier = Modifier.height(boxHeight.dp)) {
                             LazyColumn {
-                                items(users.chunked(3)) { rowUsers ->
+                                items(users.value.chunked(3)) { rowUsers ->
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -747,6 +761,8 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                             }
                         }
                     }
+
+                    // Refunds
                     if (isRefundDisplayed.value) {
                         if (doneRefunds.value.isEmpty() && refundsToDo.value.isEmpty()) {
                             Text(
@@ -823,10 +839,10 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                                 horizontalAlignment = CenterHorizontally
                                             ) {
                                                 Text(
-                                                    text = if (users.find { it.id == refund.refundingUserId }?.username?.length!! > 11)
-                                                        users.find { it.id == refund.refundingUserId }?.username.toString().substring(0, 8) + "..."
+                                                    text = if (users.value.find { it.id == refund.refundingUserId }?.username?.length!! > 11)
+                                                        users.value.find { it.id == refund.refundingUserId }?.username.toString().substring(0, 8) + "..."
                                                     else
-                                                        users.find { it.id == refund.refundingUserId }?.username.toString(),
+                                                        users.value.find { it.id == refund.refundingUserId }?.username.toString(),
                                                     color = Color.White)
                                             }
                                             Column (
@@ -836,10 +852,10 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                                 horizontalAlignment = CenterHorizontally
                                             ) {
                                                 Text(
-                                                    text = if (users.find { it.id == refund.refundedUserId }?.username?.length!! > 11)
-                                                        users.find { it.id == refund.refundedUserId }?.username.toString().substring(0, 8) + "..."
+                                                    text = if (users.value.find { it.id == refund.refundedUserId }?.username?.length!! > 11)
+                                                        users.value.find { it.id == refund.refundedUserId }?.username.toString().substring(0, 8) + "..."
                                                     else
-                                                        users.find { it.id == refund.refundedUserId }?.username.toString(),
+                                                        users.value.find { it.id == refund.refundedUserId }?.username.toString(),
                                                     color = Color.White
                                                 )
                                             }
@@ -858,11 +874,22 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                                 modifier = Modifier.weight(1f),
                                                 horizontalAlignment = CenterHorizontally
                                             ) {
-                                                println(refund.refundingUserId)
-                                                println(userId)
-                                                println(refund.refundingUserId == userId)
                                                 if (refund.refundingUserId == userId) {
-                                                    IconButton(onClick = { isRefundPopUpDisplayed.value = true }) {
+                                                    IconButton(
+                                                        onClick =
+                                                        {
+                                                            isRefundPopUpDisplayed.value = true
+                                                            refundToDoDetails.value = refund
+                                                            CoroutineScope(Dispatchers.Main).launch {
+                                                                paymentMethodsUserToRefund.value =
+                                                                    PaymentMethodsRepository(httpClient).getPaymentMethods(
+                                                                        refund.refundedUserId.toString(),
+                                                                        groupId,
+                                                                        jwtToken
+                                                                    )
+                                                            }
+                                                        }
+                                                    ) {
                                                         Image(
                                                             painter = painterResource(id = R.drawable.rightarrow),
                                                             contentDescription = "Create Group",
@@ -883,6 +910,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                         }
                                     }
                                 }
+
                                 if (doneRefunds.value.isNotEmpty()) {
                                     Row (modifier = Modifier.padding(bottom = 8.dp)) {
                                         Text(
@@ -948,10 +976,10 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                                 horizontalAlignment = CenterHorizontally
                                             ) {
                                                 Text(
-                                                    text = if (users.find { it.id == refund.refundingUserId }?.username?.length!! > 11)
-                                                        users.find { it.id == refund.refundingUserId }?.username.toString().substring(0, 8) + "..."
+                                                    text = if (users.value.find { it.id == refund.refundingUserId }?.username?.length!! > 11)
+                                                        users.value.find { it.id == refund.refundingUserId }?.username.toString().substring(0, 8) + "..."
                                                     else
-                                                        users.find { it.id == refund.refundingUserId }?.username.toString(),
+                                                        users.value.find { it.id == refund.refundingUserId }?.username.toString(),
                                                     color = Color.White)
                                             }
                                             Column (
@@ -961,10 +989,10 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                                 horizontalAlignment = CenterHorizontally
                                             ) {
                                                 Text(
-                                                    text = if (users.find { it.id == refund.refundedUserId }?.username?.length!! > 11)
-                                                        users.find { it.id == refund.refundedUserId }?.username.toString().substring(0, 8) + "..."
+                                                    text = if (users.value.find { it.id == refund.refundedUserId }?.username?.length!! > 11)
+                                                        users.value.find { it.id == refund.refundedUserId }?.username.toString().substring(0, 8) + "..."
                                                     else
-                                                        users.find { it.id == refund.refundedUserId }?.username.toString(),
+                                                        users.value.find { it.id == refund.refundedUserId }?.username.toString(),
                                                     color = Color.White
                                                 )
                                             }
@@ -1031,7 +1059,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                             )
                         )
                         Text(
-                            "Créé par : " + users.find { it.id == transactionDetails.value.senderId }?.username + " le " + ZonedDateTime.parse(
+                            "Créé par : " + users.value.find { it.id == transactionDetails.value.senderId }?.username + " le " + ZonedDateTime.parse(
                                 transactionDetails.value.date
                             ).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                             color = Color.White,
@@ -1047,8 +1075,8 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                if (users.find { it.id == user.userId }?.profile_picture?.get(0)
-                                        ?.isNotBlank() == true && users.find { it.id == user.userId }?.profile_picture?.get(
+                                if (users.value.find { it.id == user.userId }?.profile_picture?.get(0)
+                                        ?.isNotBlank() == true && users.value.find { it.id == user.userId }?.profile_picture?.get(
                                         0
                                     ) != "null"
                                 ) {
@@ -1056,7 +1084,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                         painter = rememberAsyncImagePainter(
                                             ImageRequest.Builder(LocalContext.current)
                                                 .data(
-                                                    data = users.find { it.id == user.userId }?.profile_picture?.get(
+                                                    data = users.value.find { it.id == user.userId }?.profile_picture?.get(
                                                         0
                                                     )
                                                 )
@@ -1082,7 +1110,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                                             .size(40.dp)
                                     )
                                 }
-                                val username = users.find { it.id == user.userId }?.username
+                                val username = users.value.find { it.id == user.userId }?.username
                                 if (username != null) {
                                     Text(
                                         text = if (username.length > 11) username.substring(
@@ -1141,7 +1169,7 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                 title = {
                     Row {
                         Text(
-                            transactionDetails.value.label.toString(),
+                            text = "Rembourser " + refundToDoDetails.value.amount + "€ à " + users.value.find { it.id == refundToDoDetails.value.refundedUserId }?.username,
                             color = Color.White,
                             style = TextStyle(
                                 fontSize = 24.sp
@@ -1150,116 +1178,116 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                     }
                 },
                 text = {
+                    val userToRefundUsername = users.value.find { it.id == refundToDoDetails.value.refundedUserId }?.username
                     Column(
                         modifier = Modifier
                             .padding(bottom = 16.dp, top = 16.dp),
                     ) {
-                        Text(
-                            "Montant : " + transactionDetails.value.total_amount.toString() + " €",
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 16.sp
+                        if (paymentMethodsUserToRefund.value.isEmpty()) {
+                            Text(
+                                text = "$userToRefundUsername n'a ajouté aucun moyen de paiement, vous pouvez toujours effectuer un remboursement par moyen externe.",
+                                color = Color.White,
+                                style = TextStyle(
+                                    fontSize = 16.sp
+                                )
                             )
-                        )
-                        Text(
-                            "Catégorie : " + categories.find { it.id == transactionDetails.value.categoryId }?.label,
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 16.sp
-                            )
-                        )
-                        Text(
-                            "Créé par : " + users.find { it.id == transactionDetails.value.senderId }?.username + " le " + ZonedDateTime.parse(
-                                transactionDetails.value.date
-                            ).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 16.sp
-                            )
-                        )
-                        for (user in transactionDetails.value.TransactionUsers!!) {
-                            Row(
-                                modifier = Modifier
-                                    .padding(top = 16.dp, bottom = 16.dp)
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                if (users.find { it.id == user.userId }?.profile_picture?.get(0)
-                                        ?.isNotBlank() == true && users.find { it.id == user.userId }?.profile_picture?.get(
-                                        0
-                                    ) != "null"
-                                ) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(
-                                            ImageRequest.Builder(LocalContext.current)
-                                                .data(
-                                                    data = users.find { it.id == user.userId }?.profile_picture?.get(
-                                                        0
-                                                    )
-                                                )
-                                                .apply(block = fun ImageRequest.Builder.() {
-                                                    transformations(CircleCropTransformation())
-                                                }).build()
-                                        ),
-                                        contentDescription = "User Profile Picture",
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                    )
-                                } else {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(
-                                            ImageRequest.Builder(LocalContext.current)
-                                                .data(data = R.drawable.userdefault)
-                                                .apply(block = fun ImageRequest.Builder.() {
-                                                    transformations(CircleCropTransformation())
-                                                }).build()
-                                        ),
-                                        contentDescription = "User Profile Picture",
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                    )
-                                }
-                                val username = users.find { it.id == user.userId }?.username
-                                if (username != null) {
-                                    Text(
-                                        text = if (username.length > 11) username.substring(
-                                            0,
-                                            8
-                                        ) + "..." else username.toString(),
-                                        color = Color.White,
-                                        style = TextStyle(
-                                            fontSize = 16.sp
-                                        )
-                                    )
-                                }
+                        } else {
+                            val userHavePaypal = paymentMethodsUserToRefund.value.any { it is PaypalPaymentMethod }
+                            val userHaveRib = paymentMethodsUserToRefund.value.any { it is RIBPaymentMethod }
+                            if (userHaveRib) {
                                 Text(
-                                    text = user.amount.toString() + " €",
+                                    text = "Vous pouvez copier l'IBAN de $userToRefundUsername pour effectuer le virement bancaire ensuite ou effectuer le remboursement via PayPal.",
                                     color = Color.White,
-                                    style = TextStyle(
-                                        fontSize = 16.sp
-                                    )
+                                    modifier = Modifier.padding(bottom = 16.dp)
                                 )
-
                             }
-                            Surface(
-                                color = Color(android.graphics.Color.parseColor("#ffa31a")),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(1.dp),
-                                elevation = 1.dp,
-                                border = BorderStroke(
-                                    1.dp,
-                                    Color(android.graphics.Color.parseColor("#ffa31a"))
+                            if (userHavePaypal) {
+                                Text(
+                                    text = "En cliquant sur \"Rembourser via Paypal\" vous serez redirigé vers le profil de $userToRefundUsername afin d'effectuer le remboursement.",
+                                    color = Color.White,
+                                    modifier = Modifier.padding(bottom = 16.dp)
                                 )
-                            ) {}
+                            }
+                            if (userHaveRib) {
+                                val ribPaymentMethod = paymentMethodsUserToRefund.value.find { it is RIBPaymentMethod } as? RIBPaymentMethod
+                                val iban = ribPaymentMethod?.value?.IBAN
+                                Row (
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp)
+                                        .border(
+                                            width = 1.dp,
+                                            color = Color.White,
+                                            shape = RoundedCornerShape(8.dp),
+                                        )
+                                ) {
+                                    Text(
+                                        text = iban.toString(),
+                                        color = Color.White,
+                                        modifier = Modifier.padding(8.dp)
+                                    )
+                                }
+                                Row (
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    val context = LocalContext.current
+                                    Button(onClick = {
+                                        val clipboard = ContextCompat.getSystemService(context, ClipboardManager::class.java)
+                                        val clip = ClipData.newPlainText("IBAN", iban)
+                                        clipboard?.setPrimaryClip(clip)
+                                    },
+                                        colors = ButtonDefaults.buttonColors(
+                                            backgroundColor = Color.Transparent,
+                                            contentColor = Color.White
+                                        ),
+                                        modifier = Modifier.border(
+                                            1.dp,
+                                            Color(android.graphics.Color.parseColor("#FFA31A")),
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.orangecopy),
+                                            contentDescription = "Image Description",
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                    if (userHavePaypal) {
+                                        Button(
+                                            onClick = {
+                                                val openURL = Intent(Intent.ACTION_VIEW)
+                                                val paypalPaymentMethod = paymentMethodsUserToRefund.value.find { it is PaypalPaymentMethod } as? PaypalPaymentMethod
+                                                val paypalUsername = paypalPaymentMethod?.value?.user_paypal
+                                                openURL.data = Uri.parse("https://www.paypal.com/paypalme/$paypalUsername")
+                                                context.startActivity(openURL)
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                backgroundColor = Color(android.graphics.Color.parseColor("#00457C")),
+                                                contentColor = Color.White
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "Rembourser via Paypal"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            if (userHavePaypal && !userHaveRib) {
+                                Text(
+                                    text = "En cliquant sur \"Rembourser via Paypal\" vous serez redirigé vers le profil de $userToRefundUsername afin d'effectuer le remboursement.",
+                                    color = Color.White,
+                                    modifier = Modifier.padding(bottom = 16.dp)
+                                )
+                            }
                         }
                     }
                 },
-                confirmButton = {
+                dismissButton = {
                     Button(
                         onClick = {
-                            isPopUpTransactionDisplayed.value = false
+                            isRefundPopUpDisplayed.value = false
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color(android.graphics.Color.parseColor("#ffa31a")),
@@ -1269,7 +1297,32 @@ fun GroupScreenContent(users: List<User> ,groupId: String, jwtToken: String, use
                         Text("Fermer")
                     }
                 },
-                backgroundColor = Color(android.graphics.Color.parseColor("#292929"))
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val refundDone = RefundRepository(httpClient).makeARefund(jwtToken, groupId, refundToDoDetails.value.id.toString())
+                                if (refundDone) {
+                                    isRefundPopUpDisplayed.value = false
+                                    getGroupInfos()
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.Transparent,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.border(
+                            1.dp,
+                            Color(android.graphics.Color.parseColor("#FFA31A")),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                    ) {
+                        Text("J'ai effectué le remboursement")
+                    }
+                },
+                backgroundColor = Color(android.graphics.Color.parseColor("#292929")),
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
