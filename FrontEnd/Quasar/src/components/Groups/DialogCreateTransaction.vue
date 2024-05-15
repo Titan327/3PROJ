@@ -55,7 +55,7 @@ async function createTransaction() {
         "label": _transaction.value.label,
         "total_amount": _transaction.value.total_amount,
         "date": new Date(),
-        "receipt": "default",
+        "receipt": "",
         "senderId": props.userId,
         "categoryId": _transaction.value.categoryId.id,
         "details": _transaction.value.details
