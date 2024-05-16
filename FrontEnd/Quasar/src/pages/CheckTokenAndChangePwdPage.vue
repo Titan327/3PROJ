@@ -13,6 +13,9 @@ let pass = ref();
 let passConfirmation = ref()
 let loading = ref(false)
 
+let isPwd = ref(true);
+let isPwd2 = ref(true);
+
 const checkPasswordMatch = (value) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -27,13 +30,13 @@ const checkPasswordComplexity = (value) => {
   const hasLowerCase = /[a-z]/.test(value);
   const hasUpperCase = /[A-Z]/.test(value);
   const hasDigit = /\d/.test(value);
-  const hasSpecialChar = /[@$!%*?&-_]/.test(value);
+  const hasSpecialChar = /[@$!%*?&]/.test(value);
 
   let errorMessage = "Le mot de passe doit contenir au moins";
   if (!hasLowerCase) errorMessage += " des minuscules,";
   if (!hasUpperCase) errorMessage += " des majuscules,";
   if (!hasDigit) errorMessage += " des chiffres,";
-  if (!hasSpecialChar) errorMessage += " un caractère spécial,";
+  if (!hasSpecialChar) errorMessage += " 2 caractères spéciaux (@ $ ! % * ? &) ";
 
   if (!hasLowerCase || !hasUpperCase || !hasDigit || !hasSpecialChar) {
     errorMessage = errorMessage.slice(0, -1);
@@ -102,6 +105,7 @@ async function changePassword() {
       />
     </div>
     <span class="text-primary text-h5 text-grey-3">Mot de passe oublié</span>
+    <q-form @submit="changePassword">
     <div class="inputs">
       <q-input
         class="input"
@@ -109,23 +113,35 @@ async function changePassword() {
         v-model="pass"
         label="Nouveau mot de passe"
         hide-bottom-space
-        type="password"
+        :type="isPwd ? 'password' : 'text'"
         :rules="[checkNotNull, checkPasswordComplexity]"
         dark
-        color="secondary"
-
-      />
+        color="secondary">
+        <template v-slot:append>
+          <q-icon
+            :name="isPwd ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="isPwd = !isPwd"
+          />
+        </template>
+      </q-input>
       <q-input
         class="input"
         outlined
         v-model="passConfirmation"
         label="Confirmer"
-        type="password"
+        :type="isPwd2 ? 'password' : 'text'"
         :rules="[checkNotNull, checkPasswordMatch]"
         dark
-        color="secondary"
-
-      />
+        color="secondary">
+        <template v-slot:append>
+          <q-icon
+            :name="isPwd2 ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="isPwd2 = !isPwd2"
+          />
+        </template>
+      </q-input>
       <div class="links text-secondary">
         <a class="text-secondary" href="#/login">Se connecter</a>
         <a class="text-secondary" href="#/register"><b>Je n'ai pas de compte</b></a>
@@ -135,11 +151,12 @@ async function changePassword() {
         color="secondary"
         text-color="white"
         unelevated
-        @click="changePassword"
+       type="submit"
         :loading="loading"
         label="Réinitialiser mon mot de passe"
       />
     </div>
+    </q-form>
   </div>
 </template>
 
