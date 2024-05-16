@@ -75,12 +75,12 @@ const forgottenPassword = async (req, res) => {
         console.log(token);
 
         let htmlContent = fs.readFileSync(ForgottenPasswordTemplate,'utf8');
-        htmlContent = htmlContent.replace('{{link}}', `${process.env.FRONTEND_URL}reset-forgotten-password/`); //rediriger ver le form du front
+        htmlContent = htmlContent.replace('{{link}}', `${process.env.FRONTEND_URL}reset-forgotten-password/${token}`); //rediriger ver le form du front
 
         let mailOptions = {
             from: process.env.MAIL_USER,
             to: email,
-            subject: 'Email oublié',
+            subject: 'Bill Cutting: Mot de passe oublié',
             html: htmlContent
         };
 
