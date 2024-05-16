@@ -5,6 +5,7 @@ import { useQuasar } from 'quasar';
 
 let mail = ref();
 const $q = useQuasar();
+let isSend = ref(false);
 
 async function sendMail() {
   if(!mail.value){
@@ -21,6 +22,7 @@ async function sendMail() {
         type: 'positive',
         message: 'Un email de récupération vous a été envoyé'
       })
+      isSend.value = true;
     }
   }
   catch (e) {
@@ -71,13 +73,14 @@ const checkBasicEmailSyntax = (value) => {
           <q-icon name="mail"/>
         </template>
       </q-input>
-      <div class="links">
-        <a href="#/login">Se connecter</a>
-        <a href="#/register"><b>Je n'ai pas de compte</b></a>
+      <span class="text-positive" v-if="isSend">Email envoyé</span>
+      <div class="links text-secondary">
+        <a class="text-secondary" href="#/login">Se connecter</a>
+        <a class="text-secondary" href="#/register"><b>Je n'ai pas de compte</b></a>
       </div>
       <q-btn
         class="btn "
-        color="primary"
+        color="secondary"
         text-color="white"
         unelevated
         @click="sendMail"
@@ -122,7 +125,6 @@ const checkBasicEmailSyntax = (value) => {
 
 .links * {
   text-decoration: none;
-  color: #ffa31a;
 }
 
 .btn-log img {
