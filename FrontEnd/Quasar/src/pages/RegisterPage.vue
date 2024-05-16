@@ -24,7 +24,7 @@ const checkPasswordComplexity = (value) => {
   const hasLowerCase = /[a-z]/.test(value);
   const hasUpperCase = /[A-Z]/.test(value);
   const hasDigit = /\d/.test(value);
-  const hasSpecialChar = /[@$!%*?&]/.test(value);
+  const hasSpecialChar = /[@$!%*?&-_]/.test(value);
 
   let errorMessage = "Le mot de passe doit contenir au moins";
   if (!hasLowerCase) errorMessage += " des minuscules,";
@@ -53,7 +53,6 @@ const checkAge = (value) => {
 const checkPasswordMatch = (value) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Votre logique de validation asynchrone ici
       resolve((value === pass.value) || "Les mots de passe ne correspondent pas");
     },
     );
