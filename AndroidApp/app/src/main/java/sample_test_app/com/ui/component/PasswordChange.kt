@@ -43,7 +43,7 @@ data class UserPasswordInfos(
 @OptIn(InternalAPI::class)
 @Composable
 fun PasswordChangeSection(currentPasswordState: MutableState<String>, newPasswordState: MutableState<String>, repeatNewPasswordState: MutableState<String>, httpClient: HttpClient, jwtToken: String) {
-    val user = LocalUser.current // Get the current user
+    val user = LocalUser.current
 
     TextField(
         value = currentPasswordState.value,
@@ -113,7 +113,6 @@ fun PasswordChangeSection(currentPasswordState: MutableState<String>, newPasswor
                     }
                     if (response.status == HttpStatusCode.OK) {
                         withContext(Dispatchers.Main) {
-                            println("Password update request succeeded.")
                         }
                     } else {
                         withContext(Dispatchers.Main) {
