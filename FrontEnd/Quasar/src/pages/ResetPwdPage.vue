@@ -1,8 +1,48 @@
 <script setup lang="ts">
 import {ref} from 'vue';
+import { api } from 'boot/axios';
+import { useQuasar } from 'quasar';
 
 let mail = ref();
+const $q = useQuasar();
 
+async function sendMail() {
+  if(!mail.value){
+    $q.notify({
+      type: 'negative',
+      message: 'Veuillez renseigner votre adresse email'
+    })
+    return
+  }
+  try{
+    const response = await api.post('/auth/forgottenPassword', {email: mail.value})
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Un email de récupération vous a été envoyé'
+      })
+    }
+  }
+  catch (e) {
+    console.log(e)
+    if(e.response.status === 449){
+      $q.notify({
+        type: 'negative',
+        message: 'Aucun compte n\'est associé à cette adresse email'
+      })
+    }
+    else
+    $q.notify({
+      type: 'negative',
+      message: 'Une erreur s\'est produite lors de l\'envoi de l\'email de récupération'
+    })
+  }
+}
+
+const checkBasicEmailSyntax = (value) => {
+  const basicEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return basicEmailRegex.test(value) || 'Adresse e-mail invalide';
+};
 </script>
 
 <template>
@@ -10,7 +50,7 @@ let mail = ref();
     <div class="logo">
       <q-img
         width="100%"
-        src="/public/assets/logo-web.webp"
+        src="assets/logo-web.webp"
         :ratio="1"
       />
     </div>
@@ -25,6 +65,7 @@ let mail = ref();
         type="email"
         color="secondary"
         dark
+        :rules="[checkBasicEmailSyntax]"
       >
         <template v-slot:prepend>
           <q-icon name="mail"/>
@@ -39,6 +80,7 @@ let mail = ref();
         color="primary"
         text-color="white"
         unelevated
+        @click="sendMail"
         label="Envoyer un code de récupération"
       />
     </div>

@@ -12,7 +12,7 @@ router.post("/login",AuthController.authentication);
 //POST http://localhost:9000/api/auth/forgottenPassword
 router.post("/forgottenPassword",AuthController.forgottenPassword);
 //GET http://localhost:9000/api/auth/resetPassword
-router.get("/resetPassword",securityMiddleware.verifyIsAuth,AuthController.resetPassword);
+router.post("/resetPassword",securityMiddleware.verifyIsAuth,AuthController.resetPassword);
 
 
 module.exports = router;
