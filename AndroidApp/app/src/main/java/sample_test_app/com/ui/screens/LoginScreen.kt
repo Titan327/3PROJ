@@ -1,7 +1,8 @@
 package sample_test_app.com.ui.screens
 
 
-import GoogleOauthBtn
+
+import GoogleSignInButton
 import androidx.compose.foundation.Image
 
 import androidx.compose.foundation.layout.Arrangement
@@ -74,7 +75,6 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Champ de texte "Username"
         TextField(
             value = usernameState.value,
             onValueChange = { newValue ->
@@ -85,7 +85,6 @@ fun LoginScreen(
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-        // Champ de texte "Password"
         TextField(
             value = passwordState.value,
             onValueChange = { newValue ->
@@ -161,6 +160,8 @@ fun LoginScreen(
             Text("Login")
 
         }
-        GoogleOauthBtn()
+
+        GoogleSignInButton(httpClient)
+
     }
 }
