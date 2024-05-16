@@ -161,7 +161,7 @@ fun LoginScreen(
 
         }
 
-        GoogleSignInButton(httpClient)
+        GoogleSignInButton(navController,httpClient,jwtToken,user)
 
     }
 }

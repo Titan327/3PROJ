@@ -7,6 +7,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -19,7 +20,7 @@ import sample_test_app.com.models.Category
 
 class OauthGoogleRepositry (private val httpClient: HttpClient) {
     @OptIn(InternalAPI::class)
-    suspend fun PostTokenGoogle(jwtGoogleToken: String): Boolean {
+    suspend fun PostTokenGoogle(jwtGoogleToken: String): HttpResponse? {
         return try {
             val response: HttpResponse = withContext(Dispatchers.IO) {
                 httpClient.post("https://3proj-back.tristan-tourbier.com/api/oauth2/google") {
@@ -31,12 +32,13 @@ class OauthGoogleRepositry (private val httpClient: HttpClient) {
                 """.trimIndent()
                 }
             }
-            Log.i("google-oauth",response.body<String>())
-            response.status == HttpStatusCode.OK
+
+            response
+
 
         } catch (e: Exception) {
             println("Error: $e")
-            false
+            null
         }
     }
 }
