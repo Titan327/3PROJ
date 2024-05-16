@@ -4,7 +4,6 @@ import {api} from 'boot/axios';
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router';
 import {updateUser} from 'stores/userStore';
-import * as process from 'node:process';
 import GoogleOauth2 from 'components/Oauth2/GoogleOauth2.vue';
 
 const $q = useQuasar();
