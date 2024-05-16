@@ -53,3 +53,5 @@ FrontEnd/Quasar/src-capacitor/node_modules
 # BEX related directories and files
 FrontEnd/Quasar/src-bex/www
 FrontEnd/Quasar/src-bex/js/core
+BackEnd/Express/.env
+BackEnd/Express/.env

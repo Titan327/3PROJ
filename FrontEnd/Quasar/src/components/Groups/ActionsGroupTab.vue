@@ -14,6 +14,7 @@ import DialogRefund from 'components/Groups/DialogRefund.vue';
 import { io } from 'socket.io-client';
 import { NotificationBus} from 'boot/eventBus';
 import DialogPrivateMessage from "components/Common/DialogPrivateMessage.vue";
+import {downloadCSV, generateCSV} from "boot/csvGenerator";
 
 let  tab = ref('transactions')
 const transactionList = ref<Transaction[]>([]);
@@ -32,6 +33,8 @@ let width = ref(0);
 let dialogCreateMessage = ref(false);
 
 let loadingBalance = ref(false);
+let loadingRefund = ref(false);
+let loadingTransactions = ref(false)
 
 
 const props = defineProps({
@@ -72,6 +75,7 @@ socket.on(`new-transaction-${props.groupId}`, () => {
 });
 
 async function getTransactionList(){
+  loadingTransactions.value = true;
   try{
     const response = await api.get(`groups/${props.groupId}/transactions`);
     transactionList.value = response.data;
@@ -80,9 +84,11 @@ async function getTransactionList(){
   catch (e){
     console.error(e)
   }
+  loadingTransactions.value = false;
 }
 
 async function getOptimalRefundList(){
+  loadingRefund.value = true;
   try {
     const response = await api.get(`groups/${props.groupId}/refunds`);
     refundsList.value = response.data;
@@ -93,6 +99,7 @@ async function getOptimalRefundList(){
   catch (e){
     console.error(e)
   }
+  loadingRefund.value=false;
 }
 
 function openDialogCreateTransaction(){
@@ -126,7 +133,7 @@ function openDialogConsultTransaction(transactionId:number){
       isOpen: dialogConsultTransaction,
       groupId: props.groupId,
       userId: props.userId,
-      transactionId: transactionId
+      transactionId: +transactionId
     }
   }).onDismiss(() => {
     router.push(`/groups/${props.groupId}`);
@@ -221,6 +228,11 @@ function openDialogPrivateMessage(user2:number){
   })
 }
 
+function generateAndSaveCsv(){
+  const csvContent = generateCSV(transactionList.value);
+  downloadCSV(csvContent, 'transactions.csv');
+}
+
 </script>
 
 <template>
@@ -284,6 +296,17 @@ function openDialogPrivateMessage(user2:number){
                 label="Nouvelle transaction"
                 @click="openDialogCreateTransaction"
                 no-caps/>
+              <q-btn
+                class="q-mx-md"
+                color="secondary"
+                icon-right="format_list_numbered"
+                outline
+                @click="generateAndSaveCsv"
+                no-caps>
+                <q-tooltip>
+                  Générer un fichier CSV
+                </q-tooltip>
+              </q-btn>
             </div>
             <q-card-section>
               <q-item>
@@ -331,14 +354,21 @@ function openDialogPrivateMessage(user2:number){
                 </q-item-section>
 
                 <q-item-section>
-                  <q-btn outline color="secondary" rounded @click="openDialogConsultTransaction(transaction.id)">Consulter</q-btn>
+                  <q-btn outline dense color="secondary" rounded @click="openDialogConsultTransaction(+transaction.id)">Consulter</q-btn>
                 </q-item-section>
 
               </q-item>
               </q-scroll-area>
             </q-card-section>
-            <q-card-section v-if="transactionList.length == 0">
+            <q-card-section v-if="transactionList.length == 0 && !loadingTransactions">
               <q-item-label class="text-h6 q-mx-auto">Rien à afficher</q-item-label>
+            </q-card-section>
+            <q-card-section v-if="loadingTransactions">
+              <div class="row">
+                <q-space></q-space>
+                <q-spinner size="50px" class="q-pa-xs q-mx-auto" color="secondary" />
+                <q-space></q-space>
+              </div>
             </q-card-section>
           </q-tab-panel>
 
@@ -369,7 +399,7 @@ function openDialogPrivateMessage(user2:number){
                 </q-item-section>
 
               </q-item>
-              <q-item v-if="refundsList.length==0">
+              <q-item v-if="refundsList.length==0 && !loadingRefund">
                 <q-item-section>
                   <q-item-label class="text-h6">Rien à afficher</q-item-label>
                 </q-item-section>
@@ -411,7 +441,7 @@ function openDialogPrivateMessage(user2:number){
                   <q-space></q-space>
                   <q-space></q-space>
                   <q-item-section class="q-mx-auto">
-                  <q-btn outline class="w-60 q-mx-auto" color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Effectuer le remboursement</q-btn>
+                  <q-btn outline class="w-60 q-mx-auto" dense color="secondary" v-if="refund.refundingUserId == props.userId" rounded @click="openDialogRefund(refund.id,refund.refundedUserId, refund.amount)">Rembourser</q-btn>
                   <span v-else class="q-mx-auto">Rien à effectuer</span>
                   </q-item-section>
                 </q-item>
@@ -453,6 +483,13 @@ function openDialogPrivateMessage(user2:number){
                   </q-item-section>
                 </q-item>
               </q-scroll-area>
+            </q-card-section>
+            <q-card-section v-if="loadingRefund">
+              <div class="row">
+                <q-space></q-space>
+                <q-spinner size="50px" class="q-pa-xs q-mx-auto" color="secondary" />
+                <q-space></q-space>
+              </div>
             </q-card-section>
           </q-tab-panel>
 

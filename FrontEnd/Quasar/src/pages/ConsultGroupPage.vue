@@ -47,12 +47,9 @@ onMounted(async () => {
   }
 
   function getWidth() {
-
     width.value = window.innerWidth;
   }
-
   getWidth();
-
   window.addEventListener('resize', getWidth);
 });
 
@@ -61,7 +58,6 @@ async function getGroup() {
   try {
     const response = await api.get(`/groups/${groupId}`);
     group.value = response.data;
-    console.log(group.value)
 
     isGroupFavorite();
   }
@@ -290,7 +286,7 @@ function openDialogPrivateMessage(user2:number){
       </q-avatar>
     </div>
     </div>
-    <ActionsGroupTab :groupId = groupId :userId = User.id></ActionsGroupTab>
+    <ActionsGroupTab :groupId = +groupId :userId = +User.id></ActionsGroupTab>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="message" color="secondary" @click="openCloseMessageDrawer"/>
       <q-badge rounded floating color="red" v-if="newMessageNotification>0">{{newMessageNotification}}</q-badge>
