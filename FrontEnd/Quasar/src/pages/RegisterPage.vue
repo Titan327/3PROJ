@@ -15,28 +15,34 @@ let newUser = ref(DefaultUser());
 let pass = ref();
 let passConfirmation = ref()
 
+let isPwd = ref(true);
+let isPwd2 = ref(true);
+
 const checkBasicEmailSyntax = (value) => {
   const basicEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return basicEmailRegex.test(value) || 'Adresse e-mail invalide';
 };
 const checkPasswordComplexity = (value) => {
-  //regex mot de passe
+  // Regex mot de passe
   const hasLowerCase = /[a-z]/.test(value);
   const hasUpperCase = /[A-Z]/.test(value);
   const hasDigit = /\d/.test(value);
-  const hasSpecialChar = /[@$!%*?&-_]/.test(value);
+  const specialCharRegex = /[@$!%*?&]/g;
+  const specialCharMatches = value.match(specialCharRegex);
+  const hasTwoSpecialChars = specialCharMatches && specialCharMatches.length >= 2;
 
   let errorMessage = "Le mot de passe doit contenir au moins";
   if (!hasLowerCase) errorMessage += " des minuscules,";
   if (!hasUpperCase) errorMessage += " des majuscules,";
   if (!hasDigit) errorMessage += " des chiffres,";
-  if (!hasSpecialChar) errorMessage += " un caractère spécial,";
+  if (!hasTwoSpecialChars) errorMessage += " 2 caractères spéciaux (@ $ ! % * ? &),";
+  if (value.length < 8) errorMessage += " et doit avoir au moins 8 caractères.";
 
-  if (!hasLowerCase || !hasUpperCase || !hasDigit || !hasSpecialChar) {
+  if (!hasLowerCase || !hasUpperCase || !hasDigit || !hasTwoSpecialChars || value.length < 8) {
     errorMessage = errorMessage.slice(0, -1);
   }
 
-  return (hasLowerCase && hasUpperCase && hasDigit && hasSpecialChar && value.length >= 8) || errorMessage;
+  return (hasLowerCase && hasUpperCase && hasDigit && hasTwoSpecialChars && value.length >= 8) || errorMessage;
 };
 const checkAge = (value) => {
   if (!value) {
@@ -96,11 +102,24 @@ async function register() {
       }
     }
     catch (error) {
+      if (error.response.data.message == "Email already taken") {
+        $q.notify({
+          type: 'negative',
+          message: 'Cette adresse email est déjà utilisée'
+        })
+      }
+      else if (error.response.data.message == "Username already taken") {
+        $q.notify({
+          type: 'negative',
+          message: 'Ce nom d\'utilisateur est déjà utilisé'
+        })
+      }
+      else{
         $q.notify({
           type: 'negative',
           message: 'Une erreur s\'est produite lors de l\'inscription'
         })
-
+      }
     }
   }
   else {
@@ -111,31 +130,16 @@ async function register() {
   }
   loading.value = false;
 }
-
-
-async function loginGoogle() {
-
-  const authWindow = window.open(`${process.env.URL_BACKEND}api/oauth2/google`, '_blank', 'height=600,width=600');
-
-  window.addEventListener('message', (event) => {
-
-    if (event.data.token){
-      console.log('Message reçu de la fenêtre enfant :', event.data.token);
-      sessionStorage.setItem('userToken', event.data.token);
-      window.location.href = '/';
-    }
-
-  });
-}
 </script>
 
 <template>
-    <div class="form q-pa-lg q-ma-lg flex row">
+  <q-page class="row items-center justify-center">
+    <div class="form q-pa-lg q-ma-lg flex row w-50">
       <div class="inputs">
         <q-form
           @submit="register"
         >
-          <span class="text-grey-2 text-h5">Créer un compte</span>
+          <span class="text-grey-2 text-h5">Créer un compte Bill Cutting</span>
           <q-input
             style="margin-top: 20px;"
             outlined
@@ -194,23 +198,34 @@ async function loginGoogle() {
             outlined
             v-model="pass"
             label="Mot de passe"
-            type="password"
+            :type="isPwd ? 'password' : 'text'"
             :rules="[checkNotNull, checkPasswordComplexity]"
             dark
             color="secondary"
-
-          />
+          > <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+          </template></q-input>
           <q-input
             class="input"
             outlined
             v-model="passConfirmation"
             label="Confirmer"
-            type="password"
+            :type="isPwd2 ? 'password' : 'text'"
             :rules="[checkNotNull, checkPasswordMatch]"
             dark
             color="secondary"
+          > <template v-slot:append>
+            <q-icon
+              :name="isPwd2 ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd2 = !isPwd2"
+            />
+          </template></q-input>
 
-          />
           <div class="links">
             <a href="#/login"><b>Déja un compte ?</b></a>
           </div>
@@ -231,15 +246,29 @@ async function loginGoogle() {
             </div>
           </div>
         </q-form>
-        <br>
       </div>
     </div>
+    <div class="q-pa-lg q-ma-lg w-50  items-center justify-center">
+      <div class="logo">
+        <q-img
+          width="60%"
+          src="assets/logo-1800.png"
+          :ratio="1"
+        />
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <style scoped>
 
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
 .form {
-  width: 90%;
+  width: 100%;
   max-width: 400px;
   margin: auto;
   display: flex;
@@ -268,20 +297,9 @@ async function loginGoogle() {
   margin: 10px 15%;
 }
 
-.text-primary {
-  font-family: 'lato', sans-serif;
-  font-weight: bold;
-}
-
 .links * {
   text-decoration: none;
   color: #ffa31a;
-}
-
-.btn-log {
-  width: 48px;
-  height: 48px;
-  margin: 10px 10px;
 }
 
 .btn-log img {
