@@ -4,6 +4,8 @@ const BankInfo = require("../models/bankInfo.model");
 const crypto = require('crypto');
 const Joi = require('joi');
 const Security = require('../security/AES.security');
+const Message = require('../models/message.model');
+const { Verify } = require('crypto');
 
 const getPaymentMethode = async (req, res) => {
     const groupId = req.params.groupId;
@@ -234,9 +236,29 @@ const getMyPaymentMethode = async (req,res) => {
     }
 }
 
+const deletePaymentMethode = async (req,res) => {
+
+    const { paymentId } = req.query
+    const userId = req.authorization.userId;
+
+    PaymentMethode.findOneAndDelete({userId: {userId}, _id: {paymentId} })
+          .then(removedPaymentMethode => {
+              if (removedPaymentMethode) {
+                  return res.status(200).json({ message: 'Method deleted' });
+              } else {
+                  return res.status(404).json({ message: 'Method not found' });
+              }
+          })
+          .catch(err => {
+              return res.status(500).json({ message: 'Internal error server' });
+          });
+
+}
+
 
 module.exports = {
     getPaymentMethode,
     createPaymentMethode,
-    getMyPaymentMethode
+    getMyPaymentMethode,
+    deletePaymentMethode,
 }
