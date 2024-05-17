@@ -49,7 +49,7 @@ io.on('connection', function(socket){
     });
     socket.on('private message', function (msg, group, user2, username, user1){
         io.emit(`chat-private-${group}`, msg, group);
-        CreateNotif(user2,`Nouveau message privé de ${username}`,`groups/${group}/private-chat/${user2.userId}`);
+        CreateNotif(user2,`Nouveau message privé de ${username}`,`groups/${group}/private-chat/${user1}`);
     });
 
     socket.on('new-transaction', function (group){
@@ -59,7 +59,7 @@ io.on('connection', function(socket){
 app.post('/api/messages', (req, res) => {
     const { message } = req.body;
     // Diffuser le message à tous les utilisateurs connectés
-    io.emit('chat message', message;
+    io.emit('chat message', message);
     res.status(200).send('Message sent successfully');
 });
 
