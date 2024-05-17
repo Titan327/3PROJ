@@ -29,12 +29,11 @@ async function getMethod(){
   try {
     const response = await api.get(`/users/me/paymentMethode`)
     paiementsMethod.value = response.data
-    //for (let i = 0; i < paiementsMethod.value.length; i++) {
-      //if(paiementsMethod.value[i].type == 'RIB'){
-      //  paiementsMethod.value[i].ribFile = await ribExist(paiementsMethod.value[i].id);
-    //  }
-    paiementsMethod.value[3].ribFile = await ribExist(paiementsMethod.value[3].id);
-    //}
+    for (let i = 0; i < paiementsMethod.value.length; i++) {
+      if(paiementsMethod.value[i].type == 'RIB'){
+        paiementsMethod.value[i].ribFile = await ribExist(paiementsMethod.value[i].id);
+     }
+    }
     loading.value = false;
     console.log(paiementsMethod.value)
   }
