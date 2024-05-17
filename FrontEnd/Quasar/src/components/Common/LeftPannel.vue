@@ -67,7 +67,7 @@ async function getCountNotifs(){
           src="assets/logo-500.png"
           style="max-width: 150px"
         />
-        <q-item clickable v-ripple  @click="router.push('../');getCountNotifs()">
+        <q-item clickable v-ripple  @click="router.push('../');getCountNotifs();window.location.reload()">
           <q-item-section avatar>
             <q-icon color="secondary" name="dashboard" />
           </q-item-section>
@@ -75,7 +75,7 @@ async function getCountNotifs(){
           <q-item-section>Accueil</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/notifications');getCountNotifs()">
+        <q-item clickable v-ripple @click="router.push('/notifications');getCountNotifs();window.location.reload()">
           <q-item-section avatar>
             <q-icon color="secondary" name="notifications"></q-icon>
           </q-item-section>
@@ -85,7 +85,7 @@ async function getCountNotifs(){
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/groups');getCountNotifs()">
+        <q-item clickable v-ripple @click="router.push('/groups');getCountNotifs();window.location.reload()">
           <q-item-section avatar>
             <q-icon color="secondary" name="group" />
           </q-item-section>
@@ -93,7 +93,7 @@ async function getCountNotifs(){
           <q-item-section>Groupes</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="router.push('/statistics');getCountNotifs()">
+        <q-item clickable v-ripple @click="router.push('/statistics');getCountNotifs();window.location.reload()">
           <q-item-section avatar>
             <q-icon color="secondary" name="insights" />
           </q-item-section>
@@ -101,7 +101,7 @@ async function getCountNotifs(){
           <q-item-section>Statistiques</q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple  @click="router.push('/user-data');getCountNotifs()">
+        <q-item clickable v-ripple  @click="router.push('/user-data');getCountNotifs();window.location.reload()">
           <q-item-section avatar>
             <q-icon color="secondary" name="manage_accounts" />
           </q-item-section>
