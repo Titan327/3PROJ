@@ -142,10 +142,10 @@ async function ribExist(id: number){
                 src="/assets/card/rib-card.webp"
                 class="rounded-borders"
               >
-                <div class="absolute-top-right row border-radius-inherit q-pa-xs" v-if="paiement.ribFile">
+                <div class="absolute-top-right row border-radius-inherit q-pa-none" v-if="paiement.ribFile">
                   <q-space></q-space>
-                  <q-item-label class="text-h6">
-                    <q-icon name="picture_as_pdf" @click="getRibFile(paiement.id)" style="cursor: pointer;"
+                  <q-item-label class="text-h6 q-pa-none">
+                    <q-icon class="q-pa-none" name="picture_as_pdf" @click="getRibFile(paiement.id)" style="cursor: pointer;"
                     />
                   </q-item-label>
                 </div>

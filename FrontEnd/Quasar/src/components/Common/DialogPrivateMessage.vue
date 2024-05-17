@@ -110,7 +110,7 @@ async function sendMessage() {
     });
 
     if(response.status == 200){
-      socket.emit('private message', writingMessage.value, props.groupId);
+      socket.emit('private message', writingMessage.value, props.groupId, props.user2id, User.value.username, User.value.id);
       writingMessage.value = '';
       scrollNewMsg()
     }

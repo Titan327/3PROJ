@@ -47,8 +47,9 @@ io.on('connection', function(socket){
     socket.on('chat message', function (msg, group){
         io.emit(`chat-group-${group}`, msg, group);
     });
-    socket.on('private message', function (msg, group){
+    socket.on('private message', function (msg, group, user2, username, user1){
         io.emit(`chat-private-${group}`, msg, group);
+        CreateNotif(user2,`Nouveau message privé de ${username}`,`groups/${group}/private-chat/${user2.userId}`);
     });
 
     socket.on('new-transaction', function (group){
@@ -58,7 +59,7 @@ io.on('connection', function(socket){
 app.post('/api/messages', (req, res) => {
     const { message } = req.body;
     // Diffuser le message à tous les utilisateurs connectés
-    io.emit('chat message', message);
+    io.emit('chat message', message;
     res.status(200).send('Message sent successfully');
 });
 
@@ -83,6 +84,7 @@ require('./configurations/mongo.config');
 const Message = require('./models/message.model');
 const PaymentMethode = require('./models/paymentMethode.model');
 const BankInfo = require('./models/bankInfo.model');
+const { CreateNotif } = require('./controllers/notif.controller');
 
 app.use("", require("./routes/invitation.route"));
 app.use("/api/auth", require("./routes/auth.route"));
