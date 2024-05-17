@@ -6,6 +6,7 @@ import DialogAddPaymentMethod from "components/Common/DialogAddPaymentMethod.vue
 import {DefaultUser} from "src/interfaces/user.interface";
 import {useQuasar} from "quasar";
 import {convertIBAN, redirectBankWebSite, redirectToPaypal} from "stores/globalFunctionsStore";
+import { useRouter } from 'vue-router';
 
 const  slide = ref('slide-0');
 const paiementsMethod = ref();
@@ -14,6 +15,8 @@ let User = ref(DefaultUser());
 const $q = useQuasar();
 let mounted = ref(false);
 let loading = ref(false);
+const router = useRouter();
+let readingRib = ref(null);
 
 onMounted(async () => {
   User.value = await getUser();
@@ -26,7 +29,14 @@ async function getMethod(){
   try {
     const response = await api.get(`/users/me/paymentMethode`)
     paiementsMethod.value = response.data
+    //for (let i = 0; i < paiementsMethod.value.length; i++) {
+      //if(paiementsMethod.value[i].type == 'RIB'){
+      //  paiementsMethod.value[i].ribFile = await ribExist(paiementsMethod.value[i].id);
+    //  }
+    paiementsMethod.value[3].ribFile = await ribExist(paiementsMethod.value[3].id);
+    //}
     loading.value = false;
+    console.log(paiementsMethod.value)
   }
   catch(e){
     console.error(e)
@@ -48,6 +58,34 @@ async function openDialgAddPayment(type:string){
   }).onDismiss(() => {
     getMethod();
   })
+}
+
+async function getRibFile(id:number){
+  try {
+    const response = await api.get(`/img/rib/${id}`, { responseType: 'blob' });
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, '_blank');
+    //URL.revokeObjectURL(url);
+
+    return url;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
+async function ribExist(id: number){
+  console.log(`check if ${id} exist`)
+  try {
+    const response = await api.get(`/img/rib/${id}`, { responseType: 'blob' });
+    console.log(response.data)
+      return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 }
 
 </script>
@@ -105,6 +143,13 @@ async function openDialgAddPayment(type:string){
                 src="/assets/card/rib-card.webp"
                 class="rounded-borders"
               >
+                <div class="absolute-top-right row border-radius-inherit q-pa-xs" v-if="paiement.ribFile">
+                  <q-space></q-space>
+                  <q-item-label class="text-h6">
+                    <q-icon name="picture_as_pdf" @click="getRibFile(paiement.id)" style="cursor: pointer;"
+                    />
+                  </q-item-label>
+                </div>
                 <div class="absolute-bottom text-subtitle2 row">
                   <q-item-label class="q-pa-xs">{{paiement.value.bank_name}}: {{paiement.value.surname}} {{paiement.value.name}}</q-item-label>
                   <q-item-label class="q-pa-xs"></q-item-label>
