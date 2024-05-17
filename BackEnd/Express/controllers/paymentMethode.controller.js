@@ -238,7 +238,7 @@ const getMyPaymentMethode = async (req,res) => {
 
 const deletePaymentMethode = async (req,res) => {
 
-    const { paymentId } = req.query
+    const { paymentId } = req.query;
     const userId = req.authorization.userId;
 
     PaymentMethode.findOneAndDelete({userId: {userId}, _id: {paymentId} })
