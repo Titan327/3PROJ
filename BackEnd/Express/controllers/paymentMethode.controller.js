@@ -236,24 +236,26 @@ const getMyPaymentMethode = async (req,res) => {
     }
 }
 
-const deletePaymentMethode = async (req,res) => {
-
+const deletePaymentMethode = async (req, res) => {
     const { paymentId } = req.query;
     const userId = req.authorization.userId;
 
-    PaymentMethode.findOneAndDelete({userId: {userId}, _id: {paymentId} })
-          .then(removedPaymentMethode => {
-              if (removedPaymentMethode) {
-                  return res.status(200).json({ message: 'Method deleted' });
-              } else {
-                  return res.status(404).json({ message: 'Method not found' });
-              }
-          })
-          .catch(err => {
-              return res.status(500).json({ message: 'Internal error server' });
-          });
+    try {
+        const removedPaymentMethode = await PaymentMethode.findOneAndDelete({
+            userId: userId,
+            _id: paymentId,
+        });
 
-}
+        if (removedPaymentMethode) {
+            return res.status(200).json({ message: 'Method deleted' });
+        } else {
+            return res.status(404).json({ message: 'Method not found' });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 
 
 module.exports = {
