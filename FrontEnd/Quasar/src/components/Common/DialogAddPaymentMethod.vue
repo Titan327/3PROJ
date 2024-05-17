@@ -38,12 +38,6 @@ function chackHasFile(): boolean {
 async function postRib() {
   loading.value = true;
   try {
-    //if (!chackHasFile()) {
-      //return;
-    //}
-    const formData = new FormData();
-    //formData.append('image', file.value);
-
     const response = await api.post(`/users/paymentMethode`, {
       "type": "RIB",
       "name": rib.value.name,
@@ -53,10 +47,19 @@ async function postRib() {
       "box_code": rib.value.box_code,
       "account_number": rib.value.account_number,
       "RIB_key": rib.value.RIB_key,
-      "IBAN": rib.value.IBAN,
+      "IBAN": rib.value.IBAN.replace(/\s+/g, ""),
     });
 
     if (response.data) {
+      if(chackHasFile()){
+        const formData = new FormData();
+        formData.append('file', file.value);
+        await api.post(`/img/rib/${response.data.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
       $q.notify({
         type: 'positive',
         message: 'RIB ajouté avec succès'
@@ -188,6 +191,8 @@ const redirectToPaypal = () => {
               label="Code Banque"
               color="secondary"
               stack-label
+              maxlength="5"
+              mask="#####"
               v-model="rib.bank_number">
             </q-input>
             <q-input
@@ -197,6 +202,8 @@ const redirectToPaypal = () => {
               label="Code Guichet"
               color="secondary"
               stack-label
+              maxlength="5"
+              mask="#####"
               v-model="rib.box_code">
             </q-input>
             <q-input
@@ -206,6 +213,8 @@ const redirectToPaypal = () => {
               label="Numéro de compte"
               color="secondary"
               stack-label
+              maxlength="11"
+              mask="###########"
               v-model="rib.account_number">
             </q-input>
             <q-input
@@ -215,6 +224,8 @@ const redirectToPaypal = () => {
               label="Clé RIB"
               color="secondary"
               stack-label
+              maxlength="2"
+              mask="##"
               v-model="rib.RIB_key">
             </q-input>
           </div>
@@ -225,6 +236,7 @@ const redirectToPaypal = () => {
             label="IBAN"
             color="secondary"
             stack-label
+            mask="AA## #### #### #### #### #### ###"
             v-model="rib.IBAN">
           </q-input>
 

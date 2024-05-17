@@ -30,15 +30,22 @@ const getRibById = async (req, res) => {
         const userId = req.authorization.userId;
         const idMethod = req.params.idMethod;
 
-        if(!await PaymentMethode.findOne({_id: idMethod,userId: userId})){
-            return res.status(404).send({ error: "Payement method don't exist" });
+        const paymentMethod = await PaymentMethode.findOne({ _id: idMethod, userId: userId });
+        if (!paymentMethod) {
+            return res.status(404).send({ error: "Payment method doesn't exist" });
         }
 
         let documentData = '';
-        let crypt_chunk = '';
-        let iv = '';
 
-        minioClient.getObject('rib', userId+'/'+idMethod, (err, dataStream) => {
+        minioClient.getObject('rib', `${userId}/${idMethod}`, (err, dataStream) => {
+            if (err) {
+                if (err.code === 'NoSuchKey') {
+                    return res.status(404).send({ error: "File doesn't exist" });
+                } else {
+                    console.error(err);
+                    return res.status(500).send({ error: "Internal server error" });
+                }
+            }
 
             res.contentType('image/jpeg');
 
@@ -47,19 +54,23 @@ const getRibById = async (req, res) => {
             });
 
             dataStream.on('end', () => {
-                const decryptData = Security.decrypt(process.env.AES_PAYEMENT_KEY,documentData);
+                const decryptData = Security.decrypt(process.env.AES_PAYEMENT_KEY, documentData);
                 res.write(Buffer.from(decryptData, 'base64'));
                 res.end();
             });
 
+            dataStream.on('error', (streamErr) => {
+                console.error(streamErr);
+                return res.status(500).send({ error: "Error reading the file stream" });
+            });
         });
 
-
-    }catch (e) {
-        console.log(e)
-        return res.status(500).send({error: "Internal error server"});
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send({ error: "Internal server error" });
     }
-}
+};
+
 
 module.exports={
     postRib,
