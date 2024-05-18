@@ -230,6 +230,27 @@ async function deleteAccount(){
   loading.value = false;
 }
 
+async function deletePaymentMethod(id:string){
+  try {
+    loading.value = true;
+    const response = await api.delete(`users/me/paymentMethode/?paymentId=${id}`);
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Moyen de paiement supprimé'
+      })
+      getMethod();
+    }
+  }
+  catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Une erreur s\'est produite'
+    })
+  }
+  loading.value = false;
+}
+
 </script>
 
 <template>
@@ -491,6 +512,15 @@ async function deleteAccount(){
                   </q-item-label>
                 </div>
               </q-img>
+              <q-item-section>
+                <div class="absolute-top-right text-subtitle2 row border-radius-inherit">
+                  <q-space></q-space>
+                  <q-item-label class="text-h6 q-pa-md">
+                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"
+                    />
+                  </q-item-label>
+                </div>
+              </q-item-section>
             </q-card>
 
             <q-card class="paiement rounded-borders" v-if="paiement.type=='RIB'">
@@ -510,6 +540,15 @@ async function deleteAccount(){
                   </q-item-label>
                 </div>
               </q-img>
+              <q-item-section>
+                <div class="absolute-top-right text-subtitle2 row border-radius-inherit">
+                  <q-space></q-space>
+                  <q-item-label class="text-h6 q-pa-md">
+                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"
+                    />
+                  </q-item-label>
+                </div>
+              </q-item-section>
             </q-card>
           </div>
             </div>
