@@ -91,6 +91,22 @@ async function joinTicket(transactionId: number) {
   ticketLoading.value = false;
 }
 
+async function getRecieptFile(id:number){
+  try {
+    const response = await api.get(`/img/ticket/${props.groupId}/${id}`, { responseType: 'blob' });
+    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, '_blank');
+    //URL.revokeObjectURL(url);
+
+    return url;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
 </script>
 
 
@@ -105,7 +121,7 @@ async function joinTicket(transactionId: number) {
           <br>
           <span>Créé le {{formatDate(_transaction.date)}} par {{getUserGroupData(_transaction.senderId)?.username}}</span>
           <br>
-          <span><a v-if="_transaction.receipt != '' " class="text-secondary" :href="_transaction.receipt" target="_blank">Afficher le ticket de caisse</a></span>
+          <q-btn v-if="_transaction.receipt != '' " class="text-secondary q-pa-none" no-caps flat @click="getRecieptFile(_transaction.id)">Afficher le ticket de caisse</q-btn>
           <q-file
             outlined
             class="w-60"
