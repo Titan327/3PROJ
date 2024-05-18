@@ -3,6 +3,9 @@
 */node_modules/
 node_modules/
 
+#.env
+BackEnd/Express/.env
+
 # Data SQL
 Data/Postgres_data*
 Data/Minio_data*
@@ -53,5 +56,5 @@ FrontEnd/Quasar/src-capacitor/node_modules
 # BEX related directories and files
 FrontEnd/Quasar/src-bex/www
 FrontEnd/Quasar/src-bex/js/core
-BackEnd/Express/.env
+
 
