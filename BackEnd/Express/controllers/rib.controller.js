@@ -47,16 +47,33 @@ const getRibById = async (req, res) => {
                 }
             }
 
-            res.contentType('image/jpeg');
+            //res.contentType('image/jpeg');
 
             dataStream.on('data', (chunk) => {
                 documentData += chunk;
             });
 
-            dataStream.on('end', () => {
-                const decryptData = Security.decrypt(process.env.AES_PAYEMENT_KEY, documentData);
-                res.write(Buffer.from(decryptData, 'base64'));
-                res.end();
+
+
+            dataStream.on('end', async () => {
+                try {
+                    const { fileTypeFromBuffer } = await import('file-type');
+                    const decryptData = Security.decrypt(process.env.AES_PAYEMENT_KEY, documentData);
+                    const file_buff = Buffer.from(decryptData, 'base64');
+                    const type = await fileTypeFromBuffer(file_buff);
+
+                    if (type) {
+                        res.set('Content-Type', type.mime);
+                    } else {
+                        res.set('Content-Type', 'application/octet-stream');
+                    }
+
+                    res.write(file_buff);
+                    res.end();
+                } catch (error) {
+                    console.error('Error processing the file:', error);
+                    res.status(500).send('Internal Server Error');
+                }
             });
 
             dataStream.on('error', (streamErr) => {
