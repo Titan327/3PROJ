@@ -100,7 +100,7 @@ async function getRecieptFile(id:number){
     window.open(url, '_blank');
     //URL.revokeObjectURL(url);
 
-    //return url;
+    return url;
   } catch(e) {
     console.error(e);
     return false;

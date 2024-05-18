@@ -158,8 +158,7 @@ async function deletePaymentMethod(id:string){
                 <div class="absolute-top-right text-subtitle2 row border-radius-inherit">
                   <q-space></q-space>
                   <q-item-label class="text-h6 q-pa-md">
-                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"
-                    />
+                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"><q-tooltip>Supprimer</q-tooltip></q-icon>
                   </q-item-label>
                 </div>
               </q-item-section>
@@ -186,10 +185,8 @@ async function deletePaymentMethod(id:string){
                 <div class="absolute-top-right text-subtitle2 row border-radius-inherit">
                   <q-space></q-space>
                   <q-item-label class="text-h6 q-pa-md">
-                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"
-                    />
-                    <q-icon v-if="paiement.ribFile" class="q-pa-none" name="picture_as_pdf" @click="getRibFile(paiement.id)" style="cursor: pointer;"
-                    />
+                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"><q-tooltip>Supprimer le RIB</q-tooltip></q-icon>
+                    <q-icon v-if="paiement.ribFile" color="white" name="picture_as_pdf" @click="getRibFile(paiement.id)" style="cursor: pointer;"><q-tooltip>Afficher le RIB</q-tooltip></q-icon>
                   </q-item-label>
                 </div>
               </q-item-section>
