@@ -50,11 +50,10 @@ const getGroup = async (req, res) => {
             }
         );
 
-
         if (group === null) {
             return res.status(404).send({error: "Group not found"});
         }
-        if (UserGroup.findOne({where: {groupId: groupId, userId: req.authorization.userId}})) {
+        if (await UserGroup.findOne({where: {groupId: groupId, userId: req.authorization.userId}})) {
             let activeUsersCount = await UserGroup.count({where: {groupId: groupId, active: true}});
             return res.status(200).send({...group.toJSON(), activeUsersCount: activeUsersCount});
         }
