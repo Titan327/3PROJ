@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -65,14 +66,14 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.Center, // Center vertically
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Menu
         Row(
             modifier = Modifier
                 .clip(shape = RoundedCornerShape(16.dp))
                 .fillMaxWidth()
+                .padding(bottom = 20.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -85,7 +86,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                 horizontalAlignment = CenterHorizontally
             ) {
                 Text(
-                    text = "User Info",
+                    text = "Information Utilisateur",
                     color = if (isUserInfoDisplayed.value) Color(android.graphics.Color.parseColor("#FFA31A")) else Color.White,
                 )
             }
@@ -100,7 +101,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                 horizontalAlignment = CenterHorizontally
             ) {
                 Text(
-                    text = "Image Change",
+                    text = "Changment Photo",
                     color = if (isImageChangeDisplayed.value) Color(android.graphics.Color.parseColor("#FFA31A")) else Color.White,
                 )
             }
@@ -115,7 +116,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                 horizontalAlignment = CenterHorizontally
             ) {
                 Text(
-                    text = "Password Change",
+                    text = "Changement Mot De Passe",
                     color = if (isPasswordChangeDisplayed.value) Color(android.graphics.Color.parseColor("#FFA31A")) else Color.White,
                 )
             }
@@ -126,6 +127,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                 value = usernameState.value,
                 onValueChange = { usernameState.value = it },
                 label = { Text("Username") },
+
                 modifier = Modifier.padding(bottom = 16.dp),
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.Black,
@@ -230,20 +232,18 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                         }
                     }
                 }
-            }) {
-                Text("Mettre à jour l'utilisateur")
+            }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))){
+                Text("Mettre à jour l'utilisateur", color = Color.White)
             }
         }
 
-        // Image Section
         if (isImageChangeDisplayed.value) {
-            Text("Changement d'image", style = MaterialTheme.typography.h6)
+            Text("Changement d'image", style = MaterialTheme.typography.h6, color = Color.White)
             ImageChangeSection(httpClient, jwtToken)
         }
 
-        // Password Section
         if (isPasswordChangeDisplayed.value) {
-            Text("Changement de mot de passe", style = MaterialTheme.typography.h6)
+            Text("Changement de mot de passe", style = MaterialTheme.typography.h6, color = Color.White)
             PasswordChangeSection(currentPasswordState, newPasswordState, repeatNewPasswordState, httpClient, jwtToken)
         }
 
@@ -254,7 +254,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
         paymentMethods.forEach { paymentMethod ->
             when (paymentMethod.type) {
                 "RIB" -> {
-                    Spacer(modifier = Modifier.height(16.dp)) // Add a spacer of 16dp height
+                    Spacer(modifier = Modifier.height(16.dp))
                     Box {
                         Image(
                             painter = painterResource(id = sample_test_app.com.R.drawable.rib_card),
@@ -263,7 +263,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                         )
                         Column(
                             modifier = Modifier
-                                .align(Alignment.Center) // Change alignment to center
+                                .align(Alignment.Center)
                                 .padding(16.dp)
                         ) {
                             Text(text = "${paymentMethod.value.name} ${paymentMethod.value.surname}", color = Color.White)
@@ -272,7 +272,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                     }
                 }
                 "Paypal" -> {
-                    Spacer(modifier = Modifier.height(16.dp)) // Add a spacer of 16dp height
+                    Spacer(modifier = Modifier.height(16.dp))
                     Box {
                         Image(
                             painter = painterResource(id = sample_test_app.com.R.drawable.paypal_card1),
@@ -281,7 +281,7 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
                         )
                         Column(
                             modifier = Modifier
-                                .align(Alignment.Center) // Change alignment to center
+                                .align(Alignment.Center)
                                 .padding(16.dp)
                         ) {
                             Text(text = "${paymentMethod.value.user_paypal}", color = Color.White)

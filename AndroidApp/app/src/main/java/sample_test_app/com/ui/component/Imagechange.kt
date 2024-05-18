@@ -42,7 +42,7 @@ fun ImageChangeSection(httpClient: HttpClient, jwtToken: String) {
     Button(onClick = { selectImageLauncher.launch("image/*") },
         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
     ) {
-        Text("Select an Image")
+        Text("Séléctionner une image",color = Color.White)
     }
     selectedImageUri.value?.let { uri ->
         Image(
@@ -94,6 +94,6 @@ fun ImageChangeSection(httpClient: HttpClient, jwtToken: String) {
     },
         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
     ) {
-        Text("Upload Image")
+        Text("Mettre à Jour l'image", color = Color.White)
     }
 }

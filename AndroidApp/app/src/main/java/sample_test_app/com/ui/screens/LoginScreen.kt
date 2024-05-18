@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -158,11 +159,14 @@ fun LoginScreen(
                     }
                 }
             }
-        },    modifier = Modifier.background(Color(0xFFFFA31A))
+        },
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
+
 
 
         ) {
-            Text("Login")
+            Text("Login", color = Color.White)
+
 
         }
 

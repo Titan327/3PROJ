@@ -269,7 +269,7 @@ fun PaymentForm(httpClient: HttpClient, jwtToken: String) {
         },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
         ) {
-            Text("Submit")
+            Text("Envoyer" , color = Color.White)
         }
     }
 }

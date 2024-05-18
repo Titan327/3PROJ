@@ -49,7 +49,7 @@ fun PasswordChangeSection(currentPasswordState: MutableState<String>, newPasswor
     TextField(
         value = currentPasswordState.value,
         onValueChange = { currentPasswordState.value = it },
-        label = { Text("Current Password") },
+        label = { Text("Mot de passe actuel") },
         modifier = Modifier.padding(bottom = 16.dp),
         colors = TextFieldDefaults.textFieldColors(
             textColor = Color.Black,
@@ -64,7 +64,7 @@ fun PasswordChangeSection(currentPasswordState: MutableState<String>, newPasswor
     TextField(
         value = newPasswordState.value,
         onValueChange = { newPasswordState.value = it },
-        label = { Text("New Password") },
+        label = { Text("Nouveau Mot de Passe") },
         modifier = Modifier.padding(bottom = 16.dp),
         colors = TextFieldDefaults.textFieldColors(
             textColor = Color.Black,
@@ -79,7 +79,7 @@ fun PasswordChangeSection(currentPasswordState: MutableState<String>, newPasswor
     TextField(
         value = repeatNewPasswordState.value,
         onValueChange = { repeatNewPasswordState.value = it },
-        label = { Text("Repeat New Password") },
+        label = { Text("Répéter Le Nouveau Mot de Passe") },
         modifier = Modifier.padding(bottom = 16.dp),
         colors = TextFieldDefaults.textFieldColors(
             textColor = Color.Black,
@@ -133,6 +133,6 @@ fun PasswordChangeSection(currentPasswordState: MutableState<String>, newPasswor
         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
 
     ) {
-        Text("Change Password")
+        Text("Changer le Mot de Passe",  color = Color.White)
     }
 }

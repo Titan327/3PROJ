@@ -132,6 +132,6 @@ fun GoogleSignInButton (navController: NavHostController, httpClient: HttpClient
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
     ) {
-        Text(text = "Sign in with Google")
+        Text(text = "Connexion avec Google", color = Color.White)
     }
 }

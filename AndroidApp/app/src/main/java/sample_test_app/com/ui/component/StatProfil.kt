@@ -69,7 +69,7 @@ fun UserStatistics(httpClient: HttpClient, jwtToken: String) {
 
     userStatistics.value?.let {
         Column {
-            Text(it.statistic, color = Color.White, style = TextStyle(fontSize = 20.sp))
+            Text("Statistique du compte sur le mois : ${it.statistic}", color = Color.White, style = TextStyle(fontSize = 20.sp))
             Text("Moyenne: ${it.average}", color = Color.White, style = TextStyle(fontSize = 20.sp))
             Text("Transactions: ${it.transactions}", color = Color.White, style = TextStyle(fontSize = 20.sp))
 
