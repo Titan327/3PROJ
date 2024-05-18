@@ -17,20 +17,24 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun TheirsBubble(message: String){
+fun TheirsBubble(message: String,userId: String,userName: String){
     Column (
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
+        Text(style = TextStyle(fontSize = 10.sp, color = Color.White), text=userName)
         Row (
             modifier = Modifier
                 .fillMaxWidth(),

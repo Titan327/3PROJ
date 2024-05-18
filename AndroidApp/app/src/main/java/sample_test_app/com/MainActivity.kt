@@ -1,5 +1,6 @@
 package sample_test_app.com
 import MessageScreen
+import MessageScreenPrivate
 import SplashScreen
 import android.os.Build
 import android.os.Bundle
@@ -105,7 +106,12 @@ fun AppNavHost() {
                 composable("group/{groupId}") { backStackEntry ->
                     GroupScreen(HttpClient(), navController, backStackEntry.arguments?.getString("groupId"))
                 }
-                composable("message") { MessageScreen(navController, HttpClient()) }
+                composable("message/{groupId}") { backStackEntry ->
+                    MessageScreen(navController, HttpClient(),backStackEntry.arguments?.getString("groupId"))
+                }
+                composable("messagePrivate/{groupId}") { backStackEntry ->
+                    MessageScreenPrivate(navController, HttpClient(),backStackEntry.arguments?.getString("groupId"))
+                }
             }
         }
     }

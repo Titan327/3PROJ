@@ -48,7 +48,7 @@ import sample_test_app.com.models.Group
 import sample_test_app.com.models.Message
 
 @Composable
-fun MessageScreen(navController: NavHostController, httpClient: HttpClient, groupId: String?) {
+fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClient, groupId: String?) {
     val messageRepository = remember { MessageRepository(httpClient) }
     val groupRepository = remember { GroupRepository(httpClient) }
     val jwtToken = LocalJwtToken.current
@@ -74,7 +74,7 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
     }
 
     DisposableEffect(socket) {
-        socket.on("chat-group-$groupId") { args ->
+        socket.on("chat-private-$groupId") { args ->
             if (args.isNotEmpty()) {
                 val message = args[0]?.toString().orEmpty()
                 val group = args[1]?.toString().orEmpty()
@@ -105,9 +105,9 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
         try {
             if (isValidString(text)){
                 CoroutineScope(Dispatchers.Main).launch {
-                    val isSent = groupId?.let { messageRepository.sendMessage(jwtToken, it, text) }
+                    val isSent = groupId?.let { messageRepository.sendMessagePrivate(jwtToken, it, text) }
                     if (isSent == 200) {
-                        socket.emit("chat message", text, groupId, userId)
+                        socket.emit("private message", text, groupId)
                         messText = ""
                     } else {
                         Log.e("Socket", "Failed to send message: $isSent")
@@ -137,7 +137,7 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
             val offset = messCount % limit.toInt()
 
 
-            val AllMess = messageRepository.getmessage(groupId,limit, page.toString(),jwtToken)
+            val AllMess = messageRepository.getmessagePrivate(groupId,limit, page.toString(),jwtToken)
             var mess: Array<Message>? = null
             if (AllMess != null){
                 mess = AllMess.drop(offset).toTypedArray()
