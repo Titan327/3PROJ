@@ -35,6 +35,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import sample_test_app.com.LocalUser
 import sample_test_app.com.ui.component.ImageChangeSection
+import sample_test_app.com.ui.component.PaymentForm
 
 @OptIn(InternalAPI::class)
 @Composable
@@ -240,5 +241,6 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             Text("Changement de mot de passe", style = MaterialTheme.typography.h6)
             PasswordChangeSection(currentPasswordState, newPasswordState, repeatNewPasswordState, httpClient, jwtToken)
         }
+        PaymentForm(httpClient, jwtToken)
     }
 }
