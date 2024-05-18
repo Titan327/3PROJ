@@ -86,7 +86,26 @@ async function ribExist(id: number){
     return false;
   }
 }
-
+async function deletePaymentMethod(id:string){
+  try {
+    loading.value = true;
+    const response = await api.delete(`users/me/paymentMethode/?paymentId=${id}`);
+    if (response.data) {
+      $q.notify({
+        type: 'positive',
+        message: 'Moyen de paiement supprimé'
+      })
+      getMethod();
+    }
+  }
+  catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Une erreur s\'est produite'
+    })
+  }
+  loading.value = false;
+}
 </script>
 
 
@@ -135,6 +154,15 @@ async function ribExist(id: number){
                   </q-item-label>
                 </div>
               </q-img>
+              <q-item-section>
+                <div class="absolute-top-right text-subtitle2 row border-radius-inherit">
+                  <q-space></q-space>
+                  <q-item-label class="text-h6 q-pa-md">
+                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"
+                    />
+                  </q-item-label>
+                </div>
+              </q-item-section>
             </q-card>
 
             <q-card class="method rounded-borders" v-if="paiement.type=='RIB'">
@@ -142,13 +170,6 @@ async function ribExist(id: number){
                 src="/assets/card/rib-card.webp"
                 class="rounded-borders"
               >
-                <div class="absolute-top-right row border-radius-inherit q-pa-none" v-if="paiement.ribFile">
-                  <q-space></q-space>
-                  <q-item-label class="text-h6 q-pa-none">
-                    <q-icon class="q-pa-none" name="picture_as_pdf" @click="getRibFile(paiement.id)" style="cursor: pointer;"
-                    />
-                  </q-item-label>
-                </div>
                 <div class="absolute-bottom text-subtitle2 row">
                   <q-item-label class="q-pa-xs">{{paiement.value.bank_name}}: {{paiement.value.surname}} {{paiement.value.name}}</q-item-label>
                   <q-item-label class="q-pa-xs"></q-item-label>
@@ -161,6 +182,17 @@ async function ribExist(id: number){
                   </q-item-label>
                 </div>
               </q-img>
+              <q-item-section>
+                <div class="absolute-top-right text-subtitle2 row border-radius-inherit">
+                  <q-space></q-space>
+                  <q-item-label class="text-h6 q-pa-md">
+                    <q-icon name="delete" color="red" @click="deletePaymentMethod(paiement.id)" style="cursor: pointer;"
+                    />
+                    <q-icon v-if="paiement.ribFile" class="q-pa-none" name="picture_as_pdf" @click="getRibFile(paiement.id)" style="cursor: pointer;"
+                    />
+                  </q-item-label>
+                </div>
+              </q-item-section>
             </q-card>
           </q-carousel-slide>
 
