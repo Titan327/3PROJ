@@ -1,3 +1,4 @@
+<script src="../../../../../BackEnd/Express/server.js"></script>
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import {DefaultGroup} from "src/interfaces/group.interface";

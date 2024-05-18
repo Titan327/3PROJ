@@ -115,7 +115,7 @@ async function sendMessage() {
     });
 
     if(response.status == 200){
-      socket.emit('chat message', writingMessage.value, props.groupId);
+      socket.emit('chat message', writingMessage.value, props.groupId, User.value.id);
       writingMessage.value = '';
       scrollNewMsg()
     }
