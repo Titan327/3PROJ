@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.InternalAPI
 import kotlinx.serialization.Serializable
@@ -128,7 +129,10 @@ fun PasswordChangeSection(currentPasswordState: MutableState<String>, newPasswor
         } else {
             println("New password and confirmation do not match.")
         }
-    }) {
+    },
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
+
+    ) {
         Text("Change Password")
     }
 }

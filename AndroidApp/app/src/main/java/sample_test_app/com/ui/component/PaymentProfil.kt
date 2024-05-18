@@ -3,6 +3,7 @@ package sample_test_app.com.ui.component
 import androidx.compose.foundation.layout.*
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.RadioButton
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -265,7 +266,9 @@ fun PaymentForm(httpClient: HttpClient, jwtToken: String) {
                     println("An error occurred while sending the request: ${e.message}")
                 }
             }
-        }) {
+        },
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
+        ) {
             Text("Submit")
         }
     }

@@ -132,6 +132,7 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                         dismissButton = {
                             Button(onClick = { showDialog.value = false }) {
                                 Text("Cancel")
+
                             }
                         }
                     )

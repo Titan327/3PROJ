@@ -1,6 +1,6 @@
 package sample_test_app.com.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,8 +17,10 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import fetchPaymentMethods
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.put
@@ -54,6 +56,11 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
     val isUserInfoDisplayed = remember { mutableStateOf(true) }
     val isImageChangeDisplayed = remember { mutableStateOf(false) }
     val isPasswordChangeDisplayed = remember { mutableStateOf(false) }
+
+    val payments = listOf(
+        Pair("RIB", "Détails du RIB..."),
+        Pair("PayPal", "Détails du PayPal...")
+    )
 
     Column(
         modifier = Modifier
@@ -241,6 +248,27 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             Text("Changement de mot de passe", style = MaterialTheme.typography.h6)
             PasswordChangeSection(currentPasswordState, newPasswordState, repeatNewPasswordState, httpClient, jwtToken)
         }
-        PaymentForm(httpClient, jwtToken)
+        val paymentMethods = fetchPaymentMethods(httpClient, jwtToken)
+        paymentMethods.forEach { paymentMethod ->
+            when (paymentMethod.type) {
+                "RIB" -> {
+                    Image(
+                        painter = painterResource(id = sample_test_app.com.R.drawable.rib_card),
+                        contentDescription = "RIB Card",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                "Paypal" -> {
+                    Image(
+                        painter = painterResource(id = sample_test_app.com.R.drawable.paypal_card1),
+                        contentDescription = "Paypal Card",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+
+
     }
+
 }

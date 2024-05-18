@@ -6,11 +6,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
@@ -37,7 +39,9 @@ fun ImageChangeSection(httpClient: HttpClient, jwtToken: String) {
         selectedImageUri.value = uri
     }
 
-    Button(onClick = { selectImageLauncher.launch("image/*") }) {
+    Button(onClick = { selectImageLauncher.launch("image/*") },
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
+    ) {
         Text("Select an Image")
     }
     selectedImageUri.value?.let { uri ->
@@ -45,6 +49,7 @@ fun ImageChangeSection(httpClient: HttpClient, jwtToken: String) {
             painter = rememberImagePainter(data = uri),
             contentDescription = "Selected image",
             modifier = Modifier.size(200.dp)
+
         )
     }
 
@@ -86,7 +91,9 @@ fun ImageChangeSection(httpClient: HttpClient, jwtToken: String) {
                 }
             }
         }
-    }) {
+    },
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
+    ) {
         Text("Upload Image")
     }
 }
