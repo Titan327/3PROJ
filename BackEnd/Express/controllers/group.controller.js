@@ -3,12 +3,23 @@ const UserGroup = require('../models/userGroup.model');
 const User = require('../models/user.model');
 const Joi = require('joi');
 const {createUserGroupRelation} = require("./userGroup.controller");
-const {Op} = require("sequelize");
+const {Op, where} = require("sequelize");
 
 const getGroup = async (req, res) => {
     console.log(`REST getGroup`);
     const { groupId } = req.params;
+
     try {
+
+        /*
+        const userInGroup = await UserGroup.findOne({
+            where:{
+                userId : user.id,
+                groupId : groupId
+            }
+        })
+        */
+
         const group = await Group.findOne({
             where: {id: groupId},
             include: [{
@@ -44,7 +55,7 @@ const getGroup = async (req, res) => {
             return res.status(404).send({error: "Group not found"});
         }
         if (UserGroup.findOne({where: {groupId: groupId, userId: req.authorization.userId}})) {
-            let activeUsersCount = await UserGroup.count({where: {groupId: groupId, active: true}})
+            let activeUsersCount = await UserGroup.count({where: {groupId: groupId, active: true}});
             return res.status(200).send({...group.toJSON(), activeUsersCount: activeUsersCount});
         }
         return res.status(403).send({error: "You are not part of this group"});
