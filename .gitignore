@@ -4,7 +4,7 @@
 node_modules/
 
 #.env
-BackEnd/Express/.env
+#BackEnd/Express/.env
 
 # Data SQL
 Data/Postgres_data*
