@@ -1,6 +1,8 @@
 const UserGroup = require("../models/userGroup.model");
+const Transactions = require("../models/transaction.model");
 const {minioClient} = require("../configurations/minio.config");
 const path = require("path");
+
 
 
 const postTicket = async (req, res) => {
@@ -14,6 +16,15 @@ const postTicket = async (req, res) => {
         }
 
         await minioClient.putObject("ticket", groupId+'/'+transactionId/*+extension*/, req.file.buffer);
+
+        await Transactions.update({
+                //receipt:process.env.APP_URL+"api/img/ticket/"+groupId+"/"+transactionId
+                receipt:true
+            },{
+            where:{
+                id:transactionId
+            }
+        })
 
         return res.status(200).send({ message: "Ticket uploaded successfully"});
 
