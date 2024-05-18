@@ -90,6 +90,13 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:2.2.3")
     implementation("io.ktor:ktor-client-json:2.2.3")
 
+
+    // Websocket
+    implementation ('io.socket:socket.io-client:2.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+
+
     // Oauth2 google
     implementation("androidx.credentials:credentials:1.3.0-alpha04")
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0-alpha04")
