@@ -139,8 +139,9 @@ const computeFriendPaypalLink = computed(() => {
         <div class="text-h5">Rembourser {{formatNumber(refund.amount)}}€ à {{getUserGroupData(refund.userToPaidID)?.username}}</div>
       </q-card-section>
       <q-card-section>
-        <q-item-label v-if="computeFriendIban" class="text-subtitle2 q-pa-md">Vous pouvez copier l'IBAN de {{getUserGroupData(refund.userToPaidID)?.username}} pour effectuer le virement bancaire ensuite ou effectuer le remboursement via PayPal.</q-item-label>
-        <q-item-label v-if="computeFriendPaypalLink" class="text-subtitle2 q-pa-md">En cliquant sur "Rembourser via Paypal" vous serez redirigé vers le profil de {{getUserGroupData(refund.userToPaidID)?.username}} afin d'effectuer le remboursement.</q-item-label>
+        <q-item-label v-if="computeFriendIban &&  computeFriendPaypalLink" class="text-subtitle2 q-pa-md">Vous pouvez copier l'IBAN de {{getUserGroupData(refund.userToPaidID)?.username}} pour effectuer le virement bancaire ensuite ou effectuer le remboursement via PayPal.</q-item-label>
+        <q-item-label v-if="computeFriendIban && !computeFriendPaypalLink" class="text-subtitle2 q-pa-md">Vous pouvez copier l'IBAN de {{getUserGroupData(refund.userToPaidID)?.username}} pour effectuer le virement bancaire ensuite.</q-item-label>
+        <q-item-label v-if="computeFriendPaypalLink && !computeFriendIban" class="text-subtitle2 q-pa-md">En cliquant sur "Rembourser via Paypal" vous serez redirigé vers le profil de {{getUserGroupData(refund.userToPaidID)?.username}} afin d'effectuer le remboursement.</q-item-label>
         <q-item-label v-if="!computeFriendPaypalLink && !computeFriendIban" class="text-subtitle2 q-pa-md">{{getUserGroupData(refund.userToPaidID)?.username}} n'a ajouté aucun moyen de paiement, vous pouvez toujours effectuer un remboursement par moyen externe.</q-item-label>
 
         <div class="bloc-link row items-center justify-evenly" v-if="computeFriendIban">
@@ -175,7 +176,7 @@ const computeFriendPaypalLink = computed(() => {
             no-caps
             @click="redirectBankWebSite(computeBankLink)">
             <q-tooltip class="bg-red" v-if="!computeBankLink">
-              Vous devez avoir un RIB d'enregistré pour utiliser cette fonctionnalité
+              Vous devez avoir un RIB d'enregistré avec une banque reconnue pour utiliser cette fonctionnalité
             </q-tooltip>
           </q-btn>
         </div>
