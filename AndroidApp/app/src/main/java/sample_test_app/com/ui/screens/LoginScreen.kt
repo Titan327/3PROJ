@@ -4,6 +4,7 @@ package sample_test_app.com.ui.screens
 
 import GoogleSignInButton
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -157,7 +158,10 @@ fun LoginScreen(
                     }
                 }
             }
-        }) {
+        },    modifier = Modifier.background(Color(0xFFFFA31A))
+
+
+        ) {
             Text("Login")
 
         }

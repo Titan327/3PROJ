@@ -35,7 +35,7 @@ fun SplashScreen(navController: NavHostController) {
             painter = painterResource(id = R.drawable.logomid),
             contentDescription = null,
             modifier = Modifier
-                .padding(bottom = 20.dp)
+                .padding(bottom = 10.dp)
                 .height(500.dp)
                 .width(500.dp)
         )
@@ -48,7 +48,7 @@ fun SplashScreen(navController: NavHostController) {
                 .padding(top = 10.dp)
                 .height(70.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF5490A1)
+                backgroundColor = Color(0xFFFFA31A)
             )
         ) {
             Text(
@@ -68,7 +68,7 @@ fun SplashScreen(navController: NavHostController) {
                 .padding(top = 38.dp, bottom = 30.dp)
                 .height(70.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF5490A1)
+                backgroundColor = Color(0xFFFFA31A)
             )
         ) {
             Text(

@@ -2,6 +2,8 @@ package sample_test_app.com.ui.screens
 
 import android.util.Patterns
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -19,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -39,13 +41,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import sample_test_app.com.http.Security.JwtUtils.JwtUtils
 import sample_test_app.com.models.User
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import java.text.SimpleDateFormat
 
 @Serializable
@@ -169,6 +169,8 @@ fun RegisterScreen(
                 birth_date = dateOfBirthState.value.trim(),
                 password = passwordState.value.trim()
             )
+
+
             val userInfoJson = Json.encodeToString(mapOf("userInfos" to userInfo))
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -194,7 +196,10 @@ fun RegisterScreen(
                     }
                 }
             }
-        }) {
+
+        }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
+
+        ) {
             Text("Register")
         }
     }

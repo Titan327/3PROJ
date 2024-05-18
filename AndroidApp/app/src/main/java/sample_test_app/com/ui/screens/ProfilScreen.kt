@@ -38,10 +38,11 @@ import kotlinx.serialization.json.Json
 import sample_test_app.com.LocalUser
 import sample_test_app.com.ui.component.ImageChangeSection
 import sample_test_app.com.ui.component.PaymentForm
+import sample_test_app.com.ui.component.UserStatistics
 
 @OptIn(InternalAPI::class)
 @Composable
-fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtToken: String) {
+fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtToken: String, userId: Int) {
     val user = LocalUser.current
 
     var usernameState = remember { mutableStateOf(user.username ?: "") }
@@ -51,23 +52,21 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
     var birthDateState = remember { mutableStateOf(user.birth_date ?: "") }
     var currentPasswordState = remember { mutableStateOf("") }
     var newPasswordState = remember { mutableStateOf("") }
+
     var repeatNewPasswordState = remember { mutableStateOf("") }
 
     val isUserInfoDisplayed = remember { mutableStateOf(true) }
     val isImageChangeDisplayed = remember { mutableStateOf(false) }
     val isPasswordChangeDisplayed = remember { mutableStateOf(false) }
 
-    val payments = listOf(
-        Pair("RIB", "Détails du RIB..."),
-        Pair("PayPal", "Détails du PayPal...")
-    )
+
 
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxSize(), // Fill the maximum size of the parent
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center, // Center vertically
-        horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Menu
         Row(
@@ -122,7 +121,6 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             }
         }
 
-        // User Info Section
         if (isUserInfoDisplayed.value) {
             TextField(
                 value = usernameState.value,
@@ -248,27 +246,50 @@ fun ProfilScreen(httpClient: HttpClient, navController: NavHostController, jwtTo
             Text("Changement de mot de passe", style = MaterialTheme.typography.h6)
             PasswordChangeSection(currentPasswordState, newPasswordState, repeatNewPasswordState, httpClient, jwtToken)
         }
+
+        PaymentForm(httpClient, jwtToken)
+
+
         val paymentMethods = fetchPaymentMethods(httpClient, jwtToken)
         paymentMethods.forEach { paymentMethod ->
             when (paymentMethod.type) {
                 "RIB" -> {
-                    Image(
-                        painter = painterResource(id = sample_test_app.com.R.drawable.rib_card),
-                        contentDescription = "RIB Card",
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Spacer(modifier = Modifier.height(16.dp)) // Add a spacer of 16dp height
+                    Box {
+                        Image(
+                            painter = painterResource(id = sample_test_app.com.R.drawable.rib_card),
+                            contentDescription = "RIB Card",
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.Center) // Change alignment to center
+                                .padding(16.dp)
+                        ) {
+                            Text(text = "${paymentMethod.value.name} ${paymentMethod.value.surname}", color = Color.White)
+                            Text(text = "${paymentMethod.value.IBAN}", color = Color.White)
+                        }
+                    }
                 }
                 "Paypal" -> {
-                    Image(
-                        painter = painterResource(id = sample_test_app.com.R.drawable.paypal_card1),
-                        contentDescription = "Paypal Card",
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Spacer(modifier = Modifier.height(16.dp)) // Add a spacer of 16dp height
+                    Box {
+                        Image(
+                            painter = painterResource(id = sample_test_app.com.R.drawable.paypal_card1),
+                            contentDescription = "Paypal Card",
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.Center) // Change alignment to center
+                                .padding(16.dp)
+                        ) {
+                            Text(text = "${paymentMethod.value.user_paypal}", color = Color.White)
+                        }
+                    }
                 }
             }
         }
-
+        UserStatistics(httpClient, jwtToken)}
 
     }
-
-}
