@@ -95,9 +95,10 @@ fun AppNavHost() {
 
                 composable("profil") {
                     MainScreen(navController) {
-                        ProfilScreen(HttpClient(), navController, LocalJwtToken.current)
+                        LocalUser.current.id?.let { it1 -> ProfilScreen(HttpClient(), navController, LocalJwtToken.current, it1.toInt()) }
                     }
                 }
+
                 composable("notifications") {
                     MainScreen(navController) {
                         NotificationScreen(HttpClient(), navController)

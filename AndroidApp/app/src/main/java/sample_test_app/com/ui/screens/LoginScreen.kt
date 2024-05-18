@@ -4,12 +4,14 @@ package sample_test_app.com.ui.screens
 
 import GoogleSignInButton
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -20,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -43,6 +46,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import sample_test_app.com.R
 import sample_test_app.com.http.Security.JwtUtils.JwtUtils
 import sample_test_app.com.models.User
 
@@ -75,12 +79,16 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.logobig),
+            contentDescription = "Logo"
+        )
         TextField(
             value = usernameState.value,
             onValueChange = { newValue ->
                 usernameState.value = newValue
             },
-            placeholder = { Text("Enter your username") },
+            placeholder = { Text("Entrer votre pseudo") },
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
             modifier = Modifier.padding(vertical = 8.dp)
         )
@@ -90,7 +98,7 @@ fun LoginScreen(
             onValueChange = { newValue ->
                 passwordState.value = newValue
             },
-            placeholder = { Text("Enter your password") },
+            placeholder = { Text("Entrer votre mot de passe") },
             visualTransformation = PasswordVisualTransformation(),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White),
             modifier = Modifier.padding(vertical = 8.dp)
@@ -157,8 +165,14 @@ fun LoginScreen(
                     }
                 }
             }
-        }) {
-            Text("Login")
+        },
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA31A))
+
+
+
+        ) {
+            Text("Connexion", color = Color.White)
+
 
         }
 
