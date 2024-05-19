@@ -5,9 +5,9 @@ const crypto = require('crypto');
 
 const createInvitation = async (req, res) => {
     try {
-        console.log('REST createInvitation');
+
         const userId = req.authorization.userId;
-        console.log(`userId: ${userId}`);
+
         if (await UserGroup.findOne({where: {userId: userId, groupId: req.params.groupId}}) === null) {
             return res.status(403).send({error: "You are not allowed to create an invitation for this group"});
         }
@@ -33,7 +33,6 @@ const createInvitation = async (req, res) => {
 
 
 const joinGroup = async (req, res) => {
-    console.log('REST joinGroup');
 
     const token = req.params.token;
     const userId = req.authorization.userId;

@@ -3,7 +3,7 @@ const Refund = require('../models/refund.model');
 const {Op, where} = require("sequelize");
 
 const processRefund = async (req, res) => {
-    console.log(`REST refundTransactions`);
+
     const groupId = req.params.groupId;
     const refundId = req.params.refundId;
     try {
@@ -35,10 +35,9 @@ const processRefund = async (req, res) => {
 }
 
 const getGroupRefunds = async (req, res) => {
-    console.log(`REST getGroupRefunds`);
+
     const {groupId} = req.params;
-    console.log(groupId)
-    console.log(typeof groupId)
+
     try {
         let refunds = await Refund.findAll({
             where: {groupId, processed: false},
@@ -52,10 +51,9 @@ const getGroupRefunds = async (req, res) => {
 }
 
 const getGroupDoneRefunds = async (req, res) => {
-    console.log(`REST getGroupDoneRefunds`);
+
     const {groupId} = req.params;
-    console.log(groupId)
-    console.log(typeof groupId)
+
     try {
         let refunds = await Refund.findAll({
             where: {groupId, processed: true},
@@ -75,7 +73,6 @@ const getGroupDoneRefunds = async (req, res) => {
 
 const calculateMinimalRefunds = async (groupId) => {
     try {
-        console.log(`REST calculateMinimalRefunds`);
 
         await Refund.destroy({where: {groupId, processed: false}});
         let users = await UserGroup.findAll({

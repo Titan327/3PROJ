@@ -117,7 +117,7 @@ const createPaymentMethode = async (req, res) => {
         let result = {};
 
         if (type === "Paypal"){
-            console.log(data);
+
             const schema = Joi.object({
                 type: Joi.string().required(),
                 paypal_username: Joi.string().required()
@@ -185,7 +185,6 @@ const getMyPaymentMethode = async (req,res) => {
         if (paymentMethodes === null) {
             return res.status(404).send({ error: "Payment methode not found" });
         }
-        console.log(paymentMethodes);
 
         let result = [];
 

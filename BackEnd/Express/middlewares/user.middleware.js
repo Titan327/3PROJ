@@ -3,7 +3,7 @@ const User = require("../models/user.model");
 const {compare} = require("bcrypt");
 
 const verifyUserInfos = async (req, res, next) => {
-    console.log(`REST verifyUserInfos`);
+
     const schema = Joi.object({
         lastname: Joi.string().min(3).max(63).required(),
         firstname: Joi.string().min(3).max(63).required(),
@@ -27,7 +27,7 @@ const verifyUserInfos = async (req, res, next) => {
 }
 
 const verifyPasswordWhenCreatingOrUpdating = async (req, res, next) => {
-    console.log(`REST verifyPasswordWhenCreating`);
+
     const schema = Joi.object({
         password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required(),
         passwordConfirm: Joi.ref('password')
@@ -48,7 +48,7 @@ const verifyPasswordWhenCreatingOrUpdating = async (req, res, next) => {
 }
 
 const verifyPasswordForSensibleInfos = async (req, res, next) => {
-    console.log(`REST verifyPasswordForSensibleInfos`);
+
     if (!req.body.password) {
         return res.status(400).send({ message: "Password is required for this operation" });
     }

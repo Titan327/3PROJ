@@ -32,8 +32,7 @@ const getUser = async (req, res) => {
 }
 
 const createUser = async (req, res) => {
-    console.log(`REST createUser`);
-    console.log(req.value);
+
     const { lastname, firstname, username, email, birth_date, password } = req.value;
     try {
         const salt = await genSalt(12);
@@ -54,11 +53,11 @@ const createUser = async (req, res) => {
 }
 
 const modifyUser = async (req, res) => {
-    console.log(`REST modifyUser`);
+
     const { lastname, firstname, username, email, birth_date } = req.value;
     const user = await User.findOne({ where: { id: req.authorization.userId } });
-    console.log(user.email);
-    console.log(email);
+
+
     if (email !== user.email){
         if (await User.findOne({ where: { email: email } }) !== null) {
             return res.status(409).send({ message: "Email already taken"});
@@ -86,7 +85,7 @@ const modifyUser = async (req, res) => {
 }
 
 const modifyPassword = async (req, res) => {
-    console.log(`REST modifyPassword`);
+
     const schema = Joi.object({
         password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/).required(),
         passwordConfirm: Joi.ref('password')
@@ -116,7 +115,7 @@ const modifyPassword = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-    console.log(`REST deleteUser`);
+
     try {
         const userId = req.params.userId;
         await User.update({
@@ -141,7 +140,7 @@ const deleteUser = async (req, res) => {
 }
 
 const getAmountOfAllUserTransactionsThisMonth = async (req, res) => {
-    console.log(`REST getAmountOfAllUserTransactionsThisMonth`);
+
     try {
         const transactions = await TransactionUserController.getAllUserTransactionsThisMonth(req.params.userId);
         let amount = 0;
@@ -156,7 +155,7 @@ const getAmountOfAllUserTransactionsThisMonth = async (req, res) => {
 }
 
 const totalBalance = async (req, res) => {
-    console.log(`REST getAverageBalance`);
+
     try {
         const userGroups = await UserGroup.findAll({
             where: { userId: req.params.userId },

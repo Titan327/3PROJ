@@ -6,7 +6,7 @@ const RefundController = require('./refund.controller');
 const {CreateNotif} = require("./notif.controller");
 
 const createTransaction = async (req, res) => {
-    console.log(`REST createTransaction`);
+
     let groupId = req.params.groupId;
     let senderId = req.authorization.userId;
     const {label, total_amount, date, receipt, categoryId, details} = req.body;
@@ -99,7 +99,7 @@ const createTransaction = async (req, res) => {
 }
 
 const getTransaction = async (req, res) => {
-    console.log(`REST getTransaction`);
+
     try {
         const transaction = await Transaction.findByPk(req.params.transactionId, {
             include: [{
@@ -117,7 +117,7 @@ const getTransaction = async (req, res) => {
 }
 
 const getGroupTransactions = async (req, res) => {
-    console.log(`REST getGroupTransaction`);
+
     try {
         const groupId = req.params.groupId;
         const userGroup = await UserGroup.findOne({
@@ -130,7 +130,7 @@ const getGroupTransactions = async (req, res) => {
         if (!userGroup) {
             return res.status(404).send('User not found in group');
         }
-        console.log(`userInGroup`);
+
         let transactions = await Transaction.findAll({
             where: {
                 groupId
@@ -148,7 +148,7 @@ const getGroupTransactions = async (req, res) => {
 }
 
 const getUserTransactions = async (req, res) => {
-    console.log(`REST getTransaction`);
+
     try {
         const transaction = await Transaction.findAll({
             where: {
@@ -166,7 +166,7 @@ const getUserTransactions = async (req, res) => {
 }
 
 const getXLastsUserTransactions = async (req, res) => {
-    console.log(`REST getTransaction`);
+
     try {
         const limit = parseInt(req.query.limit);
         const transactions = await TransactionUser.findAll({

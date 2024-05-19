@@ -19,7 +19,7 @@ const Post = async (req,res) => {
 
         nouveauMessage.save()
             .then(savedMessage => {
-                console.log("Message enregistré avec succès :", savedMessage);
+
                 return res.status(200).json({ message: 'Message saved' });
             })
             .catch(error => {
@@ -128,7 +128,7 @@ const GetUserToUser = async (req,res) => {
                             }
 
                         }).catch(err => {
-                            console.log(err);
+
                             return res.status(500).json({ message: 'Internal error server' });
                     });
                 }else {
@@ -175,7 +175,7 @@ const PostUserToUser = async (req,res) => {
 
                 nouveauMessage.save()
                     .then(savedMessage => {
-                        console.log("Message enregistré avec succès :", savedMessage);
+
                         return res.status(200).json({ message: 'Message saved' });
                     })
                     .catch(error => {

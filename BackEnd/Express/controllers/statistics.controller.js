@@ -4,7 +4,7 @@ const TransactionCategory = require('../models/transactionCategory.model');
 const {Op} = require("sequelize");
 
 const getAllStatistics = async (req, res) => {
-    console.log(`REST getAllStatistics`);
+
     const userId = req.params.userId;
     try {
         const averageTransactionPrice = await getAverageTransactionPrice(userId);
@@ -22,7 +22,7 @@ const getAllStatistics = async (req, res) => {
 }
 
 const getAverageTransactionPrice = async (userId) => {
-    console.log(`REST getAverageTransactionPrice`);
+
     try {
         const transactions = await TransactionUser.findAll({
             where: {
@@ -46,7 +46,7 @@ const getAverageTransactionPrice = async (userId) => {
 }
 
 const getAllTransactionsAmountByCategory = async (userId) => {
-    console.log(`REST getAllTransactionsAmountByCategory`);
+
     try {
         const transactions = await TransactionUser.findAll({
             where: {
@@ -87,7 +87,7 @@ const getAllTransactionsAmountByCategory = async (userId) => {
 }
 
 const getAllUserTransactionsByMonthOnLastYear = async (userId) => {
-    console.log(`REST getAmountOfAllUserTransactionsByMonthOnLastYear`);
+
     try {
         const transactions = await TransactionUser.findAll({
             where: {

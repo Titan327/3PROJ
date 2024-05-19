@@ -34,7 +34,7 @@ const uploadUserPic = async (req, res) => {
         res.status(200).json({ message: 'photo de profile upload' });
     }catch (e){
         res.status(500).json({ error: 'Erreur lors du redimensionnement des images' });
-        console.log(e);
+
     }
 }
 

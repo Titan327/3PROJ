@@ -1,7 +1,7 @@
 const UserGroup = require('../models/userGroup.model');
 
 const createUserGroupRelation = async (userId, groupId) => {
-    console.log(`REST createUserGroupRelation`);
+
     try {
     return await UserGroup.create({
         userId,
@@ -14,7 +14,7 @@ const createUserGroupRelation = async (userId, groupId) => {
 }
 
 const deleteUserGroupRelationsWhenDeletingUser = async (userId) => {
-    console.log(`REST deleteUserGroupRelationsWhenDeletingUser`);
+
     try {
         await UserGroup.destroy({
             where: { userId }
@@ -41,7 +41,7 @@ const verifyUserInGroup = async (userId,groupId) => {
 }
 
 const setFavorite = async (req, res) => {
-    console.log(`REST setFavorite`);
+
     try {
         const userId = req.authorization.userId;
         const groupId = req.params.groupId;

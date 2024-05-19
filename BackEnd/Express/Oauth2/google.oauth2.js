@@ -74,8 +74,8 @@ const oauthGoogle = async (req,res) => {
 
         }
     } catch (error) {
-        console.log(error);
-        return res.status(500).send("ca marche pas");
+
+        return res.status(500).send("Internal server error");
     }
 }
 

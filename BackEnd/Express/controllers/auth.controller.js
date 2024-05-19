@@ -13,7 +13,6 @@ const UserController = require("../controllers/user.controller");
 
 
 const register = async (req, res) => {
-    console.log(`REST register`);
     const {username, email } = req.body.userInfos;
 
     const usernameIsAlreadyInDb = await User.findOne({where: { username: username }});
@@ -29,7 +28,6 @@ const register = async (req, res) => {
 }
 
 const authentication = async (req, res) => {
-    console.log(`REST login`);
     let credentialsAreValid = false;
     let user = null;
     if (req.body.email) {
@@ -72,7 +70,6 @@ const forgottenPassword = async (req, res) => {
         }
 
         const token = Token.createToken(user,'1h');
-        console.log(token);
 
         let htmlContent = fs.readFileSync(ForgottenPasswordTemplate,'utf8');
         htmlContent = htmlContent.replace('{{link}}', `${process.env.FRONTEND_URL}reset-forgotten-password/${token}`); //rediriger ver le form du front
@@ -131,7 +128,6 @@ const resetPassword = async (req, res) => {
 
 
 function loginWithEmail(email, password) {
-    console.log("login with email");
     return new Promise((resolve, reject) => {
         User.findOne({ where: { email: email } })
             .then(async user => {
@@ -152,7 +148,6 @@ function loginWithEmail(email, password) {
 }
 
 function loginWithUsername(username, password) {
-    console.log("login with username");
     return new Promise((resolve, reject) => {
         User.findOne({ where: { username: username } })
             .then(async user => {

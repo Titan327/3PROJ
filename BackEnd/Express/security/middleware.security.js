@@ -2,7 +2,6 @@ const Token = require('./token.security')
 const User = require('../models/user.model')
 
 const verifyIsAuth = (req, res, next) => {
-    console.log("Verifying token of the user \n");
 
     // header: authorization: Bearer token
     const header = req.headers.authorization;
@@ -22,7 +21,6 @@ const verifyIsAuth = (req, res, next) => {
 }
 
 const verifyIsAuthAndActivUser = async (req, res, next) => {
-    console.log("Verifying if the token is ok and if the user requesting is the actual user \n");
 
     verifyIsAuth(req, res, async () => {
         try {
