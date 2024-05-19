@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -102,37 +104,54 @@ fun GroupListScreen(httpClient: HttpClient, navController: NavController) {
                 if (showDialog.value) {
                     AlertDialog(
                         onDismissRequest = { showDialog.value = false },
-                        title = { Text("Create Group") },
+                        title = { Text("Création d'un Groupe") },
                         text = {
                             Column {
                                 TextField(
                                     value = groupName.value,
                                     onValueChange = { groupName.value = it },
-                                    label = { Text("Group Name") }
+                                    label = { Text("Nom du Groupe") },
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        focusedIndicatorColor = Color(0xFFFFA31A),
+                                        unfocusedIndicatorColor = Color(0xFFFFA31A)
+                                    )
                                 )
 
                                 TextField(
                                     value = groupDescription.value,
                                     onValueChange = { groupDescription.value = it },
-                                    label = { Text("Group Description") }
+                                    label = { Text("Description du Groupe") },
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        focusedIndicatorColor = Color(0xFFFFA31A),
+                                        unfocusedIndicatorColor = Color(0xFFFFA31A)
+                                    )
                                 )
                             }
                         },
                         confirmButton = {
-                            Button(onClick = {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    groupRepository.createGroup(jwtToken, groupName.value, groupDescription.value)
-                                    showDialog.value = false
-                                    groups.value = groupRepository.getUserGroups(userId, jwtToken, false)
-                                }
-                            }) {
-                                Text("Create Group")
+                            Button(
+                                onClick = {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        groupRepository.createGroup(jwtToken, groupName.value, groupDescription.value)
+                                        showDialog.value = false
+                                        groups.value = groupRepository.getUserGroups(userId, jwtToken, false)
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFFFFA31A)
+                                )
+                            ) {
+                                Text("Création du Groupe")
                             }
                         },
                         dismissButton = {
-                            Button(onClick = { showDialog.value = false }) {
-                                Text("Cancel")
-
+                            Button(
+                                onClick = { showDialog.value = false },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFFFFA31A)
+                                )
+                            ) {
+                                Text("Anuler")
                             }
                         }
                     )

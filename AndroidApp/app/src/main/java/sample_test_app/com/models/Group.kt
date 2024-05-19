@@ -15,3 +15,4 @@ data class Group(
     val isFavorite: Boolean? = false,
     val Users: List<User> = emptyList(),
 )
+
