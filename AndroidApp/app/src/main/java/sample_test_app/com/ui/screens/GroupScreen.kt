@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -109,14 +110,22 @@ fun GroupScreen(httpClient: HttpClient, navController: NavController, groupId: S
         groupPicture = if (group.value.picture?.isEmpty() == false) {
             group.value.picture?.get(1)
         } else null) {
-        GroupScreenContent(groupId = groupId.toString(), jwtToken = jwtToken, userId = userId, httpClient)
+        Column (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = CenterHorizontally
+        ) {
+            Button(onClick = { navController.navigate("message/"+groupId) }) {
+                Text(text = "Messages")
+            }
+            GroupScreenContent(groupId = groupId.toString(), jwtToken = jwtToken, userId = userId, httpClient,navController)
+        }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("DiscouragedApi")
 @Composable
-fun GroupScreenContent(groupId: String, jwtToken: String, userId: String, httpClient: HttpClient) {
+fun GroupScreenContent(groupId: String, jwtToken: String, userId: String, httpClient: HttpClient,navController: NavController) {
     val transactions = remember { mutableStateOf(emptyList<Transaction>()) }
     val refundsToDo = remember { mutableStateOf(emptyList<Refund>()) }
     val doneRefunds = remember { mutableStateOf(emptyList<Refund>()) }
@@ -543,11 +552,17 @@ fun GroupScreenContent(groupId: String, jwtToken: String, userId: String, httpCl
                                         horizontalArrangement = Arrangement.SpaceEvenly
                                     ) {
                                         for (user in rowUsers) {
+                                            Log.i("userrr",rowUsers.toString())
                                             Card(
                                                 backgroundColor = Color.Black
                                             ) {
                                                 Column {
                                                     Image(
+                                                        modifier = Modifier
+                                                            .size(100.dp)
+                                                            .clickable {
+                                                                navController.navigate("messagePrivate/"+groupId+"-"+userId+"-"+user.id+"-"+user.username)
+                                                            },
                                                         painter = if (user.profile_picture?.isEmpty() == false) {
                                                             rememberAsyncImagePainter(
                                                                 ImageRequest.Builder(LocalContext.current)
@@ -562,7 +577,7 @@ fun GroupScreenContent(groupId: String, jwtToken: String, userId: String, httpCl
                                                             )
                                                         },
                                                         contentDescription = "User Picture",
-                                                        modifier = Modifier.size(100.dp)
+
                                                     )
 
                                                     user.username?.let {

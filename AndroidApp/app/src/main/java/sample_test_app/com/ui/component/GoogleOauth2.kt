@@ -101,7 +101,8 @@ fun GoogleSignInButton (navController: NavHostController, httpClient: HttpClient
                                }
 
                                navController.navigate("home")
-                               //navController.navigate("message")
+                               //navController.navigate("message/5")
+                               //navController.navigate("group/5")
                            } else {
                                println("Error: userId is null")
                            }

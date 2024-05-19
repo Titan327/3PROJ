@@ -30,6 +30,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,13 +49,38 @@ import sample_test_app.com.ui.component.Chat.TriangleEdgeShape
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import sample_test_app.com.LocalUser
 import sample_test_app.com.http.Repository.GroupRepository
 import sample_test_app.com.models.Group
 import sample_test_app.com.models.Message
+import sample_test_app.com.models.User
+
+
+fun fetchUser(httpClient: HttpClient, userId: String, jwtToken: String): User? {
+    return runBlocking {
+        val userResponse: HttpResponse = withContext(Dispatchers.IO) {
+            httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId") {
+                contentType(ContentType.Application.Json)
+                header("Authorization", "Bearer $jwtToken")
+                println("Received token: $jwtToken")
+            }
+        }
+
+        if (userResponse.status == HttpStatusCode.OK) {
+            val userResponseBody = userResponse.bodyAsText()
+            Json.decodeFromString<User>(userResponseBody)
+        } else {
+            null
+        }
+    }
+}
+
 
 @Composable
-fun MessageScreen(navController: NavHostController, httpClient: HttpClient, groupId: String?) {
+fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClient, groupId: String?) {
     val messageRepository = remember { MessageRepository(httpClient) }
     val groupRepository = remember { GroupRepository(httpClient) }
     val jwtToken = LocalJwtToken.current
@@ -59,11 +91,27 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
     val listState = rememberLazyListState()
     var messCount = 0
 
-    val groupId = groupId!!.replace("-", "/")
+    var groupId = groupId!!.replace("-", "/")
+    val tmparray = groupId.split("/").map { it.toString() }.toTypedArray()
 
-    val groupInfo: Group? = runBlocking {
-        groupId?.let { groupRepository.getGroup(it,jwtToken) }
+    val otherUsername = tmparray.drop(3).joinToString(separator = "-")
+
+    groupId = tmparray[0]+"/"+tmparray[1]+"/"+tmparray[2]
+    val groupIdSocket = tmparray[0]
+
+    Log.i("gpi",groupId)
+
+    val user: User? = fetchUser(httpClient, userId, jwtToken)
+
+    var otherId:String
+
+    if (tmparray[0]==userId){
+        otherId = tmparray[0]
+    }else{
+        otherId = tmparray[1]
     }
+
+
 
 
     val socket = remember {
@@ -74,15 +122,16 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
     }
 
     DisposableEffect(socket) {
-        socket.on("chat-group-$groupId") { args ->
+        socket.on("chat-private-$groupIdSocket") { args ->
             if (args.isNotEmpty()) {
                 val message = args[0]?.toString().orEmpty()
                 val group = args[1]?.toString().orEmpty()
                 val user = args[2]?.toString().orEmpty()
+                val username = args[3]?.toString().orEmpty()
 
-                Log.i("Socket", "message: $message, group: $group, user: $user")
+                Log.i("Socket", "message: $message, group: $group, user: $user, username: $username")
                 CoroutineScope(Dispatchers.Main).launch {
-                    messages = messages + listOf(listOf(message, user))
+                    messages = messages + listOf(listOf(message, user,username))
                     listState.scrollToItem(messages.size - 1)
                     messCount += 1
                     Log.i("Socket", "messCount: $messCount")
@@ -105,9 +154,9 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
         try {
             if (isValidString(text)){
                 CoroutineScope(Dispatchers.Main).launch {
-                    val isSent = groupId?.let { messageRepository.sendMessage(jwtToken, it, text) }
+                    val isSent = groupId?.let { messageRepository.sendMessagePrivate(jwtToken, it, text) }
                     if (isSent == 200) {
-                        socket.emit("chat message", text, groupId, userId)
+                        socket.emit("private message", text, groupIdSocket, otherId, user!!.username,user.id)
                         messText = ""
                     } else {
                         Log.e("Socket", "Failed to send message: $isSent")
@@ -137,20 +186,19 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
             val offset = messCount % limit.toInt()
 
 
-            val AllMess = messageRepository.getmessage(groupId,limit, page.toString(),jwtToken)
+            val AllMess = messageRepository.getmessagePrivate(groupId,limit, page.toString(),jwtToken)
             var mess: Array<Message>? = null
             if (AllMess != null){
                 mess = AllMess.drop(offset).toTypedArray()
             }
 
-            Log.i("Socket",mess.toString())
             if (mess != null) {
                 Log.i("Socket","nb mess: "+mess.count())
 
                 //messages = listOf(listOf("testttttttt-------", "1"))
 
                 mess.forEach{
-                    messages = listOf(listOf(it.text, it.userId.toString())) + messages
+                    messages = listOf(listOf(it.text, it.userId.toString(),otherUsername)) + messages
                     messCount += 1
                 }
                 if (messCount == limit.toInt()){
@@ -190,13 +238,9 @@ fun MessageScreen(navController: NavHostController, httpClient: HttpClient, grou
                     if (message[1] == userId) {
                         MyBubble(message[0])
                     } else {
-                        groupInfo!!.Users.forEach{
-                            if (it.id==message[1]){
-                                TheirsBubble(message[0], message[1], it.username.toString())
-                            }
-                        }
 
-                        Log.i("laaaa",groupInfo.toString())
+                        TheirsBubble(message[0], message[1], message[2])
+
 
                     }
                 }
