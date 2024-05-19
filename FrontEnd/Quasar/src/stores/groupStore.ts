@@ -1,4 +1,4 @@
-import { ref, Ref } from 'vue';
+import { ref } from 'vue';
 import { api } from "boot/axios";
 import { DefaultGroup, Group } from 'src/interfaces/group.interface';
 
@@ -32,7 +32,6 @@ async function getGroup(id:number): Promise<Group> {
 }
 
 function getUserGroupData(id:number){
-
   return group.value.Users.find(user => user.id == id);
 }
 
