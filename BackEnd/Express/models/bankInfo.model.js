@@ -147,9 +147,9 @@ async function syncDatabase() {
                     }
                 ]
             );
-            console.log('BankInfo est initialisé.');
+
         } else {
-            console.log('BankInfo contient déjà des données.');
+
         }
     } catch (error) {
         console.error('Erreur lors de la synchronisation:', error);

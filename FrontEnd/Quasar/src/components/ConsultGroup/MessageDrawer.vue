@@ -75,7 +75,7 @@ async function getGroup() {
   try {
     const response = await api.get(`/groups/${props.groupId}`);
     senders.value = response.data.Users;
-    console.log(senders.value)
+
   }
   catch (error) {
     console.error(error);

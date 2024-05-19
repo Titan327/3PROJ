@@ -6,7 +6,6 @@ const {createUserGroupRelation} = require("./userGroup.controller");
 const {Op, where} = require("sequelize");
 
 const getGroup = async (req, res) => {
-    console.log(`REST getGroup`);
     const { groupId } = req.params;
 
     try {
@@ -46,7 +45,6 @@ const getGroup = async (req, res) => {
                     user.profile_picture = null;
                 }
                 user.profile_picture;
-                console.log(user);
             }
         );
 
@@ -65,7 +63,6 @@ const getGroup = async (req, res) => {
 }
 
 const getGroups = async (req, res) => {
-    console.log(`REST getGroups`);
     if (!req.params.userId) {
         return res.status(400).send({ message: "User ID is required" });
     }
@@ -78,7 +75,7 @@ const getGroups = async (req, res) => {
         const groupsID = await UserGroup.findAll({where: whereCondition});
         if (groupsID.length > 0) {
             let groupIds = groupsID.map(group => group.groupId);
-            console.log(`groupIds: ${groupIds}`);
+
             let groups = await Promise.all(groupIds.map(async (id) => {
                 let group = await Group.findOne({where: {id: id}});
 
@@ -104,7 +101,7 @@ const getGroups = async (req, res) => {
 }
 
 const createGroup = async (req, res) => {
-    console.log(`REST createGroup`);
+
     const schema = Joi.object({
         name: Joi.string().min(3).max(63).required(),
         description: Joi.string().min(3).max(255),
@@ -117,14 +114,14 @@ const createGroup = async (req, res) => {
     }
     try {
         const userId = req.authorization.userId;
-        console.log(`userId: ${userId}`);
+
         // Stocker le groupe créé dans une variable
         let newGroup = await Group.create({
             name,
             description,
             ownerId: userId,
         });
-        console.log(`newGroup: ${newGroup.id}`);
+
         await createUserGroupRelation(userId, newGroup.id);
         res.status(201).send({ message: "Group created successfully", group: newGroup });
     } catch (e) {
@@ -134,7 +131,7 @@ const createGroup = async (req, res) => {
 }
 
 const modifyGroup = async (req, res) => {
-    console.log(`REST modifyGroup`);
+
     const { groupId } = req.params;
     const { name, description } = req.body;
     try {
@@ -155,7 +152,7 @@ const modifyGroup = async (req, res) => {
 }
 
 const modifyGroupPicture = async (req, res) => {
-    console.log(`REST modifyGroup`);
+
     const { groupId } = req.params;
     const { url } = req.body;
     try {
@@ -176,7 +173,7 @@ const modifyGroupPicture = async (req, res) => {
 }
 
 const switchGroupOwnerWhenDeletingUser = async (userId) => {
-    console.log(`REST switchGroupOwnerWhenDeletingUser`);
+
     try {
         let groups = await Group.findAll({where: {ownerId: userId}});
         if (groups.length > 0) {

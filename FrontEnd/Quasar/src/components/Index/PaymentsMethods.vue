@@ -35,7 +35,7 @@ async function getMethod(){
      }
     }
     loading.value = false;
-    console.log(paiementsMethod.value)
+
   }
   catch(e){
     console.error(e)
@@ -76,10 +76,10 @@ async function getRibFile(id:number){
 }
 
 async function ribExist(id: number){
-  console.log(`check if ${id} exist`)
+
   try {
     const response = await api.get(`/img/rib/${id}`, { responseType: 'blob' });
-    console.log(response.data)
+
       return true;
   } catch (e) {
     console.error(e);

@@ -9,7 +9,7 @@ const waitForPostgres = async () => {
             const socket = net.connect(port, host);
 
             socket.on('connect', () => {
-                console.log(`PostgreSQL is available on ${host}:${port}`);
+
                 socket.end();
                 resolve();
             });

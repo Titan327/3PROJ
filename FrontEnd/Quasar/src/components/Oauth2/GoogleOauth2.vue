@@ -12,7 +12,7 @@ const handleCredentialResponse = (response: any) => {
 
   axios.post('https://3proj-back.tristan-tourbier.com/api/oauth2/google', { token: response.credential })
     .then(response => {
-      console.log('Réponse du backend :', response.data);
+
       sessionStorage.setItem('userToken', response.data.token);
       window.location.href = '/';
     })

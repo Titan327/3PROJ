@@ -38,7 +38,7 @@ onMounted(async () => {
 });
 
 NotificationBus.on('new-notif', async () => {
-  console.log('get count')
+
   await getCountNotifs();
 });
 

@@ -49,7 +49,7 @@ onMounted(async () => {
   function getWidth() {
 
     width.value = window.innerWidth;
-    console.log(width.value);
+
   }
 
   getWidth();
@@ -173,7 +173,7 @@ async function changeUserData(){
 
 async function getMethod(){
   try {
-    console.log(paiementsMethod.value)
+
     const response = await api.get(`/users/me/paymentMethode`)
     paiementsMethod.value = response.data
   }
