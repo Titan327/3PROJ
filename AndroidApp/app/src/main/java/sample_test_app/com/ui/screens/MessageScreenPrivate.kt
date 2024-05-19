@@ -94,6 +94,8 @@ fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClien
     var groupId = groupId!!.replace("-", "/")
     val tmparray = groupId.split("/").map { it.toString() }.toTypedArray()
 
+    val otherUsername = tmparray.drop(3).joinToString(separator = "-")
+
     groupId = tmparray[0]+"/"+tmparray[1]+"/"+tmparray[2]
     val groupIdSocket = tmparray[0]
 
@@ -109,7 +111,7 @@ fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClien
         otherId = tmparray[1]
     }
 
-    val otherUsername = tmparray[2]
+
 
 
     val socket = remember {
