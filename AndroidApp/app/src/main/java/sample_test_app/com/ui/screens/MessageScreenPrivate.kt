@@ -60,9 +60,14 @@ fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClien
     var messCount = 0
 
     val groupId = groupId!!.replace("-", "/")
+    val tmparray = groupId.split("/").map { it.toInt() }.drop(1).toTypedArray()
 
-    val groupInfo: Group? = runBlocking {
-        groupId?.let { groupRepository.getGroup(it,jwtToken) }
+    var otherUsername:String
+
+    if (tmparray[0].toString()==userId){
+        otherUsername = tmparray[0].toString()
+    }else{
+        otherUsername = tmparray[1].toString()
     }
 
 
@@ -79,10 +84,11 @@ fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClien
                 val message = args[0]?.toString().orEmpty()
                 val group = args[1]?.toString().orEmpty()
                 val user = args[2]?.toString().orEmpty()
+                val username = args[3]?.toString().orEmpty()
 
                 Log.i("Socket", "message: $message, group: $group, user: $user")
                 CoroutineScope(Dispatchers.Main).launch {
-                    messages = messages + listOf(listOf(message, user))
+                    messages = messages + listOf(listOf(message, user,username))
                     listState.scrollToItem(messages.size - 1)
                     messCount += 1
                     Log.i("Socket", "messCount: $messCount")
@@ -190,13 +196,9 @@ fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClien
                     if (message[1] == userId) {
                         MyBubble(message[0])
                     } else {
-                        groupInfo!!.Users.forEach{
-                            if (it.id==message[1]){
-                                TheirsBubble(message[0], message[1], it.username.toString())
-                            }
-                        }
 
-                        Log.i("laaaa",groupInfo.toString())
+                        TheirsBubble(message[0], message[1], otherUsername)
+
 
                     }
                 }
