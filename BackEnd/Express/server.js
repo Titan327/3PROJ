@@ -48,7 +48,7 @@ io.on('connection', function(socket){
         io.emit(`chat-group-${group}`, msg, group, userId);
     });
     socket.on('private message', function (msg, group, user2, username, user1){
-        io.emit(`chat-private-${group}`, msg, group);
+        io.emit(`chat-private-${group}`, msg, group,user1);
         CreateNotif(user2,`Nouveau message privé de ${username}`,`groups/${group}/private-chat/${user1}`);
     });
 
