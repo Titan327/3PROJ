@@ -14,7 +14,7 @@ declare module '@vue/runtime-core' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: `${process.env.URL_BACKEND}api/` }); //localhost:9002 docker
+const api = axios.create({ baseURL: `${process.env.URL_BACKEND}api/` });
 api.interceptors.request.use(
   (config) => {
     const userToken = sessionStorage.getItem('userToken');
@@ -28,7 +28,7 @@ api.interceptors.request.use(
   }
 );
 
-const back = axios.create({ baseURL: process.env.URL_BACKEND}); //localhost:9002 docker
+const back = axios.create({ baseURL: process.env.URL_BACKEND});
 back.interceptors.request.use(
   (config) => {
     const userToken = sessionStorage.getItem('userToken');

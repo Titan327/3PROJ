@@ -127,7 +127,7 @@ async function login() {
         <a href="#/reset-pwd"><b>Mot de passe oublié</b></a>
       </div>
       <q-btn
-        class="btn "
+        class="btn"
         color="secondary"
         text-color="white"
         unelevated
