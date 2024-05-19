@@ -561,7 +561,7 @@ fun GroupScreenContent(groupId: String, jwtToken: String, userId: String, httpCl
                                                         modifier = Modifier
                                                             .size(100.dp)
                                                             .clickable {
-                                                                navController.navigate("messagePrivate/"+groupId+"-"+userId+"-"+user.id)
+                                                                navController.navigate("messagePrivate/"+groupId+"-"+userId+"-"+user.id+"-"+user.username)
                                                             },
                                                         painter = if (user.profile_picture?.isEmpty() == false) {
                                                             rememberAsyncImagePainter(
