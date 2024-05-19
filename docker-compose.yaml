@@ -17,19 +17,19 @@ services:
     networks:
       - Bill-network
 
-#
-#  Quasar-app:
-#    image: ${QUASAR_IMG}
-#    container_name: API-QUASAR
-#    working_dir: /Quasar
-#    volumes:
-#      - ${QUASAR_VOLUME}
-#    ports:
-#      - "${QUASAR_PORT}"
-#    command: sh -c "npm install && npm run dev"
-#    networks:
-#      - Bill-network
-#
+
+  Quasar-app:
+    image: ${QUASAR_IMG}
+    container_name: API-QUASAR
+    working_dir: /Quasar
+    volumes:
+      - ${QUASAR_VOLUME}
+    ports:
+      - "${QUASAR_PORT}"
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - Bill-network
+
 
   Postgres:
     image: ${POSTGRES_IMG}
