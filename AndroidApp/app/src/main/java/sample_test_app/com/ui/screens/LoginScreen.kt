@@ -148,7 +148,6 @@ fun LoginScreen(
                                 }
 
                                 navController.navigate("home")
-                                //navController.navigate("message")
                             } else {
                                 println("Error: userId is null")
                             }

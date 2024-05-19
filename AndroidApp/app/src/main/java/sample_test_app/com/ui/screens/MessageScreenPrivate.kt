@@ -195,7 +195,6 @@ fun MessageScreenPrivate(navController: NavHostController, httpClient: HttpClien
             if (mess != null) {
                 Log.i("Socket","nb mess: "+mess.count())
 
-                //messages = listOf(listOf("testttttttt-------", "1"))
 
                 mess.forEach{
                     messages = listOf(listOf(it.text, it.userId.toString(),otherUsername)) + messages
