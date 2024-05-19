@@ -1,16 +1,18 @@
 package sample_test_app.com.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,315 +20,414 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import sample_test_app.com.LocalJwtToken
+import sample_test_app.com.LocalUser
 import sample_test_app.com.R
-import androidx.navigation.NavController
-import coil.transform.CircleCropTransformation
-import kotlinx.serialization.json.JsonArray
+import sample_test_app.com.http.Repository.GroupRepository
+import sample_test_app.com.http.Repository.TransactionRepository
+import sample_test_app.com.models.Group
+import sample_test_app.com.models.TransactionUser
 
 
 @Composable
-fun HomeScreen(userId: String, httpClient: HttpClient, jwtToken: String, navController: NavController) {
-    var usernameState = remember { mutableStateOf("") }
-    var profilePictureState = remember { mutableStateOf("") }
-    var groupsState = remember { mutableStateOf(listOf<Pair<String, String>>()) }
-    var transactionsState = remember { mutableStateOf(listOf<Map<String, String>>()) } // New state for transactions
-    var lastTransactionsState = remember { mutableStateOf(listOf<Map<String, String>>()) } // New state for last transactions
-
-
+fun HomeScreen(httpClient: HttpClient, navController: NavController) {
+    val jwtToken = LocalJwtToken.current
+    val userId = LocalUser.current.id.toString()
+    val groups = remember { mutableStateOf(emptyList<Group>()) }
+    val transactions = remember { mutableStateOf(emptyList<TransactionUser>()) }
+    val totalPaidThisMonth = remember { mutableStateOf(Pair(0.0f, 0)) }
+    val restToPay = remember { mutableStateOf(Pair(0.0f, 0)) }
+    val groupRepository = GroupRepository(httpClient)
+    val transactionRepository = TransactionRepository(httpClient)
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.Main).launch {
-            val userInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId") {
-                    contentType(ContentType.Application.Json)
-                    header("Authorization", "Bearer $jwtToken")
-                }
-            }
-            if (userInfoResponse.status == HttpStatusCode.OK) {
-                val userInfoResponseBody = userInfoResponse.bodyAsText()
-                withContext(Dispatchers.Main) {
-                    println("User info request succeeded. Response: $userInfoResponseBody")
-
-                    val userInfoJson = Json.parseToJsonElement(userInfoResponseBody).jsonObject
-                    val username = userInfoJson["username"]?.jsonPrimitive?.content
-                    val profilePicture = if (userInfoJson["profile_picture"] is JsonArray && userInfoJson["profile_picture"]?.jsonArray?.isNotEmpty() == true) {
-                        userInfoJson["profile_picture"]?.jsonArray?.get(0)?.jsonPrimitive?.content
-
-                    } else {
-                        null
-                    }
-                    if (username != null) {
-                        usernameState.value = username
-                    }
-                    if (profilePicture != null) {
-                        profilePictureState.value = profilePicture
-                    }
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    println("User info request failed. Error code: ${userInfoResponse.status.value}")
-                }
-            }
-
-            val groupsResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/groups") {
-                    contentType(ContentType.Application.Json)
-                    header("Authorization", "Bearer $jwtToken")
-                }
-            }
-            if (groupsResponse.status == HttpStatusCode.OK) {
-                val groupsResponseBody = groupsResponse.bodyAsText()
-                withContext(Dispatchers.Main) {
-                    println("Groups request succeeded. Response: $groupsResponseBody")
-
-                    val groupsJson = Json.parseToJsonElement(groupsResponseBody).jsonArray
-                    val groups = groupsJson.mapNotNull { it.jsonObject }
-                        .mapNotNull {
-                            val id = it["id"]?.jsonPrimitive?.content
-                            val name = it["name"]?.jsonPrimitive?.content
-                            if (id != null && name != null) {
-                                Pair(id, name)
-                            } else {
-                                null
-                            }
-                        }
-                    groupsState.value = groups
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    println("Groups request failed. Error code: ${groupsResponse.status.value}")
-                }
-            }
-
-            val transactionsResponse: HttpResponse = withContext(Dispatchers.IO) {
-                httpClient.get("https://3proj-back.tristan-tourbier.com/api/users/$userId/transactions") {
-                    contentType(ContentType.Application.Json)
-                    header("Authorization", "Bearer $jwtToken")
-                }
-            }
-            if (transactionsResponse.status == HttpStatusCode.OK) {
-                val transactionsResponseBody = transactionsResponse.bodyAsText()
-                withContext(Dispatchers.Main) {
-                    println("Transactions request succeeded. Response: $transactionsResponseBody")
-
-                    val transactionsJson = Json.parseToJsonElement(transactionsResponseBody).jsonArray
-                    val transactions = transactionsJson.mapNotNull { it.jsonObject }
-                        .mapNotNull {
-                            val amount = it["amount"]?.jsonPrimitive?.content
-                            val description = it["description"]?.jsonPrimitive?.content
-                            val date = it["date"]?.jsonPrimitive?.content
-                            if (amount != null && description != null && date != null) {
-                                mapOf(
-                                    "amount" to amount,
-                                    "description" to description,
-                                    "date" to date
-                                )
-                            } else {
-                                null
-                            }
-                        }
-                    transactionsState.value = transactions
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    println("Transactions request failed. Error code: ${transactionsResponse.status.value}")
-                }
-            }
+            groups.value = groupRepository.getUserGroups(userId, jwtToken, true)
+            transactions.value = transactionRepository.getLastTransactions(userId, jwtToken)
+            totalPaidThisMonth.value = transactionRepository.getTotalPaidThisMonth(userId, jwtToken)
+            restToPay.value = transactionRepository.getRestToPay(userId, jwtToken)
         }
     }
 
-    Box(
+    Column (
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo250),
-            contentDescription = "Logo",
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-
-        if (profilePictureState.value.isNotBlank() && profilePictureState.value != "null") {
-            Image(
-                painter = rememberImagePainter(
-                    data = profilePictureState.value,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                    }
-                ),
-                contentDescription = "User Profile Picture",
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp))
+            ){
+            Column (
                 modifier = Modifier
-                    .size(80.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(top = 16.dp)
-                    .clickable {
-                        navController.navigate("ProfilScreen/$userId/$jwtToken")
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row{
+                    Text(
+                        text = "Mes groupes favoris:",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                }
+                Row (
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (groups.value.isEmpty()) {
+                        Text(
+                            text = "Aucun groupe favori",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 18.sp
+                            )
+                        )
+                    } else {
+                        for (group in groups.value) {
+                            val groupId = group.id.toString()
+                            if (group.picture?.isNotEmpty() == true) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(data = group.picture[0])
+                                            .apply(block = fun ImageRequest.Builder.() {
+                                                transformations(CircleCropTransformation())
+                                            }).build()
+                                    ),
+                                    contentDescription = "Group Picture",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(top = 16.dp)
+                                        .clickable {
+                                            navController.navigate("group/$groupId")
+                                        }
+                                )
+                            } else {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(data = R.drawable.groupslogofull)
+                                            .apply(block = fun ImageRequest.Builder.() {
+                                                transformations(CircleCropTransformation())
+                                            }).build()
+                                    ),
+                                    contentDescription = "Logo",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(top = 16.dp)
+                                        .clickable {
+                                            navController.navigate("group/$groupId")
+                                        }
+                                )
+                            }
+                        }
                     }
-            )
-        } else {
-            Image(
-                painter = rememberImagePainter(
-                    data = R.drawable.userdefault,
-                    builder = {
-                        transformations(CircleCropTransformation())
-                    }
-                ),
-                contentDescription = "User Profile Picture",
-                modifier = Modifier
-                    .size(80.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(top = 16.dp)
-                    .clickable {
-                        navController.navigate("ProfilScreen/$userId/$jwtToken")
-                    }
-            )
+                }
+            }
         }
 
-        LazyColumn(
-            modifier = Modifier.align(Alignment.Center)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp))
         ) {
-            items(groupsState.value) { group ->
-                Card(
+            Column(
+                modifier = Modifier
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row {
+                    Text(
+                        text = "Dernières transactions:",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                }
+                Row (
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .clickable {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                val groupInfoResponse: HttpResponse = withContext(Dispatchers.IO) {
-                                    httpClient.get("https://3proj-back.tristan-tourbier.com/api/groups/${group.first}") {
-                                        contentType(ContentType.Application.Json)
-                                        header("Authorization", "Bearer $jwtToken")
-                                    }
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        if (transactions.value.isEmpty()) {
+                            Row {
+                                Text(
+                                    text = "Aucune transaction récente",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 18.sp
+                                    )
+                                )
+                            }
+                        } else {
+                            Row (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .align(Alignment.CenterVertically),
+                                ) {
+                                    Text(text = "Groupe", color = Color.White)
                                 }
-                                if (groupInfoResponse.status == HttpStatusCode.OK) {
-                                    val groupInfoResponseBody = groupInfoResponse.bodyAsText()
-                                    withContext(Dispatchers.Main) {
-                                        println("Group info request succeeded. Response: $groupInfoResponseBody")
-                                        navController.navigate("GroupScreen/${group.first}/$jwtToken")
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(2f)
+                                        .align(Alignment.CenterVertically),
+                                ) {
+                                    Text(text = "Dépense", color = Color.White)
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .align(Alignment.CenterVertically),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(text = "Montant", color = Color.White)
+                                }
+                            }
+                            Surface(
+                                color = Color.White,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp),
+                                elevation = 1.dp,
+                                border = BorderStroke(1.dp, Color.White)
+                            ) {}
+                            for (transaction in transactions.value) {
+                                Row (
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .align(Alignment.CenterVertically),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Image(
+                                            painter = if (transaction.Transaction?.Group?.picture?.isNotEmpty() == true) {
+                                                rememberAsyncImagePainter(
+                                                    ImageRequest.Builder(LocalContext.current)
+                                                        .data(data = transaction.Transaction.Group.picture[0])
+                                                        .apply(block = fun ImageRequest.Builder.() {
+                                                            transformations(CircleCropTransformation())
+                                                        }).build()
+                                                )
+                                            } else {
+                                                painterResource(id = R.drawable.groupslogofull)
+                                            },
+                                            contentDescription = "Logo",
+                                            modifier = Modifier
+                                                .size(60.dp)
+                                        )
                                     }
-                                } else {
-                                    withContext(Dispatchers.Main) {
-                                        println("Group info request failed. Error code: ${groupInfoResponse.status.value}")
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(2f)
+                                            .align(Alignment.CenterVertically),
+                                    ) {
+                                        Text(text = transaction.Transaction?.label ?: "", color = Color.White)
+                                    }
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .align(Alignment.CenterVertically),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(text = transaction.amount.toString() + "€", color = Color.White)
                                     }
                                 }
                             }
-                        },
-                    elevation = 4.dp
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.grouplogo),
-                            contentDescription = "Group Logo",
-                            modifier = Modifier
-                                .size(50.dp)
-                                .padding(end = 16.dp)
-                        )
-                        Text(text = group.second)                    }
+                        }
+                    }
                 }
             }
-
-            item {
-                Card(
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row {
+                    Text(
+                        text = "Total payé ce mois-ci:",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                }
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 16.dp), // Ajout de padding horizontal
-                    elevation = 4.dp
+                        .padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp) // Ajout de padding à l'intérieur de la Card
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(color = Color(R.color.secondary))
+                            .padding(16.dp)
                     ) {
-                        Text(text = "Dernières dépenses", style = MaterialTheme.typography.h6)
-
-                        // En-têtes du tableau
-                        Row(
-                            modifier = Modifier
-                                .background(Color.LightGray)
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Text(text = "Nom", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
-                            Text(text = "Date", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
-                            Text(text = "Somme", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
-                            Text(text = "Statut", modifier = Modifier.weight(1f), style = MaterialTheme.typography.subtitle1)
-                        }
-
-                        if (transactionsState.value.isEmpty()) {
-                            Text(text = "Rien à afficher", style = MaterialTheme.typography.body1)
+                        Image(
+                            painter = painterResource(id = R.drawable.botleftarrow),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Column (
+                        modifier = Modifier.padding(start = 24.dp)
+                    ) {
+                        if (totalPaidThisMonth.value.first == 0.0f) {
+                            Row {
+                                Text(
+                                    text = "Aucune transaction ce mois-ci",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
+                            }
                         } else {
-                            transactionsState.value.forEach { transaction ->
-                                // Ligne du tableau pour chaque transaction
-                                Row(
-                                    modifier = Modifier
-                                        .border(1.dp, Color.LightGray)
-                                        .padding(vertical = 8.dp)
-                                ) {
-                                    Text(text = transaction["description"] ?: "", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1)
-                                    Text(text = transaction["date"] ?: "", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1)
-                                    Text(text = transaction["amount"] ?: "", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1)
-                                    Text(text = "Paid", modifier = Modifier.weight(1f), style = MaterialTheme.typography.body1) // Remplacez "Paid" par le statut réel
-                                }
+                            Row {
+                                Text(
+                                    text = "Total: ${totalPaidThisMonth.value.first}€",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
+                            }
+                            Row {
+                                Text(
+                                    text = "Nombre de transactions: ${totalPaidThisMonth.value.second}",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 18.sp
+                                    )
+                                )
                             }
                         }
                     }
                 }
             }
         }
-
-
-
-
-        Image(
-            painter = painterResource(id = R.drawable.notificationbellhome),
-            contentDescription = "Notification Icon",
+        Row(
             modifier = Modifier
-                .size(40.dp)
-                .align(Alignment.BottomStart)
-                .offset(x = 26.dp)
-                .offset(y = -20.dp)
-                .clickable { /* Ajoutez votre action de clic ici */ }
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.homepage),
-            contentDescription = "Home Icon",
-            modifier = Modifier
-                .size(40.dp)
-                .align(Alignment.BottomCenter)
-                .offset(y = -20.dp)
-                .clickable { /* Ajoutez votre action de clic ici */ }
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.messsagecircular),
-            contentDescription = "Settings Icon",
-            modifier = Modifier
-                .size(30.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = -26.dp)
-                .offset(y = -20.dp)
-                .clickable { /* Ajoutez votre action de clic ici */ }
-        )
+                .fillMaxWidth()
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(color = Color(0xFF808080))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row {
+                    Text(
+                        text = "Reste à rembourser:",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(color = Color(R.color.secondary))
+                            .padding(16.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.toprightarrow),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Column (
+                        modifier = Modifier.padding(start = 24.dp)
+                    ) {
+                        if (totalPaidThisMonth.value.first == 0.0f) {
+                            Row {
+                                Text(
+                                    text = "0€ à rembourser",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
+                            }
+                        } else {
+                            Row {
+                                Text(
+                                    text = "Total: ${restToPay.value.first}€",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 21.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

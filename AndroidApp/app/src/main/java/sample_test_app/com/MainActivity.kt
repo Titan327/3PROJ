@@ -1,39 +1,53 @@
 package sample_test_app.com
+import MessageScreen
+import MessageScreenPrivate
 import SplashScreen
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.ktor.client.HttpClient
-import sample_test_app.com.ui.screens.InformationScreen
-import sample_test_app.com.ui.screens.LoginScreen
-import sample_test_app.com.ui.screens.RegisterScreen
-import sample_test_app.com.ui.screens.HomeScreen
-import sample_test_app.com.ui.theme.SampleTestAppTheme
-import io.ktor.client.*
-import io.ktor.http.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import sample_test_app.com.http.Repository.CategoryRepository
+import sample_test_app.com.models.CategoryStore
+import sample_test_app.com.models.NotificationScreen
+import sample_test_app.com.models.User
+import sample_test_app.com.ui.screens.GroupListScreen
 import sample_test_app.com.ui.screens.GroupScreen
 import sample_test_app.com.ui.screens.HomeScreen
 import sample_test_app.com.ui.screens.LoginScreen
+import sample_test_app.com.ui.screens.MainScreen
+
 import sample_test_app.com.ui.screens.ProfilScreen
 import sample_test_app.com.ui.screens.RegisterScreen
 import sample_test_app.com.ui.theme.SampleTestAppTheme
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CoroutineScope(Dispatchers.IO).launch {
+            CategoryStore.categories = CategoryRepository(HttpClient()).getCategories()
+        }
         setContent {
             SampleTestAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF141332)) {
+                Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF1b1b1b)) {
                     AppNavHost()
                 }
             }
@@ -41,28 +55,66 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+var LocalJwtToken = compositionLocalOf<String> { error("No JWT Token provided") }
+var LocalUser = compositionLocalOf<User> { error("No User provided") }
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
+    val jwtToken = remember { mutableStateOf("") }
+    val user = remember { mutableStateOf(User()) }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF141332)) {
-        NavHost(navController = navController, startDestination = "splash") {
-            composable("splash") { SplashScreen(navController) }
-            composable("login") { LoginScreen(navController, HttpClient()) }
-            composable("ProfilScreen/{userId}/{jwtToken}") { backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId") ?: ""
-                val jwtToken = backStackEntry.arguments?.getString("jwtToken") ?: ""
-                ProfilScreen(HttpClient(), userId, jwtToken)
-            }
-            composable("GroupScreen/{groupId}/{jwtToken}") { backStackEntry ->
-                GroupScreen(backStackEntry, HttpClient())
-            }
-            composable("register") { RegisterScreen(navController , HttpClient()) }
-            composable("home/{userId}/{jwtToken}") { backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId") ?: ""
-                val jwtToken = backStackEntry.arguments?.getString("jwtToken") ?: ""
-                HomeScreen(userId, HttpClient(), jwtToken, navController)
+
+    CompositionLocalProvider(LocalJwtToken provides jwtToken.value, LocalUser provides user.value) {
+        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF1b1b1b)) {
+            NavHost(navController = navController, startDestination = "splash") {
+                composable("splash") { SplashScreen(navController) }
+                composable("register") { RegisterScreen(navController, HttpClient(), jwtToken, user) }
+                composable("login/{username}/{password}") { backStackEntry ->
+                    val username = backStackEntry.arguments?.getString("username") ?: ""
+                    val password = backStackEntry.arguments?.getString("password") ?: ""
+                    LoginScreen(navController, HttpClient(), jwtToken, user, username, password)
+                }
+                composable("login") {
+                    LoginScreen(navController, HttpClient(), jwtToken, user, "", "")
+                }
+
+
+
+                composable("home") {
+                    MainScreen(navController) {
+                        HomeScreen(HttpClient(), navController)
+                    }
+                }
+                composable("groupList") {
+                    MainScreen(navController) {
+                        GroupListScreen(HttpClient(), navController)
+                    }
+                }
+
+                composable("profil") {
+                    MainScreen(navController) {
+                        LocalUser.current.id?.let { it1 -> ProfilScreen(HttpClient(), navController, LocalJwtToken.current, it1.toInt()) }
+                    }
+                }
+
+                composable("notifications") {
+                    MainScreen(navController) {
+                        NotificationScreen(HttpClient(), navController)
+                    }
+                }
+                composable("group/{groupId}") { backStackEntry ->
+                    GroupScreen(HttpClient(), navController, backStackEntry.arguments?.getString("groupId"))
+                }
+                composable("message/{groupId}") { backStackEntry ->
+                    MessageScreen(navController, HttpClient(),backStackEntry.arguments?.getString("groupId"))
+                }
+                composable("messagePrivate/{groupId}") { backStackEntry ->
+                    MessageScreenPrivate(navController, HttpClient(),backStackEntry.arguments?.getString("groupId"))
+                }
             }
         }
     }
 }
+
